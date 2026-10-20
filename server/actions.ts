@@ -51,6 +51,9 @@ export async function cancelPreview(c: Ctx, id: string) {
   const v = await need(c.store, id);
   const now = await c.store.now();
   const minutesBefore = v.start - now;
+  if (minutesBefore <= 0 || !["scheduled", "holding", "held", "at_risk"].includes(v.state)) {
+    return { minutesBefore, late: false, feeCents: 0, releaseCents: 0, heldCents: v.hold?.cents ?? 0, lateFeeCents: 0, noticeHours: v.terms.noticeHours, closed: true };
+  }
   const s = settle(v.terms, { type: "cancel", by: "household", minutesBefore, assigned: v.memberIds }, v.hold ? "placed" : "failed");
   const lateFee = Math.round((priceCents(v.terms) * v.terms.lateCancelPct) / 100);
   return {
@@ -61,6 +64,7 @@ export async function cancelPreview(c: Ctx, id: string) {
     heldCents: v.hold?.cents ?? 0,
     lateFeeCents: lateFee,
     noticeHours: v.terms.noticeHours,
+    closed: false,
   };
 }
 

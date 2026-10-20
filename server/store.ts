@@ -66,7 +66,9 @@ export class Store {
           [v.id, v.householdId, JSON.stringify(v.memberIds), v.start, v.minutes, JSON.stringify(v.terms), v.state]);
       }
     });
-    await this.setClock(STORY.day * 1440 + 7 * 60);
+    const start = STORY.messageAt;
+    await this.db.query("update visits set state = 'done' where start + minutes <= $1", [start]);
+    await this.setClock(start);
   }
 
   // ---- clock: board minutes, running at real speed from the last time it was set

@@ -29,8 +29,9 @@ export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
   await d.store.updateVisit(v.id, { state: "holding" });
   try {
     const hold = await d.paypal.authorize(h.vaultId, cents, v.id, `Home cleaning, ${h.name}`, `covered-${v.id}`);
-    const now = await d.store.now();
-    await d.store.updateVisit(v.id, { state: "held", hold: { orderId: hold.orderId, authorizationId: hold.authorizationId, cents, placedAt: now, status: hold.status } });
+    // placed when it fell due on the board's clock (the demo clock can jump past that moment)
+    const placedAt = Math.min(await d.store.now(), v.start - holdAtMinutesBefore(v.terms));
+    await d.store.updateVisit(v.id, { state: "held", hold: { orderId: hold.orderId, authorizationId: hold.authorizationId, cents, placedAt, status: hold.status } });
     await d.store.money(v.id, "hold", cents, v.id, hold.authorizationId, hold.status);
     await d.store.event("hold.placed", v.id, "workflow", { cents, authorizationId: hold.authorizationId });
     return `held ${dollars(cents)}`;

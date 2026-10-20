@@ -71,6 +71,7 @@ export const DEFAULT_TERMS: Terms = {
 };
 
 export type VisitState =
+  | "done" // seeded history: before the demo clock started, no money moved
   | "scheduled"
   | "holding" // hold requested, not yet confirmed
   | "held"

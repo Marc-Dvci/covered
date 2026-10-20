@@ -6,6 +6,14 @@
 // with template messages.
 import { randomUUID } from "node:crypto";
 import { clock, dollars, LANG_NAMES, WEEK_DAYS, type Household, type Lang, type Member } from "../../shared/domain.ts";
+import { WEEK_START_ISO } from "../../shared/seed.ts";
+
+const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+function longDay(t: number): string {
+  const d = new Date(`${WEEK_START_ISO}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + Math.floor(t / 1440));
+  return `${DAY_NAMES[Math.floor(t / 1440) % 7]} ${d.getUTCDate()} ${d.toLocaleString("en-US", { month: "long", timeZone: "UTC" })}`;
+}
 import { activeAbsences, holdText } from "../actions.ts";
 import { AIUnavailable, numbersOk, type Gemini } from "../ai/gemini.ts";
 import type { Store, VisitRow } from "../store.ts";
@@ -112,7 +120,7 @@ function visitLine(f: Facts, v: VisitRow) {
   const h = f.households.find((x) => x.id === v.householdId)!;
   return {
     visit_id: v.id, household: h.name, household_id: h.id, area: h.area, language: LANG_NAMES[h.language],
-    day: WEEK_DAYS[Math.floor(v.start / 1440)], start: clock(v.start), end: clock(v.start + v.minutes), hours: v.minutes / 60,
+    day: longDay(v.start), start: clock(v.start), end: clock(v.start + v.minutes), hours: v.minutes / 60,
     needs: h.needs, same_cleaner_requested: h.sameCleaner, payment: holdText(v),
   };
 }
@@ -151,7 +159,7 @@ export function recipients(f: Facts, p: Plan): { id: string; kind: "member" | "h
 function allowedNumbers(f: Facts): (string | number)[] {
   const nums: (string | number)[] = [];
   for (const v of f.visits) {
-    nums.push(clock(v.start), clock(v.start + v.minutes), v.minutes / 60, v.minutes);
+    nums.push(clock(v.start), clock(v.start + v.minutes), v.minutes / 60, v.minutes, longDay(v.start));
     if (v.hold) nums.push(dollars(v.hold.cents));
   }
   for (const p of f.solved.plans) nums.push(p.covered, p.consent, p.addedTravel);
@@ -212,7 +220,7 @@ export async function propose(store: Store, ai: Gemini | null, disruptionId: str
   if (ai && solved.plans.length && affected.length) {
     const allowed = allowedNumbers(f);
     const task = {
-      who_is_out: f.out.name, their_message: d.text, day: WEEK_DAYS[d.day], now: clock(d.boardAt),
+      who_is_out: f.out.name, their_message: d.text, day: longDay(d.day * 1440), now: clock(d.boardAt),
       affected_visits: affected.map((v) => visitLine(f, v)),
     };
     const contents: unknown[] = [{ role: "user", parts: [{ text: `Task:\n${JSON.stringify(task, null, 1)}` }] }];

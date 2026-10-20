@@ -71,6 +71,7 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
   server.post("/api/clock", wrap(async (req, reply) => {
     if (!app.cfg.demo) return reply.code(403).send({ error: "demo only" });
     const body = z.object({ at: z.number().int().min(0).max(7 * 1440 - 1) }).parse(req.body);
+    if (body.at < (await app.store.now())) return reply.code(409).send({ error: "the demo clock only moves forward; reset the demo to start the day again" });
     await app.store.setClock(body.at);
     await app.store.event("clock.set", null, "demo", { at: body.at });
     const held = await sweep(app);

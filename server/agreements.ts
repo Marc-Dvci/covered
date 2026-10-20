@@ -116,7 +116,11 @@ export async function finish(store: Store, ai: Gemini | null, d: Draft, memberLa
         "Translate this cleaning agreement summary faithfully. Keep every number, time and amount exactly as written. Do not add or remove terms.",
         [{ text: `Target language: ${LANG_NAMES[lang]} (${lang}).\n\n${en}` }],
         { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] }, visitor);
-      const same = numbersIn(r.text).sort().join(",") === numbersIn(en).sort().join(",");
+      // every number in the translation must be one of the English numbers, and every amount must survive
+      const amounts = (en.match(/\$\d[\d,]*\.\d{2}/g) ?? []).map((a) => a.slice(1).replace(/,/g, ""));
+      const norm = (n: string) => n.replace(/\.00$/, "").replace(/^0(\d)/, "$1");
+      const theirs = new Set(numbersIn(r.text).map(norm));
+      const same = numbersOk(r.text, numbersIn(en)) && amounts.every((a) => theirs.has(norm(a)));
       if (same) d.readback.push({ language: lang, text: r.text, source: ai.last?.source ?? "live" });
       else d.notes.push(`The ${LANG_NAMES[lang]} read-back changed a number, so it is not shown.`);
     } catch (e) {

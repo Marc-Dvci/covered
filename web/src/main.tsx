@@ -1,0 +1,49 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./styles.css";
+import { Top } from "./components/Top.tsx";
+import { AboutPage } from "./pages/About.tsx";
+import { BoardPage } from "./pages/Board.tsx";
+import { HomePage } from "./pages/Home.tsx";
+import { HouseholdPage } from "./pages/Household.tsx";
+import { JoinPage } from "./pages/Join.tsx";
+import { MemberPage } from "./pages/Member.tsx";
+import { SharePage } from "./pages/Share.tsx";
+import { StatementPage } from "./pages/Statement.tsx";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/s/:token" element={<SharePage />} />
+        <Route path="*" element={<WithTop />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function WithTop() {
+  return (
+    <>
+      <Top />
+      <main id="main">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/board" element={<BoardPage />} />
+          <Route path="/m/:id" element={<MemberPage />} />
+          <Route path="/m/:id/statement" element={<StatementPage />} />
+          <Route path="/h/:id" element={<HouseholdPage />} />
+          <Route path="/join" element={<JoinPage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Routes>
+      </main>
+    </>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);

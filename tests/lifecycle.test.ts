@@ -25,11 +25,11 @@ describe("visit money lifecycle", () => {
     const due = await sweep(app);
     await idle();
     const visits = await app.store.visits();
-    const now = THU + hm("07:00");
+    const now = THU + hm("07:10");
     for (const v of visits) {
       const inWindow = v.start > now && v.start - (24 * 60 + 10) <= now;
       expect(due.includes(v.id)).toBe(inWindow);
-      expect(v.state).toBe(inWindow ? "held" : "scheduled");
+      expect(v.state).toBe(inWindow ? "held" : v.start + v.minutes <= now ? "done" : "scheduled");
     }
     expect(due).toContain("v-thu-okafor");
   });

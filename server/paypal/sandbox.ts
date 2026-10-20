@@ -68,7 +68,7 @@ export class SandboxPayPal implements PayPal {
         let issue = "UNKNOWN";
         let debugId: string | undefined;
         try {
-          const body = typeof e.body === "string" ? JSON.parse(e.body) : (e.body as Record<string, unknown>);
+          const body = (typeof e.body === "string" ? JSON.parse(e.body) : e.body) as Record<string, unknown> | undefined;
           debugId = (body?.debug_id as string) ?? undefined;
           const details = body?.details as { issue?: string }[] | undefined;
           issue = details?.[0]?.issue ?? (body?.name as string) ?? issue;

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+var/
+.env
+probe/.env
+*.tgz
+coverage/
+test-results/
+playwright-report/

@@ -1,5 +1,37 @@
 [
  {
+  "page": "home",
+  "violations": []
+ },
+ {
+  "page": "board",
+  "violations": []
+ },
+ {
+  "page": "board-proposal",
+  "violations": []
+ },
+ {
+  "page": "household-ask",
+  "violations": []
+ },
+ {
+  "page": "member-phone",
+  "violations": []
+ },
+ {
+  "page": "statement",
+  "violations": []
+ },
+ {
+  "page": "landlord",
+  "violations": []
+ },
+ {
+  "page": "join",
+  "violations": []
+ },
+ {
   "page": "about",
   "violations": []
  }

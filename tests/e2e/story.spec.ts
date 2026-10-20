@@ -69,15 +69,25 @@ test("Thursday: Sam is out, the board is covered, everyone is paid", async ({ pa
   await axe(page, "landlord");
 });
 
+test("the demo inputs draft from the recorded answer and can be signed", async ({ page }) => {
+  await page.goto("/join");
+  await page.getByRole("button", { name: "Draft the agreement" }).click();
+  await expect(page.getByText("drafted (recorded)")).toBeVisible();
+  await expect(page.getByText("Português", { exact: true }).last()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign and save PayPal" })).toBeEnabled();
+});
+
 test("a new household signs without a model and lands on the board", async ({ page }) => {
   await page.goto("/join");
+  await page.getByLabel("Name").fill("The Abernathys");
+  await page.getByLabel("The job, in their words").fill("A small flat, floors and bathroom.");
   await page.getByRole("button", { name: "Draft the agreement" }).click();
   await expect(page.getByRole("heading", { name: "Fill in by hand" })).toBeVisible();
   await axe(page, "join");
   await page.getByLabel("Work on each visit").fill("kitchen; bathrooms; floors");
   await page.getByRole("button", { name: "Apply" }).click();
   await page.getByRole("button", { name: "Sign and save PayPal" }).click();
-  await page.waitForURL(/\/h\/parks/);
+  await page.waitForURL(/\/h\/abernathys/);
   await expect(page.getByText("Agreement signed and PayPal saved")).toBeVisible();
 });
 

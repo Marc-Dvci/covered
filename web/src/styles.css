@@ -18,7 +18,7 @@
   --paid-wash: #e5f4eb;
   --fee: #a35a00;
   --fee-wash: #fdf1e1;
-  --void: #6b7280;
+  --void: #5d6470;
   --void-wash: #f1f2f4;
   --risk: #b42318;
   --risk-wash: #fdeceb;
@@ -103,7 +103,7 @@ label { display: grid; gap: 0.3rem; font-weight: 700; font-size: 0.95rem; }
 .bar b { display: block; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar span { white-space: nowrap; }
 .bar.s-scheduled { color: var(--scheduled); background: #fff; }
-.bar.s-done { color: #8a93a6; background: #fff; border-color: var(--line); }
+.bar.s-done { color: var(--void); background: #fff; border-color: var(--line); }
 .bar.s-held, .bar.s-holding { color: var(--held); background: var(--held-wash); }
 .bar.s-in_progress, .bar.s-settling { color: var(--progress); background: var(--progress-wash); }
 .bar.s-captured, .bar.s-paid_out { color: var(--paid); background: var(--paid-wash); }

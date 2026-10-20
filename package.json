@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "eval": "tsx eval/run.ts",
-    "demo:reset": "tsx server/cli/reset.ts"
+    "demo:reset": "tsx server/cli/reset.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.10",

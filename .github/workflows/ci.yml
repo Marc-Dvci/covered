@@ -1,0 +1,22 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Cover evaluation (development set) is reproduced exactly
+        run: |
+          cp eval/disruptions/results.json /tmp/before.json
+          npx tsx eval/run.ts
+          node -e "const a=require('/tmp/before.json'),b=require('./eval/disruptions/results.json');for(const k of Object.keys(a))if(!k.startsWith('solverMs')&&a[k]!==b[k]){console.error(k,a[k],b[k]);process.exit(1)}"
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e

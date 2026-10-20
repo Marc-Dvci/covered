@@ -149,6 +149,7 @@ function DraftView({ draft, onChange, onSign, busy }: { draft: Draft; onChange: 
             <dt>Cancel</dt><dd>{a.cancellation.noticeHours} h notice, {a.cancellation.lateCancelPct}% fee inside it, {a.cancellation.lockoutPct}% if locked out</dd>
           </dl>
           {draft.notes.map((n) => <p key={n} className="reason">{n}</p>)}
+          {(missing.has("scope") || missing.has("schedule") || missing.has("location")) && <ManualFields a={a} update={update} />}
         </div>
       </div>
       {draft.readback.length > 0 && (
@@ -163,5 +164,27 @@ function DraftView({ draft, onChange, onSign, busy }: { draft: Draft; onChange: 
           : <small className="muted">PayPal opens to save the household's account once. Each visit is held {a.cancellation.noticeHours} hours before: {a.rateCentsPerHour && a.schedule.minutes ? dollars(Math.round((a.rateCentsPerHour * (a.schedule.minutes + a.extraAllowanceMinutes)) / 60)) : ""}.</small>}
       </div>
     </section>
+  );
+}
+
+function ManualFields({ a, update }: { a: Agreement; update: (p: Partial<Agreement>) => Promise<void> }) {
+  const [scope, setScope] = useState(a.scope.join("; "));
+  const [weekday, setWeekday] = useState(String(a.schedule.weekday ?? 5));
+  const [start, setStart] = useState(a.schedule.start ?? "10:00");
+  const [hours, setHours] = useState(String((a.schedule.minutes ?? 180) / 60));
+  return (
+    <div className="stack" aria-label="Fill in by hand">
+      <h3>Fill in by hand</h3>
+      <label>Work on each visit<input value={scope} onChange={(e) => setScope(e.target.value)} placeholder="kitchen; bathrooms; floors" /></label>
+      <div className="row" style={{ flexWrap: "nowrap" }}>
+        <label style={{ flex: 1 }}>Day<select value={weekday} onChange={(e) => setWeekday(e.target.value)}>{WEEK_DAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}</select></label>
+        <label style={{ flex: 1 }}>Start<input value={start} onChange={(e) => setStart(e.target.value)} /></label>
+        <label style={{ flex: 1 }}>Hours<input value={hours} onChange={(e) => setHours(e.target.value)} /></label>
+      </div>
+      <button className="btn secondary" onClick={() => update({
+        scope: scope.split(";").map((x) => x.trim()).filter(Boolean), location: a.location || a.area,
+        schedule: { weekday: Number(weekday), start, minutes: Math.round(Number(hours) * 60), frequency: "weekly" },
+      })}>Apply</button>
+    </div>
   );
 }

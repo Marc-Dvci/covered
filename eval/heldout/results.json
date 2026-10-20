@@ -1,0 +1,17 @@
+{
+ "set": "held-out",
+ "scenarios": 20,
+ "affectedVisits": 29,
+ "oracleMaxCovered": 20,
+ "solverCovered": 20,
+ "solverScenariosAtOracleMax": 20,
+ "solverConstraintViolations": 0,
+ "solverConsentRequests": 2,
+ "oracleMinConsent": 2,
+ "healthyScenarioProposals": 0,
+ "baselinePlaced": 29,
+ "baselineVisitsBreakingARule": 26,
+ "baselineSameCleanerWithoutAsking": 4,
+ "solverMsTotal": 5,
+ "solverMsMean": 0.3
+}

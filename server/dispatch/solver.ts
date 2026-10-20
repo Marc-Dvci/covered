@@ -100,9 +100,9 @@ export function solve(input: SolveInput): SolveResult {
     const from = v.start % 1440;
     const to = from + v.minutes;
     if (input.absences.some((a) => a.memberId === m.id && v.start < a.to && v.start + v.minutes > a.from)) reasons.push("is out");
-    const win = m.availability.find((w) => w.day === day && w.from <= from && to <= w.to);
+    const win = m.availability.find((w) => w.day === day % 7 && w.from <= from && to <= w.to);
     if (!win) {
-      const any = m.availability.find((w) => w.day === day);
+      const any = m.availability.find((w) => w.day === day % 7);
       reasons.push(any ? `works ${clock(any.from)} to ${clock(any.to)} that day` : "does not work that day");
     }
     const missingSkills = h.needs.filter((n) => !m.skills.includes(n));

@@ -12,7 +12,7 @@ loadEnv();
 const cfg = config();
 const app = await makeApp(cfg);
 if (!(await app.store.members()).length) {
-  await app.store.reset(cfg.demoVaultId);
+  await app.store.reset(cfg.demoVaultId, cfg.sandboxPayouts);
   await sweep(app);
 }
 const ai = new Gemini(cfg, app.store);

@@ -81,7 +81,7 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
   server.post("/api/demo/reset", wrap(async (_req, reply) => {
     if (!app.cfg.demo) return reply.code(403).send({ error: "demo only" });
     await app.runner.idle();
-    await app.store.reset(app.cfg.demoVaultId);
+    await app.store.reset(app.cfg.demoVaultId, app.cfg.sandboxPayouts);
     const held = await sweep(app);
     return { ok: true, holdsStarted: held.length };
   }));

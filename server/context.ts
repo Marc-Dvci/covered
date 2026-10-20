@@ -26,6 +26,7 @@ export interface Config {
   paypalSecret?: string;
   currency: string;
   demoVaultId?: string;
+  sandboxPayouts: string;
   publicUrl: string;
   demo: boolean;
   linkSecret: string;
@@ -49,6 +50,7 @@ export function config(env = process.env): Config {
     paypalSecret: env.PAYPAL_CLIENT_SECRET || undefined,
     currency: env.PAYPAL_CURRENCY || "USD",
     demoVaultId: env.COVERED_DEMO_VAULT_ID || undefined,
+    sandboxPayouts: env.COVERED_SANDBOX_PAYOUTS || "",
     publicUrl: (env.COVERED_PUBLIC_URL || env.RENDER_EXTERNAL_URL || "http://localhost:8787").replace(/\/$/, ""),
     demo: env.COVERED_DEMO !== "0",
     linkSecret: env.COVERED_LINK_SECRET || "dev-only-secret",

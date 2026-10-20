@@ -7,6 +7,7 @@ import { WEEK_START_ISO } from "../shared/seed.ts";
 import { AIUnavailable, numbersOk, type Gemini } from "./ai/gemini.ts";
 import type { PayPal } from "./paypal/types.ts";
 import type { Store } from "./store.ts";
+import { mergePayoutItems } from "./tasks.ts";
 
 export interface StatementLine {
   visitId: string;
@@ -42,6 +43,18 @@ export async function statement(store: Store, paypal: PayPal, memberId: string):
   const [members, households, visits] = await Promise.all([store.members(), store.households(), store.visits()]);
   const m = members.find((x) => x.id === memberId);
   if (!m) throw new Error("no such member");
+  // fill transaction ids PayPal had not assigned when the payout task finished
+  for (const v of visits) {
+    if (!v.payout?.batchId || !v.payout.items.some((i) => !i.transactionId)) continue;
+    try {
+      const p = await paypal.getPayout(v.payout.batchId);
+      const items = mergePayoutItems(v.id, v.payout.items, p.items);
+      v.payout = { ...v.payout, status: p.status, items };
+      await store.updateVisit(v.id, { payout: v.payout });
+    } catch {
+      /* keep the payout id; the line stays pending */
+    }
+  }
   const lines: StatementLine[] = [];
   for (const v of visits) {
     const item = v.payout?.items.find((i) => i.memberId === memberId);

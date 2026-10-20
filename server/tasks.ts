@@ -112,7 +112,12 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
       await new Promise((r) => setTimeout(r, d.payoutPollMs ?? 3000));
       p = await d.paypal.getPayout(v.payout.batchId);
     }
-    const items = v.payout.items.map((i, k) => ({ ...i, status: p.items[k]?.status ?? i.status, transactionId: p.items[k]?.transactionId ?? i.transactionId }));
+    // transaction ids can trail the batch's SUCCESS by a few seconds
+    for (let k = 0; k < 4 && p.status === "SUCCESS" && p.items.some((i) => !i.transactionId); k++) {
+      await new Promise((r) => setTimeout(r, d.payoutPollMs ?? 3000));
+      p = await d.paypal.getPayout(v.payout.batchId);
+    }
+    const items = mergePayoutItems(v.id, v.payout.items, p.items);
     const final = ["SUCCESS", "DENIED", "CANCELED"].includes(p.status);
     v = await d.store.updateVisit(v.id, { payout: { ...v.payout, status: p.status, items, ...(final ? { finalAt: await d.store.now(), finalMs: Date.now() - t0 } : {}) } });
     for (const i of items) await d.store.money(v.id, "payout", i.cents, `${v.payout!.senderBatchId}-${i.memberId}`, v.payout!.batchId, p.status, { memberId: i.memberId, transactionId: i.transactionId });
@@ -123,6 +128,18 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
     : v.outcome?.type === "cancel" ? "late_cancel" : v.payout ? "paid_out" : "captured";
   await d.store.updateVisit(v.id, { state });
   return `${state}: captured ${dollars(s.captureCents)}, released ${dollars(s.releaseCents)}`;
+}
+
+/** Match PayPal's items to ours by sender_item_id (`<visit>-<member>`), never by position. */
+export function mergePayoutItems(
+  visitId: string,
+  ours: NonNullable<VisitRow["payout"]>["items"],
+  theirs: { itemId: string; transactionId?: string; status?: string }[],
+): NonNullable<VisitRow["payout"]>["items"] {
+  return ours.map((i) => {
+    const t = theirs.find((x) => x.itemId === `${visitId}-${i.memberId}`);
+    return { ...i, status: t?.status ?? i.status, transactionId: t?.transactionId ?? i.transactionId };
+  });
 }
 
 /** Visits whose hold is due: start minus (notice + lead) has passed, and the visit has not started. */

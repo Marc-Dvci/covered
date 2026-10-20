@@ -53,11 +53,22 @@ export class Store {
     for (const stmt of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) await this.db.query(stmt);
   }
 
-  /** Wipe and load the demo cooperative; the demo clock goes to Thursday 07:00. */
-  async reset(vaultId = "DEMO-VAULT"): Promise<void> {
+  /**
+   * Wipe and load the demo cooperative; the demo clock goes to Thursday 07:10. `payouts` routes the
+   * fictional members' pay to real sandbox receivers: "*=PAYPAL:a@b.com;teresa=VENMO:+12065550123".
+   */
+  async reset(vaultId = "DEMO-VAULT", payouts = ""): Promise<void> {
+    const route = new Map(payouts.split(";").map((x) => x.trim()).filter(Boolean).map((x) => {
+      const [who, rest = ""] = x.split("=");
+      const [wallet, receiver] = rest.split(":");
+      return [who!.trim(), { wallet: (wallet === "VENMO" ? "VENMO" : "PAYPAL") as "PAYPAL" | "VENMO", receiver: receiver!.trim() }];
+    }));
     await this.db.tx(async (q) => {
       for (const t of ["kv", "members", "households", "agreements", "visits", "money", "events", "disruptions", "shares"]) await q(`delete from ${t}`);
-      for (const m of seedMembers) await q("insert into members(id, data) values ($1, $2)", [m.id, JSON.stringify(m)]);
+      for (const m of seedMembers) {
+        const payout = route.get(m.id) ?? route.get("*") ?? m.payout;
+        await q("insert into members(id, data) values ($1, $2)", [m.id, JSON.stringify({ ...m, payout })]);
+      }
       for (const h of seedHouseholds) {
         await q("insert into households(id, data, vault_id, vault_email) values ($1, $2, $3, $4)", [h.id, JSON.stringify(h), vaultId, `${h.id}@households.example`]);
       }

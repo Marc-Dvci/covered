@@ -1,0 +1,17 @@
+{
+ "set": "development",
+ "scenarios": 60,
+ "affectedVisits": 91,
+ "oracleMaxCovered": 55,
+ "solverCovered": 55,
+ "solverScenariosAtOracleMax": 60,
+ "solverConstraintViolations": 0,
+ "solverConsentRequests": 2,
+ "oracleMinConsent": 2,
+ "healthyScenarioProposals": 0,
+ "baselinePlaced": 86,
+ "baselineVisitsBreakingARule": 68,
+ "baselineSameCleanerWithoutAsking": 4,
+ "solverMsTotal": 8,
+ "solverMsMean": 0.1
+}

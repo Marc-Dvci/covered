@@ -1,0 +1,2733 @@
+[
+ {
+  "id": "story",
+  "kind": "sick",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "sam",
+    "from": 4320,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-okafor",
+    "householdId": "okafor",
+    "memberIds": [],
+    "start": 4860,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-thu-santos",
+    "householdId": "santos",
+    "memberIds": [],
+    "start": 5160,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-thu-murphy",
+    "householdId": "murphy",
+    "memberIds": [],
+    "start": 5310,
+    "minutes": 90,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 90,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-okafor",
+   "v-thu-santos",
+   "v-thu-murphy"
+  ],
+  "note": "Sam's son has a fever (the demo story)"
+ },
+ {
+  "id": "s002",
+  "kind": "two_sick",
+  "day": 0,
+  "absent": [
+   {
+    "memberId": "lena",
+    "from": 0,
+    "to": 1440
+   },
+   {
+    "memberId": "ines",
+    "from": 0,
+    "to": 1440
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-mon-bauer",
+    "householdId": "bauer",
+    "memberIds": [],
+    "start": 540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-mon-larsen",
+    "householdId": "larsen",
+    "memberIds": [],
+    "start": 600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-mon-fischer",
+    "householdId": "fischer",
+    "memberIds": [],
+    "start": 840,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-bauer",
+   "v-mon-larsen",
+   "v-mon-fischer"
+  ],
+  "note": "lena and ines out on day 0"
+ },
+ {
+  "id": "s061",
+  "kind": "reschedule",
+  "day": 2,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-wed-ahmed",
+    "householdId": "ahmed",
+    "memberIds": [],
+    "start": 3540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-ahmed"
+  ],
+  "note": "ahmed move their visit by 120 minutes"
+ },
+ {
+  "id": "s036",
+  "kind": "sick_afternoon",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "lena",
+    "from": 2160,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-lindqvist",
+    "householdId": "lindqvist",
+    "memberIds": [],
+    "start": 2040,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-haddad",
+    "householdId": "haddad",
+    "memberIds": [],
+    "start": 2280,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-lindqvist",
+   "v-tue-haddad"
+  ],
+  "note": "lena out on day 1 from 12:00"
+ },
+ {
+  "id": "s011",
+  "kind": "sick_afternoon",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "tomas",
+    "from": 5040,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-petersen",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 5010,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-petersen"
+  ],
+  "note": "tomas out on day 3 from 12:00"
+ },
+ {
+  "id": "s064",
+  "kind": "reschedule",
+  "day": 2,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-wed-murphy",
+    "householdId": "murphy",
+    "memberIds": [],
+    "start": 3570,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-murphy"
+  ],
+  "note": "murphy move their visit by -90 minutes"
+ },
+ {
+  "id": "s060",
+  "kind": "reschedule",
+  "day": 2,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-wed-dubois",
+    "householdId": "dubois",
+    "memberIds": [],
+    "start": 3540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-dubois"
+  ],
+  "note": "dubois move their visit by 120 minutes"
+ },
+ {
+  "id": "s052",
+  "kind": "reschedule",
+  "day": 4,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-fri-ali",
+    "householdId": "ali",
+    "memberIds": [],
+    "start": 6450,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-ali"
+  ],
+  "note": "ali move their visit by 180 minutes"
+ },
+ {
+  "id": "s054",
+  "kind": "sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "kofi",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-abebe",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-abebe"
+  ],
+  "note": "kofi out on day 2"
+ },
+ {
+  "id": "s068",
+  "kind": "reschedule",
+  "day": 5,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-sat-abebe",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 7680,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-sat-abebe"
+  ],
+  "note": "abebe move their visit by -120 minutes"
+ },
+ {
+  "id": "s098",
+  "kind": "sick",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 1440,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-obrien",
+    "householdId": "obrien",
+    "memberIds": [],
+    "start": 1980,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-kaur",
+    "householdId": "kaur",
+    "memberIds": [],
+    "start": 2310,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-obrien",
+   "v-tue-kaur"
+  ],
+  "note": "teresa out on day 1"
+ },
+ {
+  "id": "s007",
+  "kind": "healthy",
+  "day": 2,
+  "absent": [],
+  "visits": [],
+  "affected": [],
+  "note": "an ordinary day, nothing to change"
+ },
+ {
+  "id": "s076",
+  "kind": "new_request",
+  "day": 0,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s076",
+    "householdId": "sato",
+    "memberIds": [],
+    "start": 900,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s076"
+  ],
+  "note": "The Satos ask for an extra visit"
+ },
+ {
+  "id": "s008",
+  "kind": "two_sick",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "tomas",
+    "from": 1440,
+    "to": 2880
+   },
+   {
+    "memberId": "grace",
+    "from": 1440,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-garcia",
+    "householdId": "garcia",
+    "memberIds": [],
+    "start": 1920,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-fischer",
+    "householdId": "fischer",
+    "memberIds": [],
+    "start": 1980,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-morales",
+    "householdId": "morales",
+    "memberIds": [],
+    "start": 2160,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-chen",
+    "householdId": "chen",
+    "memberIds": [],
+    "start": 2220,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-garcia",
+   "v-tue-fischer",
+   "v-tue-morales",
+   "v-tue-chen"
+  ],
+  "note": "tomas and grace out on day 1"
+ },
+ {
+  "id": "s030",
+  "kind": "reschedule",
+  "day": 4,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-fri-dubois",
+    "householdId": "dubois",
+    "memberIds": [],
+    "start": 6720,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-dubois"
+  ],
+  "note": "dubois move their visit by 180 minutes"
+ },
+ {
+  "id": "s044",
+  "kind": "new_request",
+  "day": 3,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s044",
+    "householdId": "weber",
+    "memberIds": [],
+    "start": 5220,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s044"
+  ],
+  "note": "The Webers ask for an extra visit"
+ },
+ {
+  "id": "s099",
+  "kind": "sick",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "sam",
+    "from": 5760,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-martin",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 6300,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-fri-hassan",
+    "householdId": "hassan",
+    "memberIds": [],
+    "start": 6540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-martin",
+   "v-fri-hassan"
+  ],
+  "note": "sam out on day 4"
+ },
+ {
+  "id": "s056",
+  "kind": "sick_afternoon",
+  "day": 0,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 720,
+    "to": 1440
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-mon-rossi",
+    "householdId": "rossi",
+    "memberIds": [],
+    "start": 780,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-rossi"
+  ],
+  "note": "teresa out on day 0 from 12:00"
+ },
+ {
+  "id": "s003",
+  "kind": "new_request",
+  "day": 4,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s003",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 6540,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s003"
+  ],
+  "note": "Mr. Abebe ask for an extra visit"
+ },
+ {
+  "id": "s012",
+  "kind": "sick_afternoon",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "sam",
+    "from": 2160,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-santos",
+    "householdId": "santos",
+    "memberIds": [],
+    "start": 2220,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-santos"
+  ],
+  "note": "sam out on day 1 from 12:00"
+ },
+ {
+  "id": "s032",
+  "kind": "new_request",
+  "day": 3,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s032",
+    "householdId": "novak",
+    "memberIds": [],
+    "start": 4980,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s032"
+  ],
+  "note": "Ms. Novak ask for an extra visit"
+ },
+ {
+  "id": "s090",
+  "kind": "sick",
+  "day": 5,
+  "absent": [
+   {
+    "memberId": "marek",
+    "from": 7200,
+    "to": 8640
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-sat-larsen",
+    "householdId": "larsen",
+    "memberIds": [],
+    "start": 7740,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-sat-larsen"
+  ],
+  "note": "marek out on day 5"
+ },
+ {
+  "id": "s045",
+  "kind": "two_sick",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "ines",
+    "from": 4320,
+    "to": 5760
+   },
+   {
+    "memberId": "grace",
+    "from": 4320,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-chen",
+    "householdId": "chen",
+    "memberIds": [],
+    "start": 4860,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-thu-osei",
+    "householdId": "osei",
+    "memberIds": [],
+    "start": 5100,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-thu-wright",
+    "householdId": "wright",
+    "memberIds": [],
+    "start": 5130,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-chen",
+   "v-thu-osei",
+   "v-thu-wright"
+  ],
+  "note": "ines and grace out on day 3"
+ },
+ {
+  "id": "s055",
+  "kind": "new_request",
+  "day": 1,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s055",
+    "householdId": "murphy",
+    "memberIds": [],
+    "start": 2280,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s055"
+  ],
+  "note": "The Murphys ask for an extra visit"
+ },
+ {
+  "id": "s005",
+  "kind": "sick",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "ines",
+    "from": 4320,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-wright",
+    "householdId": "wright",
+    "memberIds": [],
+    "start": 5130,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-wright"
+  ],
+  "note": "ines out on day 3"
+ },
+ {
+  "id": "s092",
+  "kind": "sick",
+  "day": 0,
+  "absent": [
+   {
+    "memberId": "ines",
+    "from": 0,
+    "to": 1440
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-mon-bauer",
+    "householdId": "bauer",
+    "memberIds": [],
+    "start": 540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-bauer"
+  ],
+  "note": "ines out on day 0"
+ },
+ {
+  "id": "s073",
+  "kind": "new_request",
+  "day": 2,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s073",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 3660,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s073"
+  ],
+  "note": "The Martins ask for an extra visit"
+ },
+ {
+  "id": "s025",
+  "kind": "sick",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "lena",
+    "from": 5760,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-haddad",
+    "householdId": "haddad",
+    "memberIds": [],
+    "start": 6360,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-fri-fischer",
+    "householdId": "fischer",
+    "memberIds": [],
+    "start": 6600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-haddad",
+   "v-fri-fischer"
+  ],
+  "note": "lena out on day 4"
+ },
+ {
+  "id": "s053",
+  "kind": "new_request",
+  "day": 3,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s053",
+    "householdId": "osei",
+    "memberIds": [],
+    "start": 5160,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s053"
+  ],
+  "note": "The Oseis ask for an extra visit"
+ },
+ {
+  "id": "s066",
+  "kind": "two_sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "tomas",
+    "from": 2880,
+    "to": 4320
+   },
+   {
+    "memberId": "joy",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-petersen",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 3360,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-ahmed",
+    "householdId": "ahmed",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-martin",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 3600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-kim",
+    "householdId": "kim",
+    "memberIds": [],
+    "start": 3660,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-petersen",
+   "v-wed-ahmed",
+   "v-wed-martin",
+   "v-wed-kim"
+  ],
+  "note": "tomas and joy out on day 2"
+ },
+ {
+  "id": "s088",
+  "kind": "sick",
+  "day": 0,
+  "absent": [
+   {
+    "memberId": "marek",
+    "from": 0,
+    "to": 1440
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-mon-adeyemi",
+    "householdId": "adeyemi",
+    "memberIds": [],
+    "start": 480,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-mon-kowalski",
+    "householdId": "kowalski",
+    "memberIds": [],
+    "start": 810,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-adeyemi",
+   "v-mon-kowalski"
+  ],
+  "note": "marek out on day 0"
+ },
+ {
+  "id": "s001",
+  "kind": "sick_afternoon",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 3600,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-tran",
+    "householdId": "tran",
+    "memberIds": [],
+    "start": 3660,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-tran"
+  ],
+  "note": "teresa out on day 2 from 12:00"
+ },
+ {
+  "id": "s097",
+  "kind": "sick",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "lena",
+    "from": 1440,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-lindqvist",
+    "householdId": "lindqvist",
+    "memberIds": [],
+    "start": 2040,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-haddad",
+    "householdId": "haddad",
+    "memberIds": [],
+    "start": 2280,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-lindqvist",
+   "v-tue-haddad"
+  ],
+  "note": "lena out on day 1"
+ },
+ {
+  "id": "s077",
+  "kind": "new_request",
+  "day": 4,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s077",
+    "householdId": "obrien",
+    "memberIds": [],
+    "start": 6360,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s077"
+  ],
+  "note": "Ms. O'Brien ask for an extra visit"
+ },
+ {
+  "id": "s026",
+  "kind": "new_request",
+  "day": 4,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s026",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 6270,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s026"
+  ],
+  "note": "The Martins ask for an extra visit"
+ },
+ {
+  "id": "s041",
+  "kind": "sick",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "ines",
+    "from": 1440,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-cohen",
+    "householdId": "cohen",
+    "memberIds": [],
+    "start": 2220,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-cohen"
+  ],
+  "note": "ines out on day 1"
+ },
+ {
+  "id": "s039",
+  "kind": "reschedule",
+  "day": 2,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-wed-murphy",
+    "householdId": "murphy",
+    "memberIds": [],
+    "start": 3600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-murphy"
+  ],
+  "note": "murphy move their visit by -60 minutes"
+ },
+ {
+  "id": "s057",
+  "kind": "new_request",
+  "day": 3,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s057",
+    "householdId": "yilmaz",
+    "memberIds": [],
+    "start": 5220,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s057"
+  ],
+  "note": "The Yilmazes ask for an extra visit"
+ },
+ {
+  "id": "s013",
+  "kind": "two_sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "kofi",
+    "from": 2880,
+    "to": 4320
+   },
+   {
+    "memberId": "teresa",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-abebe",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-kaur",
+    "householdId": "kaur",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-tran",
+    "householdId": "tran",
+    "memberIds": [],
+    "start": 3660,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-abebe",
+   "v-wed-kaur",
+   "v-wed-tran"
+  ],
+  "note": "kofi and teresa out on day 2"
+ },
+ {
+  "id": "s037",
+  "kind": "sick_afternoon",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 6480,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-obrien",
+    "householdId": "obrien",
+    "memberIds": [],
+    "start": 6540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-obrien"
+  ],
+  "note": "teresa out on day 4 from 12:00"
+ },
+ {
+  "id": "s047",
+  "kind": "new_request",
+  "day": 1,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s047",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 2280,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s047"
+  ],
+  "note": "The Petersens ask for an extra visit"
+ },
+ {
+  "id": "s069",
+  "kind": "sick",
+  "day": 5,
+  "absent": [
+   {
+    "memberId": "kofi",
+    "from": 7200,
+    "to": 8640
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-sat-abebe",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 7800,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-sat-abebe"
+  ],
+  "note": "kofi out on day 5"
+ },
+ {
+  "id": "s051",
+  "kind": "sick_afternoon",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "joy",
+    "from": 6480,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-ahmed",
+    "householdId": "ahmed",
+    "memberIds": [],
+    "start": 6540,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-ahmed"
+  ],
+  "note": "joy out on day 4 from 12:00"
+ },
+ {
+  "id": "s040",
+  "kind": "sick",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "ines",
+    "from": 5760,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-bauer",
+    "householdId": "bauer",
+    "memberIds": [],
+    "start": 6300,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-bauer"
+  ],
+  "note": "ines out on day 4"
+ },
+ {
+  "id": "s063",
+  "kind": "reschedule",
+  "day": 0,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-mon-adeyemi",
+    "householdId": "adeyemi",
+    "memberIds": [],
+    "start": 420,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-adeyemi"
+  ],
+  "note": "adeyemi move their visit by -60 minutes"
+ },
+ {
+  "id": "s059",
+  "kind": "sick",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 4320,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-hassan",
+    "householdId": "hassan",
+    "memberIds": [],
+    "start": 4860,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-thu-ali",
+    "householdId": "ali",
+    "memberIds": [],
+    "start": 5010,
+    "minutes": 90,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 90,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-hassan",
+   "v-thu-ali"
+  ],
+  "note": "teresa out on day 3"
+ },
+ {
+  "id": "s010",
+  "kind": "sick_afternoon",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "teresa",
+    "from": 5040,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-ali",
+    "householdId": "ali",
+    "memberIds": [],
+    "start": 5010,
+    "minutes": 90,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 90,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-ali"
+  ],
+  "note": "teresa out on day 3 from 12:00"
+ },
+ {
+  "id": "s020",
+  "kind": "sick_afternoon",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "tomas",
+    "from": 2160,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-morales",
+    "householdId": "morales",
+    "memberIds": [],
+    "start": 2160,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-morales"
+  ],
+  "note": "tomas out on day 1 from 12:00"
+ },
+ {
+  "id": "s074",
+  "kind": "new_request",
+  "day": 1,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s074",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 1980,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s074"
+  ],
+  "note": "The Petersens ask for an extra visit"
+ },
+ {
+  "id": "s015",
+  "kind": "two_sick",
+  "day": 1,
+  "absent": [
+   {
+    "memberId": "tomas",
+    "from": 1440,
+    "to": 2880
+   },
+   {
+    "memberId": "teresa",
+    "from": 1440,
+    "to": 2880
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-tue-garcia",
+    "householdId": "garcia",
+    "memberIds": [],
+    "start": 1920,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-obrien",
+    "householdId": "obrien",
+    "memberIds": [],
+    "start": 1980,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-morales",
+    "householdId": "morales",
+    "memberIds": [],
+    "start": 2160,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-tue-kaur",
+    "householdId": "kaur",
+    "memberIds": [],
+    "start": 2310,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-tue-garcia",
+   "v-tue-obrien",
+   "v-tue-morales",
+   "v-tue-kaur"
+  ],
+  "note": "tomas and teresa out on day 1"
+ },
+ {
+  "id": "s021",
+  "kind": "new_request",
+  "day": 1,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s021",
+    "householdId": "lopez",
+    "memberIds": [],
+    "start": 2340,
+    "minutes": 150,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 150,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s021"
+  ],
+  "note": "The Lopezes ask for an extra visit"
+ },
+ {
+  "id": "s019",
+  "kind": "two_sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "kofi",
+    "from": 2880,
+    "to": 4320
+   },
+   {
+    "memberId": "tomas",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-petersen",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 3360,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-abebe",
+    "householdId": "abebe",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-martin",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 3600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-petersen",
+   "v-wed-abebe",
+   "v-wed-martin"
+  ],
+  "note": "kofi and tomas out on day 2"
+ },
+ {
+  "id": "s031",
+  "kind": "reschedule",
+  "day": 0,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-mon-rossi",
+    "householdId": "rossi",
+    "memberIds": [],
+    "start": 870,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-mon-rossi"
+  ],
+  "note": "rossi move their visit by 90 minutes"
+ },
+ {
+  "id": "s024",
+  "kind": "two_sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "lena",
+    "from": 2880,
+    "to": 4320
+   },
+   {
+    "memberId": "tomas",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-petersen",
+    "householdId": "petersen",
+    "memberIds": [],
+    "start": 3360,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-novak",
+    "householdId": "novak",
+    "memberIds": [],
+    "start": 3480,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-martin",
+    "householdId": "martin",
+    "memberIds": [],
+    "start": 3600,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-larsen",
+    "householdId": "larsen",
+    "memberIds": [],
+    "start": 3720,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-petersen",
+   "v-wed-novak",
+   "v-wed-martin",
+   "v-wed-larsen"
+  ],
+  "note": "lena and tomas out on day 2"
+ },
+ {
+  "id": "s049",
+  "kind": "healthy",
+  "day": 4,
+  "absent": [],
+  "visits": [],
+  "affected": [],
+  "note": "an ordinary day, nothing to change"
+ },
+ {
+  "id": "s071",
+  "kind": "sick",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "kofi",
+    "from": 4320,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-lopez",
+    "householdId": "lopez",
+    "memberIds": [],
+    "start": 5100,
+    "minutes": 240,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 240,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-lopez"
+  ],
+  "note": "kofi out on day 3"
+ },
+ {
+  "id": "s016",
+  "kind": "new_request",
+  "day": 1,
+  "absent": [],
+  "visits": [
+   {
+    "id": "v-new-s016",
+    "householdId": "tran",
+    "memberIds": [],
+    "start": 2340,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-new-s016"
+  ],
+  "note": "The Trans ask for an extra visit"
+ },
+ {
+  "id": "s042",
+  "kind": "two_sick",
+  "day": 2,
+  "absent": [
+   {
+    "memberId": "marek",
+    "from": 2880,
+    "to": 4320
+   },
+   {
+    "memberId": "teresa",
+    "from": 2880,
+    "to": 4320
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-wed-adeyemi",
+    "householdId": "adeyemi",
+    "memberIds": [],
+    "start": 3360,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-kaur",
+    "householdId": "kaur",
+    "memberIds": [],
+    "start": 3420,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-haddad",
+    "householdId": "haddad",
+    "memberIds": [],
+    "start": 3630,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-wed-tran",
+    "householdId": "tran",
+    "memberIds": [],
+    "start": 3660,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-wed-adeyemi",
+   "v-wed-kaur",
+   "v-wed-haddad",
+   "v-wed-tran"
+  ],
+  "note": "marek and teresa out on day 2"
+ },
+ {
+  "id": "s035",
+  "kind": "sick_afternoon",
+  "day": 3,
+  "absent": [
+   {
+    "memberId": "amara",
+    "from": 5040,
+    "to": 5760
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-thu-tran",
+    "householdId": "tran",
+    "memberIds": [],
+    "start": 5070,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-thu-tran"
+  ],
+  "note": "amara out on day 3 from 12:00"
+ },
+ {
+  "id": "s065",
+  "kind": "sick",
+  "day": 4,
+  "absent": [
+   {
+    "memberId": "amara",
+    "from": 5760,
+    "to": 7200
+   }
+  ],
+  "visits": [
+   {
+    "id": "v-fri-ali",
+    "householdId": "ali",
+    "memberIds": [],
+    "start": 6270,
+    "minutes": 180,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 180,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   },
+   {
+    "id": "v-fri-dubois",
+    "householdId": "dubois",
+    "memberIds": [],
+    "start": 6540,
+    "minutes": 120,
+    "terms": {
+     "rateCentsPerHour": 3500,
+     "bookedMinutes": 120,
+     "noticeHours": 24,
+     "lateCancelPct": 50,
+     "lockoutPct": 100,
+     "extraAllowanceMinutes": 30,
+     "extraStepMinutes": 15,
+     "coopShareBps": 500,
+     "holdLeadMinutes": 10
+    },
+    "state": "scheduled"
+   }
+  ],
+  "affected": [
+   "v-fri-ali",
+   "v-fri-dubois"
+  ],
+  "note": "amara out on day 4"
+ }
+]

@@ -1,0 +1,706 @@
+[
+ {
+  "scenarioId": "story",
+  "feasible": {
+   "v-thu-okafor": [
+    "marek",
+    "ines"
+   ],
+   "v-thu-santos": [
+    "teresa"
+   ],
+   "v-thu-murphy": [
+    "teresa"
+   ]
+  },
+  "maxCovered": 3,
+  "minConsent": 1,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s002",
+  "feasible": {
+   "v-mon-bauer": [],
+   "v-mon-larsen": [],
+   "v-mon-fischer": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s061",
+  "feasible": {
+   "v-wed-ahmed": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s036",
+  "feasible": {
+   "v-tue-lindqvist": [
+    "kofi"
+   ],
+   "v-tue-haddad": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s011",
+  "feasible": {
+   "v-thu-petersen": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s064",
+  "feasible": {
+   "v-wed-murphy": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s060",
+  "feasible": {
+   "v-wed-dubois": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s052",
+  "feasible": {
+   "v-fri-ali": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s054",
+  "feasible": {
+   "v-wed-abebe": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s068",
+  "feasible": {
+   "v-sat-abebe": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s098",
+  "feasible": {
+   "v-tue-obrien": [
+    "kofi"
+   ],
+   "v-tue-kaur": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s007",
+  "feasible": {},
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s076",
+  "feasible": {
+   "v-new-s076": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s008",
+  "feasible": {
+   "v-tue-garcia": [
+    "kofi"
+   ],
+   "v-tue-fischer": [
+    "ines",
+    "kofi"
+   ],
+   "v-tue-morales": [
+    "kofi"
+   ],
+   "v-tue-chen": []
+  },
+  "maxCovered": 3,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s030",
+  "feasible": {
+   "v-fri-dubois": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s044",
+  "feasible": {
+   "v-new-s044": [
+    "teresa"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s099",
+  "feasible": {
+   "v-fri-martin": [
+    "kofi"
+   ],
+   "v-fri-hassan": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s056",
+  "feasible": {
+   "v-mon-rossi": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s003",
+  "feasible": {
+   "v-new-s003": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s012",
+  "feasible": {
+   "v-tue-santos": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s032",
+  "feasible": {
+   "v-new-s032": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s090",
+  "feasible": {
+   "v-sat-larsen": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s045",
+  "feasible": {
+   "v-thu-chen": [],
+   "v-thu-osei": [],
+   "v-thu-wright": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s055",
+  "feasible": {
+   "v-new-s055": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s005",
+  "feasible": {
+   "v-thu-wright": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s092",
+  "feasible": {
+   "v-mon-bauer": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s073",
+  "feasible": {
+   "v-new-s073": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s025",
+  "feasible": {
+   "v-fri-haddad": [
+    "kofi"
+   ],
+   "v-fri-fischer": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s053",
+  "feasible": {
+   "v-new-s053": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s066",
+  "feasible": {
+   "v-wed-petersen": [],
+   "v-wed-ahmed": [
+    "ines"
+   ],
+   "v-wed-martin": [
+    "ines"
+   ],
+   "v-wed-kim": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 3
+ },
+ {
+  "scenarioId": "s088",
+  "feasible": {
+   "v-mon-adeyemi": [
+    "kofi"
+   ],
+   "v-mon-kowalski": [
+    "ines"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 1,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s001",
+  "feasible": {
+   "v-wed-tran": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s097",
+  "feasible": {
+   "v-tue-lindqvist": [
+    "kofi"
+   ],
+   "v-tue-haddad": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s077",
+  "feasible": {
+   "v-new-s077": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s026",
+  "feasible": {
+   "v-new-s026": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s041",
+  "feasible": {
+   "v-tue-cohen": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s039",
+  "feasible": {
+   "v-wed-murphy": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s057",
+  "feasible": {
+   "v-new-s057": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s013",
+  "feasible": {
+   "v-wed-abebe": [],
+   "v-wed-kaur": [
+    "ines"
+   ],
+   "v-wed-tran": [
+    "ines"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s037",
+  "feasible": {
+   "v-fri-obrien": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s047",
+  "feasible": {
+   "v-new-s047": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s069",
+  "feasible": {
+   "v-sat-abebe": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s051",
+  "feasible": {
+   "v-fri-ahmed": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s040",
+  "feasible": {
+   "v-fri-bauer": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s063",
+  "feasible": {
+   "v-mon-adeyemi": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s059",
+  "feasible": {
+   "v-thu-hassan": [
+    "marek",
+    "ines",
+    "kofi"
+   ],
+   "v-thu-ali": []
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 3
+ },
+ {
+  "scenarioId": "s010",
+  "feasible": {
+   "v-thu-ali": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s020",
+  "feasible": {
+   "v-tue-morales": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s074",
+  "feasible": {
+   "v-new-s074": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 2
+ },
+ {
+  "scenarioId": "s015",
+  "feasible": {
+   "v-tue-garcia": [
+    "kofi"
+   ],
+   "v-tue-obrien": [
+    "kofi"
+   ],
+   "v-tue-morales": [
+    "kofi"
+   ],
+   "v-tue-kaur": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 3
+ },
+ {
+  "scenarioId": "s021",
+  "feasible": {
+   "v-new-s021": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s019",
+  "feasible": {
+   "v-wed-petersen": [],
+   "v-wed-abebe": [],
+   "v-wed-martin": [
+    "ines"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s031",
+  "feasible": {
+   "v-mon-rossi": [
+    "teresa"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s024",
+  "feasible": {
+   "v-wed-petersen": [],
+   "v-wed-novak": [
+    "ines"
+   ],
+   "v-wed-martin": [
+    "ines"
+   ],
+   "v-wed-larsen": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 3
+ },
+ {
+  "scenarioId": "s049",
+  "feasible": {},
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s071",
+  "feasible": {
+   "v-thu-lopez": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s016",
+  "feasible": {
+   "v-new-s016": [
+    "kofi"
+   ]
+  },
+  "maxCovered": 1,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s042",
+  "feasible": {
+   "v-wed-adeyemi": [],
+   "v-wed-kaur": [
+    "ines"
+   ],
+   "v-wed-haddad": [
+    "ines"
+   ],
+   "v-wed-tran": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 3
+ },
+ {
+  "scenarioId": "s035",
+  "feasible": {
+   "v-thu-tran": []
+  },
+  "maxCovered": 0,
+  "minConsent": 0,
+  "optimalPlans": 1
+ },
+ {
+  "scenarioId": "s065",
+  "feasible": {
+   "v-fri-ali": [
+    "kofi"
+   ],
+   "v-fri-dubois": [
+    "ines",
+    "kofi"
+   ]
+  },
+  "maxCovered": 2,
+  "minConsent": 0,
+  "optimalPlans": 2
+ }
+]

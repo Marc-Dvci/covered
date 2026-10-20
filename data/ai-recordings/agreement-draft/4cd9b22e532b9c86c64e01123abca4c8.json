@@ -1,0 +1,39 @@
+{
+ "task": "agreement-draft",
+ "model": "gemini-3-flash-preview",
+ "ms": 1493,
+ "usage": {
+  "promptTokenCount": 191,
+  "candidatesTokenCount": 228,
+  "totalTokenCount": 419,
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 191
+   }
+  ],
+  "serviceTier": "standard"
+ },
+ "output": {
+  "scope": [
+   "Kitchen",
+   "bathrooms",
+   "floors",
+   "changing sheets"
+  ],
+  "pets": true,
+  "fragrance_free": false,
+  "deep_clean": false,
+  "same_cleaner": true,
+  "frequency": "weekly",
+  "location": "Capitol Hill",
+  "member_late_fee_percent": 50,
+  "member_notice_hours": 24,
+  "member_rate_per_hour": 38,
+  "member_terms_english": "I charge 38 dollars per hour. If you cancel with less than 24 hours, I charge half.",
+  "member_transcript": "Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade.",
+  "minutes": 180,
+  "start": "10:00",
+  "weekday": 5
+ }
+}

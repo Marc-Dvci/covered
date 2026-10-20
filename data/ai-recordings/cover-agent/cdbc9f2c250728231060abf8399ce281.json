@@ -1,0 +1,37 @@
+{
+ "task": "cover-agent",
+ "model": "gemini-3.5-flash",
+ "ms": 5899,
+ "usage": {
+  "promptTokenCount": 1075,
+  "candidatesTokenCount": 41,
+  "totalTokenCount": 1257,
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1075
+   }
+  ],
+  "thoughtsTokenCount": 141,
+  "serviceTier": "standard"
+ },
+ "output": {
+  "parts": [
+   {
+    "functionCall": {
+     "name": "find_cover",
+     "args": {
+      "visit_ids": [
+       "v-thu-okafor",
+       "v-thu-santos",
+       "v-thu-murphy"
+      ]
+     },
+     "id": "call_559054"
+    },
+    "thoughtSignature": "EpwECpkEAWkUfRPBH+gBf0pRoFCibrxlxWUkgD7HJTJDCFp7T07eQb/3ymtN5uBoiS2jUEwkIjR+0AbdfEt90jOsVKdWg3X+JsCq9E9rHahtxpGPxDe3PoagVmV0ZRvY0XaDybAtwq34piyrRZMeC6LSbF8/QTEC87e0AnrxWLT2DnB7AifvBm1WaJsySSYYFITZRIPfJYDUraVyf2qE1gLRmlO+yRWE+CZ4fWSVjuyORNct6NczQiv8oGYGGxZksQruOzCk+pWROIMAsdvfaWF81Jsr90ti2ysS7v4V1EGiU634fTSAR3YGjXC9ypT6TWBr17Hrxk678GzI0ikomhglfz364L6r/ppbbqslhm/XyXmgm6HHQq3izff5HEq8jQOjVF5Fb2TXVwgRMb1PkkKA+NjjJFPoHKXcx38JbcLCco/gN6TlsfK87/iM820Zx0E8VxT02P5iFLHEFT+M15EG8UlQXRkJH3HFsMncsTKZjubebZ5L+KzwAvWmMxeXbCYzdbyTdoARKRmsbPBSOeKh8rH0TLiv53LKVFhBkV9bjpKkJj02xSHZ9Rf2AkSZzY2TzFJ7NN/g8OJVVAnBasQgZD+De2BTNkDBG78WWePINrRQZ8EOqphDMWW0LSm6dYk7h0aldIvKNIS+Wz0HmtZRKbmwuFUkgM/hfqkJRsR5/wY0rC8TUf54MYDH9gsN4cyy1brKuar8JKfKppjl"
+   }
+  ],
+  "role": "model"
+ }
+}

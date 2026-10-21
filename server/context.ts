@@ -25,6 +25,7 @@ export interface Config {
   paypalClientId?: string;
   paypalSecret?: string;
   currency: string;
+  webhookId?: string;
   demoVaultId?: string;
   sandboxPayouts: string;
   publicUrl: string;
@@ -49,6 +50,7 @@ export function config(env = process.env): Config {
     paypalClientId: env.PAYPAL_CLIENT_ID || undefined,
     paypalSecret: env.PAYPAL_CLIENT_SECRET || undefined,
     currency: env.PAYPAL_CURRENCY || "USD",
+    webhookId: env.PAYPAL_WEBHOOK_ID || undefined,
     demoVaultId: env.COVERED_DEMO_VAULT_ID || undefined,
     sandboxPayouts: env.COVERED_SANDBOX_PAYOUTS || "",
     publicUrl: (env.COVERED_PUBLIC_URL || env.RENDER_EXTERNAL_URL || "http://localhost:8787").replace(/\/$/, ""),

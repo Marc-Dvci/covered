@@ -101,4 +101,9 @@ export class FakePayPal implements PayPal {
   async transactions(startIso: string, endIso: string): Promise<TxnRecord[]> {
     return this.txns.filter((t) => t.at >= startIso && t.at <= endIso);
   }
+
+  /** The stand-in accepts only its own marker, so tests can send both a genuine and a forged delivery. */
+  async verifyWebhook(headers: Record<string, string | undefined>, _event: unknown, webhookId: string): Promise<boolean> {
+    return headers["paypal-transmission-sig"] === `stand-in:${webhookId}`;
+  }
 }

@@ -169,3 +169,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.25rem; }
 .fictional { font-size: 0.78rem; color: var(--muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media print {
+  .top nav, .top .spacer, .btn { display: none !important; }
+}

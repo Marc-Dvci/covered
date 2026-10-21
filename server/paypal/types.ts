@@ -82,6 +82,8 @@ export interface PayPal {
   payout(senderBatchId: string, items: PayoutItem[], subject: string): Promise<Payout>;
   getPayout(batchId: string): Promise<Payout>;
   transactions(startIso: string, endIso: string): Promise<TxnRecord[]>;
+  /** Ask PayPal whether a webhook delivery really came from PayPal for this webhook id. */
+  verifyWebhook(headers: Record<string, string | undefined>, event: unknown, webhookId: string): Promise<boolean>;
 }
 
 /** PayPal-Request-Id: same logical step, same id, so a retried task never repeats a money movement. */

@@ -235,6 +235,8 @@ const EVENT_TEXT: Record<string, (e: EventRow, n: (id: string) => string) => str
   "task.crashed": () => "Task crashed after capture (test)",
   "clock.set": () => "Demo clock moved",
   "agreement.signed": (e, n) => `${n(e.actor)} signed and saved PayPal`,
+  "paypal.webhook": (e) => `PayPal confirmed ${String(e.data.type).toLowerCase().replace(/_/g, " ")}`,
+  "paypal.webhook_rejected": () => "Unverified webhook refused",
 };
 
 function Feed({ board }: { board: Board }) {
@@ -297,6 +299,7 @@ function VisitPanel({ board, visit, onClose, reload, setToast }: { board: Board;
         {visit.settlement && <><dt>Released</dt><dd className="mono">{dollars(visit.settlement.releaseCents)}</dd><dt>Cooperative</dt><dd className="mono">{dollars(visit.settlement.coopCents)}</dd></>}
         {visit.payout && <><dt>Payout</dt><dd>{visit.payout.items.map((i) => `${name(i.memberId)} ${dollars(i.cents)} via ${i.wallet === "VENMO" ? "Venmo" : "PayPal"}`).join("; ")} · {visit.payout.status.toLowerCase()}{visit.payout.finalMs ? ` in ${(visit.payout.finalMs / 1000).toFixed(0)} s` : ""}</dd></>}
       </dl>
+      {(visit.capture || visit.void) && <a className="btn quiet small" style={{ justifySelf: "start" }} href={`/evidence/${visit.id}`}>Evidence if the household disputes</a>}
       {live && (
         <div className="stack">
           <label>Move to

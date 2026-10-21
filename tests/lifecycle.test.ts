@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { answerConsent, cancel, cancelPreview, canMove, checkIn, checkOut, lockout, move } from "../server/actions.ts";
 import { config, makeApp, sweep, type App } from "../server/context.ts";
+import { evidence } from "../server/evidence.ts";
 import { FakePayPal } from "../server/paypal/fake.ts";
 import { LocalRunner } from "../server/runner.ts";
 import { hm } from "../shared/seed.ts";
@@ -47,6 +48,25 @@ describe("visit money lifecycle", () => {
     expect(v.capture?.cents).toBe(10500);
     expect(v.settlement?.releaseCents).toBe(1750);
     expect(v.payout?.items).toEqual([expect.objectContaining({ memberId: "lena", cents: 9975, status: "SUCCESS" })]);
+  });
+
+  it("answers a dispute from the ledger: terms, attendance and every PayPal id", async () => {
+    await sweep(app);
+    await idle();
+    await app.store.setClock(THU + hm("10:02"));
+    await checkIn(ctx(), "v-thu-weber", "lena");
+    await app.store.setClock(THU + hm("13:01"));
+    await checkOut(ctx(), "v-thu-weber", "lena", false);
+    await idle();
+    const v = (await app.store.visit("v-thu-weber"))!;
+    const e = (await evidence(app.store, "v-thu-weber"))!;
+    expect(e.attendance).toMatchObject({ checkIn: expect.stringContaining("10:02"), checkOut: expect.stringContaining("13:01"), minutesOnSite: 179, extraApproved: false });
+    expect(e.money.map((m) => m.step)).toEqual(["hold", "capture", "payout to Lena Petrova"]);
+    expect(e.money.find((m) => m.step === "capture")?.paypalId).toBe(v.capture!.captureId);
+    expect(e.money.find((m) => m.step === "hold")?.paypalId).toBe(v.hold!.authorizationId);
+    expect(e.timeline.map((t) => t.what)).toEqual(expect.arrayContaining(["Member checked in at the door", expect.stringMatching(/^Captured \$105\.00/)]));
+    expect(e.summary).toContain(v.capture!.captureId);
+    expect(await evidence(app.store, "no-such-visit")).toBeNull();
   });
 
   it("survives a crash between capture and payout: one capture, one payout", async () => {

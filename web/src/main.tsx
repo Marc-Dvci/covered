@@ -5,6 +5,7 @@ import "./styles.css";
 import { Top } from "./components/Top.tsx";
 import { AboutPage } from "./pages/About.tsx";
 import { BoardPage } from "./pages/Board.tsx";
+import { EvidencePage } from "./pages/Evidence.tsx";
 import { HomePage } from "./pages/Home.tsx";
 import { HouseholdPage } from "./pages/Household.tsx";
 import { JoinPage } from "./pages/Join.tsx";
@@ -35,6 +36,7 @@ function WithTop() {
           <Route path="/m/:id/statement" element={<StatementPage />} />
           <Route path="/h/:id" element={<HouseholdPage />} />
           <Route path="/join" element={<JoinPage />} />
+          <Route path="/evidence/:id" element={<EvidencePage />} />
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>

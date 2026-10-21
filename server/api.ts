@@ -11,6 +11,7 @@ import { getDisruption, listDisruptions, openDisruption, propose } from "./dispa
 import { approve } from "./dispatch/approve.ts";
 import { solve } from "./dispatch/solver.ts";
 import { finishSigning, SIGNUP_AREAS, startSigning } from "./signup.ts";
+import { evidence } from "./evidence.ts";
 import { coverLetter, landlordView, openShare, share, statement } from "./statements.ts";
 import type { VisitRow } from "./store.ts";
 import type { Agreement } from "../shared/agreement.ts";
@@ -101,6 +102,9 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
     if (!v) return reply.code(404).send({ error: "no such visit" });
     return { visit: publicVisit(v), money: await app.store.moneyRows(id), events: await app.store.events(30, id) };
   }));
+
+  // the cooperative's answer to a dispute, from the ledger only
+  server.get("/api/visits/:id/evidence", wrap(async (req, reply) => (await evidence(app.store, (req.params as { id: string }).id)) ?? reply.code(404).send({ error: "no such visit" })));
 
   server.post("/api/visits/:id/check-move", wrap(async (req) => {
     const { id } = req.params as { id: string };
@@ -267,9 +271,20 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
     return solve({ members, households, visits, absences: [], affected: b.affected });
   }));
 
-  server.post("/api/paypal/webhook", wrap(async (req) => {
-    const body = req.body as { event_type?: string; resource?: Record<string, unknown> };
-    await app.store.event("paypal.webhook", null, "paypal", { type: body.event_type, id: body.resource?.id });
+  // PayPal webhooks: kept only when PayPal confirms the signature for our webhook id, and tied to the
+  // visit through the invoice id every hold and capture carries (covered-<visit>)
+  server.post("/api/paypal/webhook", wrap(async (req, reply) => {
+    const body = req.body as { id?: string; event_type?: string; resource?: Record<string, unknown> };
+    const headers = Object.fromEntries(Object.entries(req.headers).map(([k, v]) => [k.toLowerCase(), Array.isArray(v) ? v[0] : v]));
+    const ok = app.cfg.webhookId ? await app.paypal.verifyWebhook(headers, body, app.cfg.webhookId) : false;
+    if (!ok) {
+      await app.store.event("paypal.webhook_rejected", null, "paypal", { type: body.event_type, id: body.id, why: app.cfg.webhookId ? "signature not verified" : "no webhook id configured" });
+      return reply.code(400).send({ error: "webhook not verified" });
+    }
+    const r = body.resource ?? {};
+    const invoice = String(r.invoice_id ?? (r.disputed_transactions as { invoice_number?: string }[] | undefined)?.[0]?.invoice_number ?? "");
+    const visit = invoice.startsWith("covered-") ? await app.store.visit(invoice.slice("covered-".length)) : null;
+    await app.store.event("paypal.webhook", visit?.id ?? null, "paypal", { type: body.event_type, id: body.id, resourceId: r.id, verified: true });
     return { ok: true };
   }));
 }

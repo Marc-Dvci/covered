@@ -269,4 +269,14 @@ export class SandboxPayPal implements PayPal {
     }
     return out;
   }
+
+  async verifyWebhook(headers: Record<string, string | undefined>, event: unknown, webhookId: string): Promise<boolean> {
+    const h = (k: string) => headers[k] ?? "";
+    if (!h("paypal-transmission-sig")) return false;
+    const j = await this.rest("verify webhook", "POST", "/v1/notifications/verify-webhook-signature", {
+      auth_algo: h("paypal-auth-algo"), cert_url: h("paypal-cert-url"), transmission_id: h("paypal-transmission-id"),
+      transmission_sig: h("paypal-transmission-sig"), transmission_time: h("paypal-transmission-time"), webhook_id: webhookId, webhook_event: event,
+    });
+    return j.verification_status === "SUCCESS";
+  }
 }

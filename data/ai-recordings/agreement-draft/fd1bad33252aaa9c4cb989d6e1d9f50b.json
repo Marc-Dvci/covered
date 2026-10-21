@@ -1,0 +1,43 @@
+{
+ "task": "agreement-draft",
+ "model": "gemini-3-flash-preview",
+ "ms": 1986,
+ "usage": {
+  "promptTokenCount": 429,
+  "candidatesTokenCount": 248,
+  "totalTokenCount": 677,
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 166
+   },
+   {
+    "modality": "AUDIO",
+    "tokenCount": 263
+   }
+  ],
+  "serviceTier": "standard"
+ },
+ "output": {
+  "scope": [
+   "Kitchen",
+   "bathrooms",
+   "floors",
+   "changing sheets"
+  ],
+  "pets": true,
+  "fragrance_free": false,
+  "deep_clean": false,
+  "same_cleaner": true,
+  "frequency": "weekly",
+  "location": "Capitol Hill",
+  "member_late_fee_percent": 50,
+  "member_notice_hours": 24,
+  "member_rate_per_hour": 38,
+  "member_terms_english": "Hello, I'm Teresa. I charge 38 dollars per hour. If you cancel with less than 24 hours' notice, I charge half the amount.",
+  "member_transcript": "Olá, sou a Teresa. Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade do valor.",
+  "minutes": 180,
+  "start": "10:00",
+  "weekday": 5
+ }
+}

@@ -1,7 +1,7 @@
 {
  "task": "agreement-draft",
- "model": "gemini-3-flash-preview",
- "ms": 1493,
+ "model": "gemini-3.6-flash",
+ "ms": 2156,
  "usage": {
   "promptTokenCount": 191,
   "candidatesTokenCount": 228,
@@ -16,7 +16,7 @@
  },
  "output": {
   "scope": [
-   "Kitchen",
+   "kitchen",
    "bathrooms",
    "floors",
    "changing sheets"
@@ -30,7 +30,7 @@
   "member_late_fee_percent": 50,
   "member_notice_hours": 24,
   "member_rate_per_hour": 38,
-  "member_terms_english": "I charge 38 dollars per hour. If you cancel with less than 24 hours, I charge half.",
+  "member_terms_english": "I charge 38 dollars per hour. If canceled with less than 24 hours notice, I charge half.",
   "member_transcript": "Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade.",
   "minutes": 180,
   "start": "10:00",

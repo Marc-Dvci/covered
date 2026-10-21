@@ -41,7 +41,7 @@ const SCHEMA = {
     fragrance_free: { type: "BOOLEAN" },
     deep_clean: { type: "BOOLEAN" },
     same_cleaner: { type: "BOOLEAN", description: "The household wants the same person every time." },
-    member_transcript: { type: "STRING", nullable: true, description: "Verbatim transcript of the member's voice note, in its language." },
+    member_transcript: { type: "STRING", nullable: true, description: "Verbatim transcript of the member's voice note, in its language, with every number written in digits." },
     member_rate_per_hour: { type: "NUMBER", nullable: true, description: "Hourly rate the member asks for, in dollars, only if stated by the member." },
     member_notice_hours: { type: "INTEGER", nullable: true },
     member_late_fee_percent: { type: "INTEGER", nullable: true },
@@ -113,15 +113,10 @@ export async function finish(store: Store, ai: Gemini | null, d: Draft, memberLa
     if (!ai || d.missing.length) continue;
     try {
       const r = await ai.json<{ text: string }>("agreement-readback", "light",
-        "Translate this cleaning agreement summary faithfully. Keep every number, time and amount exactly as written. Do not add or remove terms.",
+        "Translate this cleaning agreement summary faithfully. Keep every number, time and amount exactly as written. Keep the names of people, households and places as written, untranslated. Do not add or remove terms.",
         [{ text: `Target language: ${LANG_NAMES[lang]} (${lang}).\n\n${en}` }],
         { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] }, visitor);
-      // every number in the translation must be one of the English numbers, and every amount must survive
-      const amounts = (en.match(/\$\d[\d,]*\.\d{2}/g) ?? []).map((a) => a.slice(1).replace(/,/g, ""));
-      const norm = (n: string) => n.replace(/\.00$/, "").replace(/^0(\d)/, "$1");
-      const theirs = new Set(numbersIn(r.text).map(norm));
-      const same = numbersOk(r.text, numbersIn(en)) && amounts.every((a) => theirs.has(norm(a)));
-      if (same) d.readback.push({ language: lang, text: r.text, source: ai.last?.source ?? "live" });
+      if (keepsNumbers(en, r.text)) d.readback.push({ language: lang, text: r.text, source: ai.last?.source ?? "live" });
       else d.notes.push(`The ${LANG_NAMES[lang]} read-back changed a number, so it is not shown.`);
     } catch (e) {
       if (!(e instanceof AIUnavailable)) throw e;
@@ -130,6 +125,14 @@ export async function finish(store: Store, ai: Gemini | null, d: Draft, memberLa
   await store.db.query("insert into agreements(id, data, status, readback) values ($1,$2,$3,$4) on conflict (id) do update set data = excluded.data, readback = excluded.readback, status = excluded.status",
     [d.id, JSON.stringify({ ...d.agreement, _draft: { transcript: d.transcript, notes: d.notes, source: d.source, memberLanguage } }), d.missing.length ? "draft" : "ready", JSON.stringify(d.readback)]);
   return d;
+}
+
+/** Every number in the translation must be one of the English numbers, and every amount must survive. */
+export function keepsNumbers(en: string, translated: string): boolean {
+  const amounts = (en.match(/\$\d[\d,]*\.\d{2}/g) ?? []).map((a) => a.slice(1).replace(/,/g, ""));
+  const norm = (n: string) => n.replace(/\.00$/, "").replace(/^0(\d)/, "$1");
+  const theirs = new Set(numbersIn(translated).map(norm));
+  return numbersOk(translated, numbersIn(en)) && amounts.every((a) => theirs.has(norm(a)));
 }
 
 export function readback(a: Agreement): string {

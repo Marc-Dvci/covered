@@ -1,0 +1,20 @@
+{
+ "task": "agreement-readback",
+ "model": "gemini-3.5-flash-lite",
+ "ms": 1276,
+ "usage": {
+  "promptTokenCount": 248,
+  "candidatesTokenCount": 252,
+  "totalTokenCount": 500,
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 248
+   }
+  ],
+  "serviceTier": "standard"
+ },
+ "output": {
+  "text": "The Parks와 협동조합은 Capitol Hill에서의 가정 청소에 동의합니다. 매주 토요일 10:00, 3시간 동안 진행됩니다. 각 방문 시: 주방; 욕실; 바닥; 시트 교환. 시간당 요금은 $38.00이며, 따라서 방문당 $114.00입니다. 각 방문 24시간 전에 $133.00가 PayPal에 홀드됩니다(방문 비용 및 종료 시 승인하는 최대 30분의 추가 시간 포함). 방문이 끝나면 비용이 지불되고 나머지는 해제됩니다. 24시간보다 앞서 취소하는 경우: 지불할 금액 없음. 늦게 취소하는 경우: $57.00(50%). 청소부를 들여보낼 사람이 없는 경우: 방문 비용의 100%. 매번 동일한 청소부를 요청하셨습니다. 해당 청소부가 부재중인 경우, 다른 사람이 오기 전에 먼저 문의를 받게 됩니다. 페이지에서 언제든지 계약을 중단할 수 있으며, 홀드는 즉시 중지됩니다."
+ }
+}

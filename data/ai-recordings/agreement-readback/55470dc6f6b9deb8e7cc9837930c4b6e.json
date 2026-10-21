@@ -1,0 +1,20 @@
+{
+ "task": "agreement-readback",
+ "model": "gemini-3.5-flash-lite",
+ "ms": 1013,
+ "usage": {
+  "promptTokenCount": 249,
+  "candidatesTokenCount": 232,
+  "totalTokenCount": 481,
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 249
+   }
+  ],
+  "serviceTier": "standard"
+ },
+ "output": {
+  "text": "Os Parks e a cooperativa concordam com a limpeza residencial em Capitol Hill. Todos os sábados às 10:00, por 3 horas. Cada visita: Cozinha; banheiros; pisos; troca de lençóis. Tarifa de $38.00 por hora, portanto $114.00 por visita. 24 horas antes de cada visita, $133.00 são retidos no seu PayPal (a visita mais até 30 minutos extras, que você aprova no final). A visita é paga quando termina e o restante é liberado. Cancelar com mais de 24 horas de antecedência: nada a pagar. Cancelar depois: $57.00 (50%). Se ninguém puder deixar o limpador entrar: 100% da visita. Você pediu o mesmo limpador todas as vezes. Se essa pessoa estiver ausente, você será consultado antes que qualquer outra pessoa venha. Você pode encerrar o acordo a qualquer momento em sua página; as retenções param imediatamente."
+ }
+}

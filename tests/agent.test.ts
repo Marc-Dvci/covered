@@ -1,4 +1,6 @@
+import { readdirSync, readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it } from "vitest";
+import { keepsNumbers } from "../server/agreements.ts";
 import { config, makeApp, sweep, type App } from "../server/context.ts";
 import { Gemini, numbersOk } from "../server/ai/gemini.ts";
 import { intake, openDisruption, propose } from "../server/dispatch/agent.ts";
@@ -59,6 +61,22 @@ describe("number check", () => {
     expect(numbersOk("$157.50 is held.", allowed)).toBe(true);
     expect(numbersOk("Marek can come at 10:00.", allowed)).toBe(false);
     expect(numbersOk("You'll be charged $20.", allowed)).toBe(false);
+  });
+});
+
+describe("read-back check", () => {
+  const en = "The Parks and the cooperative agree on home cleaning at Capitol Hill. Every Sat at 10:00, for 3 hours. Each visit: kitchen; bathrooms; floors; changing sheets. Rate $38.00 an hour, so $114.00 a visit. 24 hours before each visit, $133.00 is held on your PayPal (the visit plus up to 30 extra minutes, which you approve at the end). The visit is paid when it ends and the rest is released. Cancel more than 24 hours ahead: nothing to pay. Cancel later: $57.00 (50%). If nobody can let the cleaner in: 100% of the visit. You asked for the same cleaner every time. If that person is out, you will be asked before anyone else comes. You can stop the arrangement at any time from your page; holds stop at once.";
+  const text = (f: string) => (JSON.parse(readFileSync(f, "utf8")) as { output: { text: string } }).output.text;
+
+  it("rejects the live Portuguese answer that turned the $133.00 hold into $114.00", () => {
+    const pt = text("tests/fixtures/readback-pt-changed-hold.json");
+    expect(pt).toContain("$114.00 são retidos");
+    expect(keepsNumbers(en, pt)).toBe(false);
+  });
+
+  it("accepts every recorded read-back of the demo agreement", () => {
+    const dir = "data/ai-recordings/agreement-readback";
+    for (const f of readdirSync(dir)) expect(keepsNumbers(en, text(`${dir}/${f}`)), f).toBe(true);
   });
 });
 

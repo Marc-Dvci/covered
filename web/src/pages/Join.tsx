@@ -98,7 +98,10 @@ function Recorder({ onAudio, hasAudio }: { onAudio: (a: { mimeType: string; data
       r.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(chunks.current, { type: r.mimeType.split(";")[0] || "audio/webm" });
-        const b64 = btoa(String.fromCharCode(...new Uint8Array(await blob.arrayBuffer())));
+        const buf = new Uint8Array(await blob.arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        const b64 = btoa(bin);
         onAudio({ mimeType: blob.type, data: b64 });
       };
       r.start();
@@ -111,6 +114,12 @@ function Recorder({ onAudio, hasAudio }: { onAudio: (a: { mimeType: string; data
     <div className="row">
       {rec ? <button className="btn danger small" onClick={() => { rec.stop(); setRec(null); }}>Stop recording</button>
         : <button className="btn secondary small" onClick={start}>Record a voice note instead</button>}
+      {!hasAudio && !rec && <button className="btn quiet small" onClick={async () => {
+        const buf = new Uint8Array(await (await fetch("/samples/teresa-terms-pt.mp3")).arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        onAudio({ mimeType: "audio/mp3", data: btoa(bin) });
+      }}>Use the sample voice note (Portuguese)</button>}
       {hasAudio && <><span className="chip s-held">voice note ready</span><button className="btn quiet small" onClick={() => onAudio(null)}>Use the text</button></>}
     </div>
   );

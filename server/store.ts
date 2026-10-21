@@ -1,4 +1,5 @@
 // Domain reads and writes on top of the database: visits, money rows, events, the demo clock.
+import { randomBytes } from "node:crypto";
 import type { Household, Member, Terms, Visit, VisitState } from "../shared/domain.ts";
 import type { Outcome, Settlement } from "../shared/rules/settle.ts";
 import { households as seedHouseholds, members as seedMembers, seedVisits, STORY } from "../shared/seed.ts";
@@ -80,6 +81,23 @@ export class Store {
     const start = STORY.messageAt;
     await this.db.query("update visits set state = 'done' where start + minutes <= $1", [start]);
     await this.setClock(start);
+    // a fresh run tag per reset, so the replayed week's PayPal ids never collide with an earlier run's
+    await this.kvSet("run_tag", randomBytes(3).toString("hex"));
+  }
+
+  /** The PayPal reference for a visit: request ids, invoice id and payout batch id are built from it. */
+  async payRef(visitId: string): Promise<string> {
+    const tag = await this.kvGet<string>("run_tag");
+    return tag ? `${tag}-${visitId}` : visitId;
+  }
+
+  /** The visit a PayPal invoice id (covered-<ref>) belongs to, if it is from this run. */
+  async visitForInvoice(invoiceId: string): Promise<string | null> {
+    if (!invoiceId.startsWith("covered-")) return null;
+    const ref = invoiceId.slice("covered-".length);
+    const tag = await this.kvGet<string>("run_tag");
+    const id = tag ? (ref.startsWith(`${tag}-`) ? ref.slice(tag.length + 1) : null) : ref;
+    return id && (await this.visit(id)) ? id : null;
   }
 
   // ---- clock: board minutes, running at real speed from the last time it was set

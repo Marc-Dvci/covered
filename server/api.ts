@@ -290,8 +290,8 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
     }
     const r = body.resource ?? {};
     const invoice = String(r.invoice_id ?? (r.disputed_transactions as { invoice_number?: string }[] | undefined)?.[0]?.invoice_number ?? "");
-    const visit = invoice.startsWith("covered-") ? await app.store.visit(invoice.slice("covered-".length)) : null;
-    await app.store.event("paypal.webhook", visit?.id ?? null, "paypal", { type: body.event_type, id: body.id, resourceId: r.id, verified: true });
+    const visitId = await app.store.visitForInvoice(invoice);
+    await app.store.event("paypal.webhook", visitId, "paypal", { type: body.event_type, id: body.id, resourceId: r.id, verified: true });
     return { ok: true };
   }));
 }

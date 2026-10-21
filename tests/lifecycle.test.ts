@@ -69,6 +69,27 @@ describe("visit money lifecycle", () => {
     expect(await evidence(app.store, "no-such-visit")).toBeNull();
   });
 
+  it("moves real money again after a demo reset: PayPal ids carry the reset's run tag", async () => {
+    const run = async () => {
+      await sweep(app);
+      await idle();
+      await app.store.setClock(THU + hm("10:00"));
+      await checkIn(ctx(), "v-thu-weber", "lena");
+      await app.store.setClock(THU + hm("13:00"));
+      await checkOut(ctx(), "v-thu-weber", "lena", false);
+      await idle();
+      return (await app.store.visit("v-thu-weber"))!;
+    };
+    const a = await run();
+    await app.store.reset();
+    const b = await run();
+    expect(b.state).toBe("paid_out");
+    expect(b.payout?.status).toBe("SUCCESS");
+    expect(b.payout?.batchId).not.toBe(a.payout?.batchId);
+    expect(b.hold?.authorizationId).not.toBe(a.hold?.authorizationId);
+    expect(b.capture?.captureId).not.toBe(a.capture?.captureId);
+  });
+
   it("survives a crash between capture and payout: one capture, one payout", async () => {
     await sweep(app);
     await idle();

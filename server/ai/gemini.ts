@@ -82,7 +82,8 @@ export class Gemini {
   }
 
   private async post(tier: Tier, body: unknown): Promise<{ res: Record<string, unknown>; model: string; ms: number }> {
-    const chain = [tier === "main" ? this.cfg.modelMain : this.cfg.modelLight, ...this.cfg.modelFallbacks];
+    // free-tier quotas are per model: a busy main model falls back through the others, then to the light one
+    const chain = [...new Set(tier === "main" ? [this.cfg.modelMain, ...this.cfg.modelFallbacks, this.cfg.modelLight] : [this.cfg.modelLight, ...this.cfg.modelFallbacks])];
     let why = "no model";
     for (const model of chain) {
       const t0 = performance.now();

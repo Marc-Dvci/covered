@@ -12,7 +12,7 @@ const server = () => {
   routes(s, app, new Gemini({ ...app.cfg, geminiKey: undefined }, app.store));
   return s;
 };
-const delivery = { id: "WH-1", event_type: "PAYMENT.CAPTURE.COMPLETED", resource: { id: "CAP-1", invoice_id: "covered-v-thu-weber" } };
+let delivery: { id: string; event_type: string; resource: { id: string; invoice_id: string } };
 
 beforeEach(async () => {
   const pp = new FakePayPal();
@@ -22,6 +22,7 @@ beforeEach(async () => {
   await app.store.reset();
   await sweep(app);
   await app.runner.idle();
+  delivery = { id: "WH-1", event_type: "PAYMENT.CAPTURE.COMPLETED", resource: { id: "CAP-1", invoice_id: `covered-${await app.store.payRef("v-thu-weber")}` } };
 });
 
 describe("PayPal webhooks", () => {
@@ -38,6 +39,12 @@ describe("PayPal webhooks", () => {
     const types = (await app.store.events(5)).map((x) => x.type);
     expect(types).toContain("paypal.webhook_rejected");
     expect(types).not.toContain("paypal.webhook");
+  });
+
+  it("does not tie a delivery from an earlier demo run to this run's visit", async () => {
+    delivery.resource.invoice_id = "covered-0a0a0a-v-thu-weber";
+    await server().inject({ method: "POST", url: "/api/paypal/webhook", payload: delivery, headers: { "paypal-transmission-sig": "stand-in:WH-ID" } });
+    expect((await app.store.events(5)).find((x) => x.type === "paypal.webhook")?.visit_id).toBeNull();
   });
 
   it("refuses every delivery when no webhook id is configured", async () => {

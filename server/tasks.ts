@@ -1,6 +1,7 @@
 // The money steps of a visit. Each one reads the visit, does only what is not yet done, and records
 // what it did, so a retried run (Render Workflows retries a failed task) never charges or pays twice:
-// PayPal-Request-Id and the payout's sender batch id are derived from the visit id.
+// PayPal-Request-Id, the invoice id and the payout's sender batch id are derived from the visit id and the
+// run tag of the last demo reset.
 import { dollars } from "../shared/domain.ts";
 import { holdAtMinutesBefore, holdCents, settle } from "../shared/rules/settle.ts";
 import { PayPalError, type PayPal } from "./paypal/types.ts";
@@ -26,9 +27,10 @@ export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
     return "no saved PayPal";
   }
   const cents = holdCents(v.terms);
+  const ref = await d.store.payRef(v.id);
   await d.store.updateVisit(v.id, { state: "holding" });
   try {
-    const hold = await d.paypal.authorize(h.vaultId, cents, v.id, `Home cleaning, ${h.name}`, `covered-${v.id}`);
+    const hold = await d.paypal.authorize(h.vaultId, cents, ref, `Home cleaning, ${h.name}`, `covered-${ref}`);
     // placed when it fell due on the board's clock (the demo clock can jump past that moment)
     const placedAt = Math.min(await d.store.now(), v.start - holdAtMinutesBefore(v.terms));
     await d.store.updateVisit(v.id, { state: "held", hold: { orderId: hold.orderId, authorizationId: hold.authorizationId, cents, placedAt, status: hold.status } });
@@ -54,16 +56,17 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
   if (["paid_out", "cancelled", "voided", "late_cancel"].includes(v.state) && (v.payout?.finalAt || !v.settlement?.captureCents)) return `already settled (${v.state})`;
 
   const s = settle(v.terms, v.outcome, v.hold ? "placed" : "failed");
+  const ref = await d.store.payRef(v.id);
   v = await d.store.updateVisit(v.id, { settlement: s, state: "settling" });
 
   if (s.captureCents > 0 && !v.capture && v.hold) {
-    const c = await d.paypal.capture(v.hold.authorizationId, s.captureCents, v.id, `covered-${v.id}`, true);
+    const c = await d.paypal.capture(v.hold.authorizationId, s.captureCents, ref, `covered-${ref}`, true);
     v = await d.store.updateVisit(v.id, { capture: { captureId: c.captureId, cents: c.grossCents, feeCents: c.paypalFeeCents, at: await d.store.now() } });
     await d.store.money(v.id, "capture", c.grossCents, v.id, c.captureId, c.status, { feeCents: c.paypalFeeCents, releasedCents: s.releaseCents });
     await d.store.event("payment.captured", v.id, "workflow", { cents: c.grossCents, releasedCents: s.releaseCents, captureId: c.captureId });
   } else if (s.captureCents === 0 && v.hold && !v.void) {
     try {
-      const r = await d.paypal.void(v.hold.authorizationId, v.id);
+      const r = await d.paypal.void(v.hold.authorizationId, ref);
       v = await d.store.updateVisit(v.id, { void: { at: await d.store.now(), status: r.status } });
     } catch (e) {
       if (!(e instanceof PayPalError && e.issue.includes("VOID"))) throw e;
@@ -87,7 +90,7 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
       const m = members.find((x) => x.id === memberId)!;
       return { itemId: `${v!.id}-${memberId}`, receiver: m.payout.receiver, wallet: m.payout.wallet, cents, note: `${h?.name ?? "Visit"}: ${s.reason}` };
     });
-    const sender = `covered-${v.id}`;
+    const sender = `covered-${ref}`;
     try {
       const p = await d.paypal.payout(sender, items, "Your pay from the cooperative");
       v = await d.store.updateVisit(v.id, {

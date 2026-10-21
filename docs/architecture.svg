@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 790" width="1200" height="790" font-family="Atkinson Hyperlegible, system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3d4a66"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#1d5fd0"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#137a3f"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="790" fill="#ffffff"/>
+  <g fill="none" stroke="#c9d1e0" stroke-width="1.5">
+    <rect x="40" y="40" width="300" height="92" rx="10"/>
+    <rect x="450" y="40" width="300" height="92" rx="10"/>
+    <rect x="860" y="40" width="300" height="92" rx="10"/>
+    <rect x="300" y="230" width="600" height="120" rx="10" stroke="#14213d" stroke-width="2"/>
+    <rect x="960" y="230" width="200" height="120" rx="10"/>
+    <rect x="40" y="230" width="200" height="120" rx="10"/>
+    <rect x="40" y="450" width="260" height="110" rx="10"/>
+    <rect x="340" y="450" width="520" height="110" rx="10" stroke="#1d5fd0" stroke-width="2"/>
+    <rect x="300" y="630" width="860" height="130" rx="10" stroke="#137a3f" stroke-width="2"/>
+  </g>
+
+  <g fill="#14213d">
+    <text x="60" y="76" font-size="20" font-weight="700">Household phone</text>
+    <text x="60" y="104" font-size="15" fill="#5f6b84">agreement, holds, receipts, consent</text>
+    <text x="470" y="76" font-size="20" font-weight="700">Member phone</text>
+    <text x="470" y="104" font-size="15" fill="#5f6b84">check-in, check-out, pay, statement</text>
+    <text x="880" y="76" font-size="20" font-weight="700">Coordinator board</text>
+    <text x="880" y="104" font-size="15" fill="#5f6b84">week board, cover agent, demo clock</text>
+
+    <text x="320" y="266" font-size="20" font-weight="700">Web service on Render (Node, TypeScript)</text>
+    <text x="320" y="294" font-size="15" fill="#3d4a66">Fastify API + React front end. Code decides every amount, fee and payee,</text>
+    <text x="320" y="316" font-size="15" fill="#3d4a66">which covers are valid, and whether an agreement can be signed.</text>
+    <text x="320" y="338" font-size="15" fill="#3d4a66">Webhooks verified with PayPal before they are kept.</text>
+
+    <text x="980" y="266" font-size="20" font-weight="700">Gemini API</text>
+    <text x="980" y="292" font-size="15" fill="#3d4a66">reads messages, picks</text>
+    <text x="980" y="312" font-size="15" fill="#3d4a66">among solver plans,</text>
+    <text x="980" y="332" font-size="15" fill="#3d4a66">drafts, translates</text>
+
+    <text x="60" y="266" font-size="20" font-weight="700">Postgres</text>
+    <text x="60" y="292" font-size="15" fill="#3d4a66">visits, agreements,</text>
+    <text x="60" y="312" font-size="15" fill="#3d4a66">money ledger,</text>
+    <text x="60" y="332" font-size="15" fill="#3d4a66">event log</text>
+
+    <text x="60" y="486" font-size="20" font-weight="700">Cron job, every 5 min</text>
+    <text x="60" y="512" font-size="15" fill="#3d4a66">finds visits whose hold</text>
+    <text x="60" y="532" font-size="15" fill="#3d4a66">is due (24 h ahead)</text>
+
+    <text x="360" y="486" font-size="20" font-weight="700" fill="#1d5fd0">Render Workflows</text>
+    <text x="360" y="512" font-size="15" fill="#3d4a66">placeHold: authorize the visit on the household's saved PayPal</text>
+    <text x="360" y="532" font-size="15" fill="#3d4a66">settleVisit: capture or void per the outcome, then pay the members</text>
+    <text x="360" y="552" font-size="15" fill="#3d4a66">each run retried by Render; every PayPal call carries a request id</text>
+
+    <text x="320" y="666" font-size="20" font-weight="700" fill="#137a3f">PayPal sandbox</text>
+    <text x="320" y="692" font-size="15" fill="#3d4a66">Server SDK: Vault v3 (save PayPal at signing), Orders v2 (buyer-absent authorize),</text>
+    <text x="320" y="714" font-size="15" fill="#3d4a66">Payments (capture, partial capture, void), Transaction Search (income statement)</text>
+    <text x="320" y="736" font-size="15" fill="#3d4a66">REST: Payouts to PayPal and Venmo, webhook signature verification</text>
+  </g>
+
+  <g fill="none" stroke="#3d4a66" stroke-width="1.5">
+    <path d="M190 132 L480 228" marker-end="url(#a)"/>
+    <path d="M600 132 L600 228" marker-end="url(#a)"/>
+    <path d="M1010 132 L720 228" marker-end="url(#a)"/>
+    <path d="M900 290 L958 290" marker-start="url(#a)" marker-end="url(#a)"/>
+    <path d="M300 290 L242 290" marker-start="url(#a)" marker-end="url(#a)"/>
+    <path d="M300 505 L338 505" marker-end="url(#b)" stroke="#1d5fd0"/>
+    <path d="M600 352 L600 448" marker-end="url(#b)" stroke="#1d5fd0"/>
+    <path d="M600 562 L600 628" marker-end="url(#g)" stroke="#137a3f"/>
+    <path d="M880 628 L880 352" marker-end="url(#a)" stroke-dasharray="5 5"/>
+  </g>
+  <g font-size="14" fill="#5f6b84">
+    <text x="612" y="410">check-out, cancel: start a run</text>
+    <text x="612" y="602">idempotent money steps</text>
+    <text x="892" y="600">webhooks</text>
+  </g>
+</svg>

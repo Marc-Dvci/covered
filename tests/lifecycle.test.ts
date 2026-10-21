@@ -64,6 +64,8 @@ describe("visit money lifecycle", () => {
     expect(e.money.map((m) => m.step)).toEqual(["hold", "capture", "payout to Lena Petrova"]);
     expect(e.money.find((m) => m.step === "capture")?.paypalId).toBe(v.capture!.captureId);
     expect(e.money.find((m) => m.step === "hold")?.paypalId).toBe(v.hold!.authorizationId);
+    expect(e.money.find((m) => m.step.startsWith("payout"))?.paypalId).toBe(v.payout!.items[0]!.transactionId);
+    expect(e.timeline.find((t) => t.what.startsWith("Captured"))?.by).toBe("cooperative system");
     expect(e.timeline.map((t) => t.what)).toEqual(expect.arrayContaining(["Member checked in at the door", expect.stringMatching(/^Captured \$105\.00/)]));
     expect(e.summary).toContain(v.capture!.captureId);
     expect(await evidence(app.store, "no-such-visit")).toBeNull();

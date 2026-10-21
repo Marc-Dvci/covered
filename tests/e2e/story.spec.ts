@@ -67,6 +67,15 @@ test("Thursday: Sam is out, the board is covered, everyone is paid", async ({ pa
   await expect(page.getByRole("heading", { name: "Marek Nowak" })).toBeVisible();
   await expect(page.getByText("The Okafors")).toHaveCount(0);
   await axe(page, "landlord");
+
+  // the Okafors dispute the charge: the coordinator opens the evidence from the visit
+  await page.goto("/board");
+  await page.locator('[data-visit="v-thu-okafor"][data-kind="real"]').click();
+  await page.getByRole("link", { name: "Evidence if the household disputes" }).click();
+  await expect(page.getByRole("heading", { name: "Evidence for a dispute: The Okafors" })).toBeVisible();
+  await expect(page.getByText("Member checked in at the door")).toBeVisible();
+  await expect(page.locator("td", { hasText: /^capture$/ })).toHaveCount(1);
+  await axe(page, "evidence");
 });
 
 test("the demo inputs draft from the recorded answer and can be signed", async ({ page }) => {

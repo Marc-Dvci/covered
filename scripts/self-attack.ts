@@ -26,9 +26,18 @@ await sweep(app);
 await app.runner.idle();
 const ctx = { store: app.store, runner: app.runner };
 const results: { attack: string; expected: string; observed: string; pass: boolean | "not run"; model?: string }[] = [];
-// which model answered this attack; null when no model call was made or it failed and code fell back
-const begin = () => void (ai.last = null);
-const answered = () => (ai.last ? (ai.last.source === "live" ? ai.last.model : ai.last.source) : undefined);
+// every model that answered during this attack; empty when no call was made or code fell back
+let calls: string[] = [];
+for (const m of ["json", "turn"] as const) {
+  const f = ai[m].bind(ai) as (...a: unknown[]) => Promise<unknown>;
+  (ai as unknown as Record<string, unknown>)[m] = async (...a: unknown[]) => {
+    const out = await f(...a);
+    if (ai.last) calls.push(ai.last.source === "live" ? ai.last.model : ai.last.source);
+    return out;
+  };
+}
+const begin = () => void ((ai.last = null), (calls = []));
+const answered = () => (calls.length ? [...new Set(calls)].join(", ") : undefined);
 const record = (attack: string, expected: string, observed: string, pass: boolean, needsModel = false) => {
   const model = answered();
   const result = needsModel && !model ? "not run" : pass;
@@ -75,7 +84,7 @@ const base = { householdName: "The Testers", area: "Fremont", language: "en" as 
   const b = await openDisruption(app.store, ai, "sam", STORY.message);
   const p2 = await propose(app.store, ai, b.id);
   const same = JSON.stringify(p1.plan.assignments) === JSON.stringify(p2.plan.assignments);
-  if (p1.source === "template") ai.last = null; // the agent fell back to the solver's plan: not a model result
+  if (p1.source === "template") calls = []; // the agent fell back to the solver's plan: not a model result
   record("same sick message twice", "identical plans", `plans ${same ? "identical" : "differ"} (${p1.source}, then ${p2.source}); rejected messages ${p1.rejected.length + p2.rejected.length}`, same, true);
 }
 // 7. a drag that breaks the same-cleaner rule and the pets need

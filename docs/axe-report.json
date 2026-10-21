@@ -30,5 +30,13 @@
  {
   "page": "evidence",
   "violations": []
+ },
+ {
+  "page": "join",
+  "violations": []
+ },
+ {
+  "page": "about",
+  "violations": []
  }
 ]

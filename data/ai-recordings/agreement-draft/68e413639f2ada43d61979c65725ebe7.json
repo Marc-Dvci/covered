@@ -1,15 +1,19 @@
 {
  "task": "agreement-draft",
  "model": "gemini-3.6-flash",
- "ms": 2156,
+ "ms": 2427,
  "usage": {
-  "promptTokenCount": 191,
-  "candidatesTokenCount": 228,
-  "totalTokenCount": 419,
+  "promptTokenCount": 429,
+  "candidatesTokenCount": 245,
+  "totalTokenCount": 674,
   "promptTokensDetails": [
    {
     "modality": "TEXT",
-    "tokenCount": 191
+    "tokenCount": 166
+   },
+   {
+    "modality": "AUDIO",
+    "tokenCount": 263
    }
   ],
   "serviceTier": "standard"
@@ -30,8 +34,8 @@
   "member_late_fee_percent": 50,
   "member_notice_hours": 24,
   "member_rate_per_hour": 38,
-  "member_terms_english": "I charge 38 dollars per hour. If canceled with less than 24 hours notice, I charge half.",
-  "member_transcript": "Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade.",
+  "member_terms_english": "Hello, I'm Teresa. I charge $38 per hour. If you cancel with less than 24 hours notice, I charge half the amount.",
+  "member_transcript": "Olá, sou a Teresa. Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade do valor.",
   "minutes": 180,
   "start": "10:00",
   "weekday": 5

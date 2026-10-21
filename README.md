@@ -1,8 +1,32 @@
 # Covered: cleaners' pay held before the work starts
 
-Covered runs a house-cleaning cooperative's week. The coordinator plans visits on one board. Each household's PayPal holds the visit's pay 24 hours ahead. Whoever does the visit is paid through PayPal Payouts when they check out.
+![tests](https://img.shields.io/badge/tests-75%20passing-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
 
-- **Who uses it:** a coordinator at a desk, members on their phones, households on theirs.
+**Covered runs a house-cleaning cooperative's week: each household's PayPal holds the visit's pay 24 hours ahead, and whoever does the visit is paid through PayPal Payouts when they check out.**
+
+I audit payment systems for a living. In this trade, the cancellation fee and the week's pay are usually a promise; Covered makes both an authorization on PayPal before anyone travels.
+
+| | |
+|---|---|
+| Built with | PayPal Server SDK (Vault v3, Orders v2, Payments, Transaction Search), PayPal Payouts, PayPal webhooks, Gemini API, Render Workflows, Render cron and Postgres, TypeScript, React, Fastify |
+| Headline result | A full demo day on the PayPal sandbox: 30 holds, 3 captures including a late-cancel partial capture, 3 payouts final in about 25 s each; a crash between capture and payout ends in exactly 1 capture and 1 payout |
+
+## For judges
+
+| Criterion | Where it is answered |
+|---|---|
+| Technological implementation | [PayPal](#paypal) (six APIs, idempotent money steps), [Gemini, and where it stops](#gemini-and-where-it-stops), [docs/EVIDENCE.md](docs/EVIDENCE.md) sections 3 and 4 |
+| Design | [The demo day](#the-demo-day): coordinator board, member and household phones in their own languages, sign-up by voice |
+| Potential impact | [Who it is for](#who-it-is-for), [The rule](#the-rule) |
+| Innovation | The hold belongs to the visit, so a cover keeps the money in place; the notice window and the hold are the same 24 hours |
+| Presentation | [Measured](#measured), [Run it](#run-it) with no keys |
+
+## Who it is for
+
+Seattle passed Council Bill 121266 on 15 Sep 2026 (9-0). From 1 Jul 2027, domestic workers must get a written agreement that includes a cancellation policy, and records of hours and pay. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.
+
+Covered is for a cleaning cooperative: a coordinator who plans the week, members who clean, and the households they clean for. It turns two lines of the ordinance into money that moves: the cancellation policy is a PayPal authorization, and the pay record is a PayPal transaction.
+
 - **What goes in:** a household's job description, a member's terms in their own language (typed or spoken), and the members' messages on the day ("my son has a fever, I can't come in").
 - **What comes out:**
   - a signed written agreement with the household's PayPal saved once;
@@ -11,7 +35,7 @@ Covered runs a house-cleaning cooperative's week. The coordinator plans visits o
   - cover plans when someone is out;
   - a monthly income statement with a PayPal transaction id on every line.
 
-Seattle passed Council Bill 121266 on 15 Sep 2026 (9-0). From 1 Jul 2027, domestic workers must get a written agreement that includes a cancellation policy, and records of hours and pay. Covered turns those two lines of the ordinance into money that moves: the cancellation policy is a PayPal authorization, and the pay record is a PayPal transaction.
+## How it works
 
 ![Architecture](docs/architecture.png)
 
@@ -87,7 +111,7 @@ Full numbers and run details are in [docs/EVIDENCE.md](docs/EVIDENCE.md).
 | Crash between capture and payout, on the sandbox | Retried once: 1 capture, 1 payout; PayPal refused a second capture and a second payout batch |
 | Self-attack: 13 hostile inputs (prompt injection, rate changes by message, forged webhook, dispute, crash) | 13 / 13 handled |
 | Accessibility: axe-core (WCAG 2.1 AA) on every screen of the end-to-end story | 0 violations |
-| Unit and integration tests | 72 passing; 4 browser tests drive the real UI in Chromium |
+| Unit and integration tests | 75 passing; 4 browser tests drive the real UI in Chromium |
 
 ## Run it
 
@@ -150,6 +174,25 @@ Without `RENDER_API_KEY`, the same tasks run in-process with the same retry poli
 | `eval/` | Cover scenarios, labels from an exhaustive oracle, results |
 | `web/` | React front end: board, member phone, household phone, sign-up, statement, evidence |
 | `tests/` | Vitest suites and the Playwright story |
+
+## Claims
+
+| Claim | Code | Checked by |
+|---|---|---|
+| Holds are placed only for visits inside the notice window | `server/tasks.ts` `dueForHold`, `placeHold` | `tests/lifecycle.test.ts` "places holds only for visits inside the notice window" |
+| A late cancellation captures the fee and releases the rest | `shared/rules/settle.ts`, `server/tasks.ts` `settleVisit` | `tests/lifecycle.test.ts`, `shared/rules/cases.json` (40 cases), `probe/RESULTS-EUR.md` |
+| Money is conserved on every outcome | `shared/rules/settle.ts` | `tests/rules.test.ts` (9,000 random cases) |
+| A retried task never captures or pays twice | `server/tasks.ts`, `server/paypal/types.ts` `requestId` | `tests/lifecycle.test.ts` "survives a crash", `scripts/durability.ts` on the sandbox |
+| A demo reset moves real sandbox money again | `server/store.ts` `payRef` | `tests/lifecycle.test.ts` "moves real money again after a demo reset" |
+| The agent can only choose a plan the solver returned | `server/dispatch/agent.ts` `submit_plan` | `tests/agent.test.ts`, `scripts/self-attack.ts` |
+| The solver breaks no rule | `server/dispatch/solver.ts` | `eval/` (80 scenarios against an exhaustive oracle), CI |
+| A message with a number the tools did not give is not sent | `server/ai/gemini.ts` `numbersOk` | `tests/agent.test.ts` "number check" |
+| A translated read-back that changes a number is not shown | `server/agreements.ts` `keepsNumbers` | `tests/agent.test.ts` "read-back check" |
+| An agreement below the Seattle minimum or missing an ordinance field cannot be signed | `shared/agreement.ts` `missing` | `scripts/self-attack.ts`, `tests/e2e/story.spec.ts` |
+| Unverified PayPal webhooks are refused | `server/api.ts`, `server/paypal/sandbox.ts` `verifyWebhook` | `tests/webhook.test.ts` |
+| A dispute is answered from the ledger | `server/evidence.ts` | `tests/lifecycle.test.ts` "answers a dispute", `tests/e2e/story.spec.ts` |
+| The landlord link is signed, expires, and hides households | `server/statements.ts` `share`, `openShare`, `landlordView` | `tests/share.test.ts`, `tests/e2e/story.spec.ts` |
+| Every screen of the story passes axe-core | `web/` | `tests/e2e/story.spec.ts`, `docs/axe-report.json` |
 
 ## Scope
 

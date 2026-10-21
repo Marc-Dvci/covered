@@ -1,0 +1,54 @@
+{
+ "ranAt": "2026-10-21T05:56:44.499Z",
+ "currency": "EUR",
+ "runner": "local (same retry policy as the Render workflow)",
+ "visit": "v-thu-weber",
+ "state": "paid_out",
+ "taskRuns": [
+  {
+   "task": "placeHold",
+   "attempt": 0,
+   "status": "succeeded",
+   "detail": "held $122.50"
+  },
+  {
+   "task": "settleVisit",
+   "attempt": 0,
+   "status": "retrying",
+   "detail": "injected crash after capture"
+  },
+  {
+   "task": "settleVisit",
+   "attempt": 1,
+   "status": "succeeded",
+   "detail": "paid_out: captured $105.00, released $17.50"
+  }
+ ],
+ "authorization": "38J4925185108004N",
+ "capture": {
+  "at": 5100,
+  "cents": 10500,
+  "feeCents": 382,
+  "captureId": "98F41007M7301961K"
+ },
+ "payout": {
+  "batchId": "9KR5TTRAMHEW8",
+  "senderBatchId": "covered-c997cf-v-thu-weber",
+  "status": "SUCCESS",
+  "items": [
+   {
+    "itemId": "v-thu-weber-lena",
+    "payoutItemId": "M9CCV3R8DNYUJ",
+    "transactionId": "8YV16471BU867844W",
+    "status": "SUCCESS"
+   }
+  ]
+ },
+ "moneyRows": {
+  "captures": 1,
+  "payoutBatches": 1
+ },
+ "paypalRefusesSecondCapture": "422 AUTHORIZATION_ALREADY_CAPTURED",
+ "paypalRefusesSecondPayoutBatch": "400 Batch with given sender_batch_id already exists",
+ "seconds": 34
+}

@@ -62,6 +62,14 @@ export function HouseholdPage() {
         </div>
         <div className="phone-body">
           {q.get("welcome") && <p className="why">Agreement signed and PayPal saved. Your first visit is on the board.</p>}
+          {q.get("repaired") && <p className="why">PayPal saved again. Your visits will be held as usual.</p>}
+          {data.visits.some((v) => v.state === "at_risk") && (
+            <section className="stack" aria-label="Payment problem">
+              <h2>PayPal refused the hold</h2>
+              <p>We could not hold the pay for your next visit. Save your PayPal again so the visit can go ahead; nothing is charged now.</p>
+              <button className="btn" style={{ justifySelf: "start" }} disabled={busy} onClick={() => act(async () => { window.location.href = (await api<{ approveUrl: string }>(`/api/households/${h.id}/repair`, {})).approveUrl; })}>Save PayPal again</button>
+            </section>
+          )}
           {asks.map((v) => (
             <section className="stack" key={`ask-${v.id}`} aria-label="Request">
               <h2>{name(v.memberIds[0]!)} is out</h2>

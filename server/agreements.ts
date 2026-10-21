@@ -36,7 +36,7 @@ const SCHEMA = {
     weekday: { type: "INTEGER", nullable: true, description: "0 = Monday ... 6 = Sunday." },
     start: { type: "STRING", nullable: true, description: "HH:MM 24-hour." },
     minutes: { type: "INTEGER", nullable: true },
-    frequency: { type: "STRING", nullable: true, enum: ["weekly", "every_two_weeks", "once"] },
+    frequency: { type: "STRING", nullable: true, enum: ["weekly", "every_two_weeks", "once"], description: "weekly when a day recurs (\"Fridays\", \"every Monday\"); once for a single date; null if not said." },
     pets: { type: "BOOLEAN" },
     fragrance_free: { type: "BOOLEAN" },
     deep_clean: { type: "BOOLEAN" },

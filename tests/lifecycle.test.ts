@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { answerConsent, cancel, cancelPreview, canMove, checkIn, checkOut, lockout, move } from "../server/actions.ts";
 import { config, makeApp, sweep, type App } from "../server/context.ts";
 import { evidence } from "../server/evidence.ts";
+import { finishRepair, startRepair } from "../server/signup.ts";
 import { FakePayPal } from "../server/paypal/fake.ts";
 import { LocalRunner } from "../server/runner.ts";
 import { hm } from "../shared/seed.ts";
@@ -137,6 +138,21 @@ describe("visit money lifecycle", () => {
     await sweep(app);
     await idle();
     expect((await app.store.visit("v-thu-okafor"))!.state).toBe("at_risk");
+  });
+
+  it("holds again once the household saves PayPal again", async () => {
+    pp.refuse.add("DEMO-VAULT");
+    await sweep(app);
+    await idle();
+    const { approveUrl } = await startRepair(app.store, pp, "okafor", "http://x");
+    const token = new URL(approveUrl).searchParams.get("approval_token_id")!;
+    await expect(finishRepair(app.store, pp, "okafor", "SETUP-forged")).rejects.toThrow();
+    expect(await finishRepair(app.store, pp, "okafor", token)).toContain("v-thu-okafor");
+    await sweep(app);
+    await idle();
+    const v = (await app.store.visit("v-thu-okafor"))!;
+    expect(v.state).toBe("held");
+    expect((await app.store.household("okafor"))!.vaultId).not.toBe("DEMO-VAULT");
   });
 
   it("captures the lock-out fee", async () => {

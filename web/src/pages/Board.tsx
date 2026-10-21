@@ -237,6 +237,7 @@ const EVENT_TEXT: Record<string, (e: EventRow, n: (id: string) => string) => str
   "agreement.signed": (e, n) => `${n(e.actor)} signed and saved PayPal`,
   "paypal.webhook": (e) => `PayPal confirmed ${String(e.data.type).toLowerCase().replace(/_/g, " ")}`,
   "paypal.webhook_rejected": () => "Unverified webhook refused",
+  "vault.repaired": (e, n) => `${n(e.actor)} saved PayPal again`,
 };
 
 function Feed({ board }: { board: Board }) {

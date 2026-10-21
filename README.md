@@ -1,6 +1,6 @@
 # Covered: cleaners' pay held before the work starts
 
-![tests](https://img.shields.io/badge/tests-75%20passing-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
+![tests](https://img.shields.io/badge/tests-76%20passing-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
 
 **Covered runs a house-cleaning cooperative's week: each household's PayPal holds the visit's pay 24 hours ahead, and whoever does the visit is paid through PayPal Payouts when they check out.**
 
@@ -111,7 +111,7 @@ Full numbers and run details are in [docs/EVIDENCE.md](docs/EVIDENCE.md).
 | Crash between capture and payout, on the sandbox | Retried once: 1 capture, 1 payout; PayPal refused a second capture and a second payout batch |
 | Self-attack: 13 hostile inputs (prompt injection, rate changes by message, forged webhook, dispute, crash) | 13 / 13 handled |
 | Accessibility: axe-core (WCAG 2.1 AA) on every screen of the end-to-end story | 0 violations |
-| Unit and integration tests | 75 passing; 4 browser tests drive the real UI in Chromium |
+| Unit and integration tests | 76 passing; 4 browser tests drive the real UI in Chromium |
 
 ## Run it
 
@@ -189,6 +189,7 @@ Without `RENDER_API_KEY`, the same tasks run in-process with the same retry poli
 | A message with a number the tools did not give is not sent | `server/ai/gemini.ts` `numbersOk` | `tests/agent.test.ts` "number check" |
 | A translated read-back that changes a number is not shown | `server/agreements.ts` `keepsNumbers` | `tests/agent.test.ts` "read-back check" |
 | An agreement below the Seattle minimum or missing an ordinance field cannot be signed | `shared/agreement.ts` `missing` | `scripts/self-attack.ts`, `tests/e2e/story.spec.ts` |
+| A refused hold puts the visit at risk; the household saves PayPal again and the hold is placed | `server/tasks.ts`, `server/signup.ts` `startRepair`, `finishRepair` | `tests/lifecycle.test.ts` "holds again once the household saves PayPal again" |
 | Unverified PayPal webhooks are refused | `server/api.ts`, `server/paypal/sandbox.ts` `verifyWebhook` | `tests/webhook.test.ts` |
 | A dispute is answered from the ledger | `server/evidence.ts` | `tests/lifecycle.test.ts` "answers a dispute", `tests/e2e/story.spec.ts` |
 | The landlord link is signed, expires, and hides households | `server/statements.ts` `share`, `openShare`, `landlordView` | `tests/share.test.ts`, `tests/e2e/story.spec.ts` |

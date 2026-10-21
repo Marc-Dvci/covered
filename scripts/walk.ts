@@ -1,5 +1,5 @@
 // Walks the demo story through the real UI in headless Chromium and saves a screenshot per step.
-//   npx tsx scripts/walk.ts [baseUrl] [outDir]
+//   npx tsx scripts/walk.ts [baseUrl] [outDir] [scale]
 import { chromium, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
@@ -7,7 +7,7 @@ const base = process.argv[2] ?? "http://localhost:8787";
 const out = process.argv[3] ?? "var/walk";
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: Number(process.argv[4] ?? 1) });
 const errors: string[] = [];
 page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
 page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text()}`));
@@ -89,6 +89,9 @@ await shot("okafor-receipt");
 await page.goto(`${base}/board`);
 await page.waitForTimeout(2500);
 await shot("board-afternoon");
+await page.goto(`${base}/evidence/v-thu-okafor`);
+await page.getByText("Member checked in at the door").waitFor();
+await shot("evidence");
 await page.goto(`${base}/m/teresa/statement`);
 await page.waitForSelector("table");
 await page.waitForTimeout(1500);

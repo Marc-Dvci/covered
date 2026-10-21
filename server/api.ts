@@ -10,7 +10,7 @@ import { sweep, type App } from "./context.ts";
 import { getDisruption, listDisruptions, openDisruption, propose } from "./dispatch/agent.ts";
 import { approve } from "./dispatch/approve.ts";
 import { solve } from "./dispatch/solver.ts";
-import { finishSigning, SIGNUP_AREAS, startSigning } from "./signup.ts";
+import { finishRepair, finishSigning, SIGNUP_AREAS, startRepair, startSigning } from "./signup.ts";
 import { toCrud } from "./crud.ts";
 import { evidence } from "./evidence.ts";
 import { coverLetter, landlordView, openShare, share, statement } from "./statements.ts";
@@ -240,8 +240,15 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
 
   server.post("/api/agreements/:id/sign", wrap(async (req) => startSigning(app.store, app.paypal, (req.params as { id: string }).id, app.cfg.publicUrl)));
 
+  server.post("/api/households/:id/repair", wrap(async (req) => startRepair(app.store, app.paypal, (req.params as { id: string }).id, app.cfg.publicUrl)));
+
   server.get("/api/vault/return", wrap(async (req, reply) => {
-    const q = req.query as { agreement?: string; approval_token_id?: string; approval_session_id?: string };
+    const q = req.query as { agreement?: string; household?: string; approval_token_id?: string; approval_session_id?: string };
+    if (q.household && q.approval_token_id) {
+      await finishRepair(app.store, app.paypal, q.household, q.approval_token_id);
+      await sweep(app);
+      return reply.redirect(`/h/${encodeURIComponent(q.household)}?repaired=1`);
+    }
     if (!q.agreement || !q.approval_token_id) return reply.code(400).send({ error: "missing approval" });
     const r = await finishSigning(app.store, app.paypal, q.agreement, q.approval_token_id);
     await sweep(app);

@@ -1,5 +1,6 @@
 // Signing an agreement: the household saves its PayPal once (Vault), becomes a client of the
 // cooperative, and its first visit lands on the board with the member the solver finds for it.
+import { randomUUID } from "node:crypto";
 import { missing, type Agreement } from "../shared/agreement.ts";
 import { DEFAULT_TERMS, type Household, type Visit } from "../shared/domain.ts";
 import { hm } from "../shared/seed.ts";
@@ -71,4 +72,25 @@ export async function finishSigning(store: Store, paypal: PayPal, agreementId: s
   await store.insertVisit(visit);
   await store.event("visit.scheduled", visit.id, "agent", { memberId, from: "agreement" });
   return { householdId: row.household_id, visitId: visit.id, memberId };
+}
+
+/** PayPal refused a hold: the household saves PayPal again, and its at-risk visits go back to the sweep. */
+export async function startRepair(store: Store, paypal: PayPal, householdId: string, publicUrl: string): Promise<{ approveUrl: string }> {
+  if (!(await store.household(householdId))) throw new Error("no such household");
+  const back = `${publicUrl}/api/vault/return?household=${encodeURIComponent(householdId)}`;
+  const v = await paypal.vaultSetup(back, `${publicUrl}/h/${householdId}`, "Cleaning visits with the cooperative, held 24 hours ahead", `repair-${householdId}-${randomUUID().slice(0, 8)}`);
+  await store.kvSet(`repair:${householdId}`, v.setupTokenId);
+  await store.event("vault.repair_started", null, householdId);
+  return { approveUrl: v.approveUrl };
+}
+
+export async function finishRepair(store: Store, paypal: PayPal, householdId: string, setupTokenId: string): Promise<string[]> {
+  if ((await store.kvGet<string>(`repair:${householdId}`)) !== setupTokenId) throw new Error("this approval belongs to another request");
+  const token = await paypal.vaultFinalize(setupTokenId, `repair-${householdId}`);
+  await store.db.query("update households set vault_id = $2, vault_email = $3 where id = $1", [householdId, token.paymentTokenId, token.payerEmail ?? null]);
+  const back = (await store.visits()).filter((v) => v.householdId === householdId && v.state === "at_risk");
+  for (const v of back) await store.updateVisit(v.id, { state: "scheduled" });
+  await store.kvTake(`repair:${householdId}`);
+  await store.event("vault.repaired", null, householdId, { visits: back.map((v) => v.id) });
+  return back.map((v) => v.id);
 }

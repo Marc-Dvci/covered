@@ -11,6 +11,7 @@ import { getDisruption, listDisruptions, openDisruption, propose } from "./dispa
 import { approve } from "./dispatch/approve.ts";
 import { solve } from "./dispatch/solver.ts";
 import { finishSigning, SIGNUP_AREAS, startSigning } from "./signup.ts";
+import { toCrud } from "./crud.ts";
 import { evidence } from "./evidence.ts";
 import { coverLetter, landlordView, openShare, share, statement } from "./statements.ts";
 import type { VisitRow } from "./store.ts";
@@ -65,6 +66,12 @@ export function routes(server: FastifyInstance, app: App, ai: Gemini) {
       disruptions: disruptions.slice(0, 5),
       events: events.filter((e) => e.type !== "message.sent"),
     };
+  }));
+
+  // the same week in Bryntum CrudManager load format, for the Scheduler Pro board
+  server.get("/api/board/crud", wrap(async () => {
+    const [members, households, visits] = await Promise.all([app.store.members(), app.store.households(), app.store.visits()]);
+    return toCrud(members, households, visits);
   }));
 
   // ---- demo clock and reset

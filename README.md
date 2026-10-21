@@ -21,6 +21,23 @@ I audit payment systems for a living. In this trade, the cancellation fee and th
 | Innovation | The hold belongs to the visit, so a cover keeps the money in place; the notice window and the hold are the same 24 hours |
 | Presentation | [Measured](#measured), [Run it](#run-it) with no keys |
 
+## See it work
+
+![Coordinator board at 07:10 on Thursday, with the agent's proposal](docs/screens/board-proposal.png)
+
+*07:10: Sam is out. The agent's plan sits on the board as dashed bars: Marek takes the Okafors (asked first, since they want the same cleaner), Teresa takes the Santoses and the Murphys. Every hold stays where it was.*
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screens/member-phone-polish.png" alt="Marek's phone in Polish: the Okafors' visit paid, $133.00, and a $33.25 late-cancel fee"></td>
+<td width="50%"><img src="docs/screens/household-late-cancel.png" alt="Mr. Lindqvist's phone: cancelling now costs $35.00, and $52.50 is released"></td>
+</tr>
+<tr>
+<td><em>Marek's phone, in Polish: $133.00 for the Okafors, and $33.25 from Mr. Lindqvist's late-cancel fee, each paid through PayPal Payouts.</em></td>
+<td><em>Mr. Lindqvist sees the fee before he confirms: $35.00 goes to Marek, and $52.50 of the $87.50 hold is released.</em></td>
+</tr>
+</table>
+
 ## Who it is for
 
 Seattle passed Council Bill 121266 on 15 Sep 2026 (9-0). From 1 Jul 2027, domestic workers must get a written agreement that includes a cancellation policy, and records of hours and pay. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.

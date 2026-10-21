@@ -48,6 +48,8 @@ export class SandboxPayPal implements PayPal {
     this.client = new Client({
       clientCredentialsAuthCredentials: { oAuthClientId: clientId, oAuthClientSecret: secret },
       environment: Environment.Sandbox,
+      // the generated default is 0, which means no timeout at all. SDK retries stay at their generated
+      // default (off): the workflow retries the whole task, and the request ids make that safe
       timeout: 30_000,
     });
     this.orders = new OrdersController(this.client);

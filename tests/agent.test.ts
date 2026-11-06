@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it } from "vitest";
 import { keepsNumbers } from "../server/agreements.ts";
 import { config, makeApp, sweep, type App } from "../server/context.ts";
@@ -13,7 +13,7 @@ let app: App;
 beforeEach(async () => {
   const pp = new FakePayPal();
   pp.payoutDelayMs = 0;
-  app = await makeApp({ ...config({}), dataDir: null }, pp);
+  app = await makeApp({ ...config({}), dbFile: null }, pp);
   app.runner = new LocalRunner({ store: app.store, paypal: pp, payoutPollMs: 5 }, 5);
   await app.store.reset();
   await sweep(app);
@@ -75,8 +75,10 @@ describe("read-back check", () => {
   });
 
   it("accepts every recorded read-back of the demo agreement", () => {
-    const dir = "data/ai-recordings/agreement-readback";
-    for (const f of readdirSync(dir)) expect(keepsNumbers(en, text(`${dir}/${f}`)), f).toBe(true);
+    const recorded = JSON.parse(readFileSync("data/ai-recordings.json", "utf8")) as Record<string, { output: { text: string } }>;
+    const readbacks = Object.entries(recorded).filter(([k]) => k.startsWith("agreement-readback/"));
+    expect(readbacks.length).toBeGreaterThan(0);
+    for (const [k, r] of readbacks) expect(keepsNumbers(en, r.output.text), k).toBe(true);
   });
 });
 

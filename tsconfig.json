@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "@cloudflare/workers-types"]
   },
-  "include": ["server", "shared", "web/src", "eval", "probe", "tests"]
+  "include": ["server", "shared", "worker", "web/src", "eval", "probe", "tests", "scripts"]
 }

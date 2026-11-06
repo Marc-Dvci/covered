@@ -2,7 +2,7 @@
 // happened in docs/self-attack.json. Uses the live model when GEMINI_API_KEY is set.
 //   npx tsx scripts/self-attack.ts
 import { writeFileSync } from "node:fs";
-import Fastify from "fastify";
+import { Hono } from "hono";
 import { cancel, canMove, checkIn, checkOut } from "../server/actions.ts";
 import { routes } from "../server/api.ts";
 import { evidence } from "../server/evidence.ts";
@@ -15,7 +15,7 @@ import { LocalRunner } from "../server/runner.ts";
 import { STORY } from "../shared/seed.ts";
 
 loadEnv();
-const cfg = { ...config(), dataDir: null };
+const cfg = { ...config(), dbFile: null };
 const pp = new FakePayPal();
 pp.payoutDelayMs = 0;
 const app = await makeApp(cfg, pp);
@@ -144,11 +144,11 @@ const nextHeld = async () => {
 }
 // 12. a forged PayPal webhook
 {
-  const s = Fastify();
+  const s = new Hono();
   routes(s, { ...app, cfg: { ...app.cfg, webhookId: "WH-ATTACK" } }, ai);
-  const r = await s.inject({ method: "POST", url: "/api/paypal/webhook", headers: { "paypal-transmission-sig": "forged" },
-    payload: { id: "WH-X", event_type: "PAYMENT.CAPTURE.REFUNDED", resource: { id: "X", invoice_id: "covered-v-thu-okafor" } } });
-  record("forged PayPal webhook", "refused, nothing recorded as PayPal's", `HTTP ${r.statusCode}`, r.statusCode === 400 && !(await app.store.events(10)).some((e) => e.type === "paypal.webhook"));
+  const r = await s.request("/api/paypal/webhook", { method: "POST", headers: { "content-type": "application/json", "paypal-transmission-sig": "forged" },
+    body: JSON.stringify({ id: "WH-X", event_type: "PAYMENT.CAPTURE.REFUNDED", resource: { id: "X", invoice_id: "covered-v-thu-okafor" } }) });
+  record("forged PayPal webhook", "refused, nothing recorded as PayPal's", `HTTP ${r.status}`, r.status === 400 && !(await app.store.events(10)).some((e) => e.type === "paypal.webhook"));
 }
 // 13. the settlement crashes after the capture and before the payout
 {

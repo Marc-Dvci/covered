@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { chipText } from "../../../shared/chip.ts";
 import { clock, dollars, LANG_NAMES, WEEK_DAYS } from "../../../shared/domain.ts";
 import { api, STATE_LABEL, usePoll, type Board, type Disruption, type EventRow, type PublicVisit } from "../api.ts";
-import { chipText, Timeline } from "../components/Timeline.tsx";
+import { BoardScheduler, type BoardView } from "../components/BoardScheduler.tsx";
 
 function dateOf(weekStart: string, t: number): string {
   const d = new Date(`${weekStart}T12:00:00Z`);
@@ -12,11 +13,13 @@ function dateOf(weekStart: string, t: number): string {
 export function BoardPage() {
   const { data: board, reload } = usePoll<Board>("/api/board", 2000);
   const [day, setDay] = useState<number | null>(null);
+  const [week, setWeek] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const boardDay = board ? Math.floor(board.now / 1440) : null;
   useEffect(() => {
-    if (board && day === null) setDay(Math.floor(board.now / 1440));
-  }, [board, day]);
+    if (boardDay !== null) setDay(boardDay);
+  }, [boardDay]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 3500);
@@ -24,9 +27,8 @@ export function BoardPage() {
   }, [toast]);
 
   const active = board?.disruptions.find((d) => d.status === "open" || d.status === "proposed") ?? null;
-  const absent = useMemo(() => new Set((board?.disruptions ?? []).filter((d) => d.status !== "dismissed" && d.affected.length && d.day === day).map((d) => d.memberId)), [board, day]);
   if (!board || day === null) return <p className="page">Loading the board…</p>;
-  const ghost = active?.status === "proposed" ? active.proposal?.plan ?? null : null;
+  const view: BoardView = week ? { mode: "week" } : { mode: "day", day };
   const visit = selected ? board.visits.find((v) => v.id === selected) ?? null : null;
   const counts = board.visits.filter((v) => Math.floor(v.start / 1440) === day).reduce<Record<string, number>>((a, v) => ((a[v.state] = (a[v.state] ?? 0) + 1), a), {});
 
@@ -44,8 +46,9 @@ export function BoardPage() {
         <div className="row" style={{ justifyContent: "space-between" }}>
           <div className="days" role="group" aria-label="Day">
             {WEEK_DAYS.slice(0, 6).map((d, i) => (
-              <button key={d} aria-pressed={i === day} onClick={() => setDay(i)}>{dateOf(board.weekStart, i * 1440)}</button>
+              <button key={d} aria-pressed={!week && i === day} onClick={() => { setWeek(false); setDay(i); }}>{dateOf(board.weekStart, i * 1440)}</button>
             ))}
+            <button aria-pressed={week} onClick={() => setWeek(true)}>Week</button>
           </div>
           <div className="legend" aria-label="Legend">
             {(["done", "scheduled", "held", "in_progress", "paid_out", "late_cancel", "voided", "at_risk"] as const).map((s) => (
@@ -53,9 +56,9 @@ export function BoardPage() {
             ))}
           </div>
         </div>
-        <Timeline board={board} day={day} ghost={ghost} selected={selected} onSelect={setSelected} absent={absent} />
+        <BoardScheduler board={board} view={view} selected={selected} onSelect={setSelected} onMoved={(m) => { setToast(m); void reload(); }} onRefused={(m) => { setToast(`Refused: ${m}`); void reload(); }} />
         <p className="muted" style={{ marginTop: "0.6rem", fontSize: "0.85rem" }}>
-          Each visit's pay is held on the household's PayPal 24 hours before it starts, taken when the member checks out, and paid to the member the same minute. Dotted tails are travel time to the next home.
+          Each visit's pay is held on the household's PayPal 24 hours before it starts, taken when the member checks out, and paid to the member the same minute. Tails with a car are travel to the next home. Drag a bar to another member: only those who can take it light up.
         </p>
       </section>
       <aside className="board-side" aria-label="Coordinator panel">

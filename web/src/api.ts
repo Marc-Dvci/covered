@@ -26,7 +26,7 @@ export interface PublicVisit {
 export interface Mode {
   paypal: "sandbox" | "stand-in";
   currency: string;
-  runner: "render" | "local";
+  runner: "cloudflare" | "local";
   ai: "gemini" | "recorded";
   demo: boolean;
 }
@@ -85,7 +85,26 @@ export interface Board {
   visits: PublicVisit[];
   disruptions: Disruption[];
   events: EventRow[];
+  crud: CrudData;
 }
+
+/** The week in Bryntum CrudManager load format (server/crud.ts). */
+export interface CrudData {
+  success: boolean;
+  calendars: { rows: Record<string, unknown>[] };
+  resources: { rows: Record<string, unknown>[] };
+  events: { rows: Record<string, unknown>[] };
+  assignments: { rows: Record<string, unknown>[] };
+  resourceTimeRanges: { rows: Record<string, unknown>[] };
+  timeRanges: { rows: Record<string, unknown>[] };
+}
+
+export interface Guard {
+  ok: boolean;
+  reasons: string[];
+  consent: boolean;
+}
+export type Guards = Record<string, Record<string, Guard>>;
 
 export class ApiError extends Error {}
 
@@ -120,7 +139,10 @@ export function usePoll<T>(path: string | null, ms = 2000): { data: T | null; er
   useEffect(() => {
     alive.current = true;
     void reload();
-    const t = setInterval(() => void reload(), ms);
+    // a tab nobody is looking at does not poll: the free plan's daily requests are for people
+    const t = setInterval(() => {
+      if (document.visibilityState === "visible") void reload();
+    }, ms);
     return () => {
       alive.current = false;
       clearInterval(t);

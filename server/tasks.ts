@@ -1,5 +1,5 @@
 // The money steps of a visit. Each one reads the visit, does only what is not yet done, and records
-// what it did, so a retried run (Render Workflows retries a failed task) never charges or pays twice:
+// what it did, so a retried run (Cloudflare Workflows retries a failed step) never charges or pays twice:
 // PayPal-Request-Id, the invoice id and the payout's sender batch id are derived from the visit id and the
 // run tag of the last demo reset.
 import { dollars } from "../shared/domain.ts";
@@ -14,7 +14,10 @@ export interface TaskDeps {
   payoutWaitMs?: number;
 }
 
-export type TaskName = "placeHold" | "settleVisit" | "sweep";
+export type TaskName = "placeHold" | "settleVisit";
+
+export const PAYOUT_WAIT_MS = 120_000;
+const FINAL = ["SUCCESS", "DENIED", "CANCELED"];
 
 export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
   const v = await d.store.visit(visitId);
@@ -48,12 +51,14 @@ export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
   }
 }
 
-/** Capture or void per the visit's outcome, then pay the members. Idempotent at every step. */
-export async function settleVisit(d: TaskDeps, visitId: string): Promise<string> {
+const settled = (v: VisitRow) => ["paid_out", "cancelled", "voided", "late_cancel"].includes(v.state) && Boolean(v.payout?.finalAt || !v.settlement?.captureCents);
+
+/** First half of a settlement: capture or void per the outcome, then send the members' payout. Safe to repeat. */
+export async function settleMoney(d: TaskDeps, visitId: string): Promise<string> {
   let v = await d.store.visit(visitId);
   if (!v) return "no such visit";
   if (!v.outcome) return "no outcome yet";
-  if (["paid_out", "cancelled", "voided", "late_cancel"].includes(v.state) && (v.payout?.finalAt || !v.settlement?.captureCents)) return `already settled (${v.state})`;
+  if (settled(v)) return `already settled (${v.state})`;
 
   const s = settle(v.terms, v.outcome, v.hold ? "placed" : "failed");
   const ref = await d.store.payRef(v.id);
@@ -94,7 +99,7 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
     try {
       const p = await d.paypal.payout(sender, items, "Your pay from the cooperative");
       v = await d.store.updateVisit(v.id, {
-        payout: { batchId: p.batchId, senderBatchId: sender, status: p.status, sentAt: await d.store.now(),
+        payout: { batchId: p.batchId, senderBatchId: sender, status: p.status, sentAt: await d.store.now(), sentMs: Date.now(),
           items: items.map((i, k) => ({ memberId: shares[k]![0], cents: i.cents, wallet: i.wallet, status: p.items[k]?.status, transactionId: p.items[k]?.transactionId })) },
       });
       for (const [memberId, cents] of shares) await d.store.money(v.id, "payout", cents, `${sender}-${memberId}`, p.batchId, p.status, { memberId });
@@ -106,31 +111,43 @@ export async function settleVisit(d: TaskDeps, visitId: string): Promise<string>
       await d.store.event("payout.duplicate_refused", v.id, "workflow", { sender });
     }
   }
+  return `money moved: captured ${dollars(s.captureCents)}, released ${dollars(s.releaseCents)}`;
+}
 
-  if (v.payout?.batchId && !v.payout.finalAt) {
-    const t0 = Date.now();
-    const wait = d.payoutWaitMs ?? 120_000;
-    let p = await d.paypal.getPayout(v.payout.batchId);
-    while (!["SUCCESS", "DENIED", "CANCELED"].includes(p.status) && Date.now() - t0 < wait) {
-      await new Promise((r) => setTimeout(r, d.payoutPollMs ?? 3000));
-      p = await d.paypal.getPayout(v.payout.batchId);
-    }
-    // transaction ids can trail the batch's SUCCESS by a few seconds
-    for (let k = 0; k < 4 && p.status === "SUCCESS" && p.items.some((i) => !i.transactionId); k++) {
-      await new Promise((r) => setTimeout(r, d.payoutPollMs ?? 3000));
-      p = await d.paypal.getPayout(v.payout.batchId);
-    }
-    const items = mergePayoutItems(v.id, v.payout.items, p.items);
-    const final = ["SUCCESS", "DENIED", "CANCELED"].includes(p.status);
-    v = await d.store.updateVisit(v.id, { payout: { ...v.payout, status: p.status, items, ...(final ? { finalAt: await d.store.now(), finalMs: Date.now() - t0 } : {}) } });
-    for (const i of items) await d.store.money(v.id, "payout", i.cents, `${v.payout!.senderBatchId}-${i.memberId}`, v.payout!.batchId, p.status, { memberId: i.memberId, transactionId: i.transactionId });
-    if (final) await d.store.event("payout.final", v.id, "workflow", { status: p.status });
-  }
+/** Ask PayPal once where the payout is. True when there is nothing more to wait for. */
+export async function pollPayout(d: TaskDeps, visitId: string): Promise<boolean> {
+  let v = await d.store.visit(visitId);
+  if (!v?.payout?.batchId || v.payout.finalAt) return true;
+  const waited = Date.now() - (v.payout.sentMs ?? Date.now());
+  const wait = d.payoutWaitMs ?? PAYOUT_WAIT_MS;
+  const p = await d.paypal.getPayout(v.payout.batchId);
+  const final = FINAL.includes(p.status);
+  const items = mergePayoutItems(v.id, v.payout.items, p.items);
+  // transaction ids can trail the batch's SUCCESS by a few seconds
+  const complete = final && (p.status !== "SUCCESS" || items.every((i) => i.transactionId) || waited >= wait);
+  v = await d.store.updateVisit(v.id, { payout: { ...v.payout, status: p.status, items, ...(complete ? { finalAt: await d.store.now(), finalMs: waited } : {}) } });
+  for (const i of items) await d.store.money(v.id, "payout", i.cents, `${v.payout!.senderBatchId}-${i.memberId}`, v.payout!.batchId, p.status, { memberId: i.memberId, transactionId: i.transactionId });
+  if (complete) await d.store.event("payout.final", v.id, "workflow", { status: p.status });
+  return complete || waited >= wait;
+}
 
+/** Last step of a settlement: the visit's state now that the money has moved. */
+export async function finishVisit(d: TaskDeps, visitId: string): Promise<string> {
+  const v = await d.store.visit(visitId);
+  if (!v?.settlement) return "nothing to finish";
+  const s = v.settlement;
   const state = s.captureCents === 0 ? (v.outcome?.type === "member_absent" ? "voided" : "cancelled")
     : v.outcome?.type === "cancel" ? "late_cancel" : v.payout ? "paid_out" : "captured";
   await d.store.updateVisit(v.id, { state });
   return `${state}: captured ${dollars(s.captureCents)}, released ${dollars(s.releaseCents)}`;
+}
+
+/** The whole settlement in one call, for the in-process runner. Workflows run the same three parts as durable steps. */
+export async function settleVisit(d: TaskDeps, visitId: string): Promise<string> {
+  const moved = await settleMoney(d, visitId);
+  if (!moved.startsWith("money moved")) return moved;
+  while (!(await pollPayout(d, visitId))) await new Promise((r) => setTimeout(r, d.payoutPollMs ?? 3000));
+  return finishVisit(d, visitId);
 }
 
 /** Match PayPal's items to ours by sender_item_id (`<visit>-<member>`), never by position. */

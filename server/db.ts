@@ -1,76 +1,87 @@
-// One small SQL surface over two engines: Postgres (pg) in production, embedded Postgres (PGlite) for
-// the no-setup quickstart and the tests. Both take $1-style parameters and return rows.
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+// One small SQL surface over SQLite: Cloudflare D1 in production, node:sqlite for the no-setup quickstart
+// and the tests, so the SQL that the tests run is the SQL that runs live. JSON columns are stored as text
+// and decoded on the way out; parameters are written $1, $2 like the rest of the code expects.
+
+export type Query = <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]>;
 
 export interface Db {
-  query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]>;
-  tx<T>(fn: (q: Db["query"]) => Promise<T>): Promise<T>;
+  query: Query;
+  /** Apply writes atomically. On D1 they are queued and sent as one batch, so `fn` cannot read their results. */
+  tx(fn: (q: Query) => Promise<void>): Promise<void>;
   close(): Promise<void>;
 }
 
-export async function openDb(url: string | undefined, dataDir: string | null): Promise<Db> {
-  if (url) {
-    const { default: pg } = await import("pg");
-    const pool = new pg.Pool({ connectionString: url, max: 5, ssl: url.includes("localhost") ? undefined : { rejectUnauthorized: false } });
-    return {
-      query: async (sql, params) => (await pool.query(sql, params as unknown[])).rows,
-      tx: async (fn) => {
-        const c = await pool.connect();
-        try {
-          await c.query("BEGIN");
-          const out = await fn(async (sql, params) => (await c.query(sql, params as unknown[])).rows);
-          await c.query("COMMIT");
-          return out;
-        } catch (e) {
-          await c.query("ROLLBACK");
-          throw e;
-        } finally {
-          c.release();
-        }
-      },
-      close: () => pool.end(),
-    };
+const JSON_COLUMNS = new Set([
+  "value", "data", "member_ids", "terms", "hold", "capture", "void", "payout", "outcome", "settlement",
+  "readback", "output", "usage", "months", "affected", "proposal", "agent", "detail",
+]);
+
+export function decodeRow<T>(row: Record<string, unknown>): T {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(row)) {
+    out[k] = JSON_COLUMNS.has(k) && typeof v === "string" ? JSON.parse(v) : v;
   }
-  const { PGlite } = await import("@electric-sql/pglite");
-  if (dataDir) mkdirSync(dirname(dataDir + "/x"), { recursive: true });
-  const db = new PGlite(dataDir ?? undefined);
+  return out as T;
+}
+
+export const numbered = (sql: string) => sql.replace(/\$(\d+)/g, "?$1");
+export const bindable = (params: unknown[] = []) => params.map((p) => (p === undefined ? null : typeof p === "boolean" ? Number(p) : p));
+
+/** The part of Cloudflare's D1 binding this code uses. */
+export interface D1Like {
+  prepare(sql: string): D1StatementLike;
+  batch(statements: D1StatementLike[]): Promise<unknown>;
+}
+export interface D1StatementLike {
+  bind(...values: unknown[]): D1StatementLike;
+  all(): Promise<{ results?: Record<string, unknown>[] }>;
+}
+
+export function d1Db(d1: D1Like): Db {
+  const statement = (sql: string, params?: unknown[]) => d1.prepare(numbered(sql)).bind(...bindable(params));
   return {
-    query: async <T>(sql: string, params?: unknown[]) => (await db.query<T>(sql, params)).rows,
-    tx: (fn) => db.transaction((t) => fn(async <T>(sql: string, params?: unknown[]) => (await t.query<T>(sql, params)).rows)),
-    close: () => db.close(),
+    query: async <T,>(sql: string, params?: unknown[]) => ((await statement(sql, params).all()).results ?? []).map((r) => decodeRow<T>(r)),
+    tx: async (fn) => {
+      const queued: D1StatementLike[] = [];
+      await fn(async (sql, params) => {
+        queued.push(statement(sql, params));
+        return [];
+      });
+      if (queued.length) await d1.batch(queued);
+    },
+    close: async () => {},
   };
 }
 
 export const SCHEMA = `
-create table if not exists kv (key text primary key, value jsonb not null);
-create table if not exists members (id text primary key, data jsonb not null);
+create table if not exists kv (key text primary key, value text not null);
+create table if not exists members (id text primary key, data text not null);
 create table if not exists households (
-  id text primary key, data jsonb not null,
-  vault_id text, vault_email text, agreement_id text, joined_at timestamptz default now());
+  id text primary key, data text not null,
+  vault_id text, vault_email text, agreement_id text, joined_at text default (datetime('now')));
 create table if not exists agreements (
-  id text primary key, household_id text, data jsonb not null, status text not null,
-  readback jsonb, digest text, created_at timestamptz default now(), signed_at timestamptz);
+  id text primary key, household_id text, data text not null, status text not null,
+  readback text, digest text, created_at text default (datetime('now')), signed_at text);
 create table if not exists visits (
-  id text primary key, household_id text not null, member_ids jsonb not null, start int not null,
-  minutes int not null, terms jsonb not null, state text not null,
-  hold jsonb, capture jsonb, void jsonb, payout jsonb, outcome jsonb, settlement jsonb,
-  checkin_at int, checkout_at int, pending_member text, updated_at timestamptz default now());
+  id text primary key, household_id text not null, member_ids text not null, start integer not null,
+  minutes integer not null, terms text not null, state text not null,
+  hold text, capture text, void text, payout text, outcome text, settlement text,
+  checkin_at integer, checkout_at integer, pending_member text, updated_at text default (datetime('now')));
 create index if not exists visits_start on visits(start);
 create table if not exists money (
-  id bigserial primary key, visit_id text not null, kind text not null, cents int not null,
-  paypal_id text, status text, ref text not null, at timestamptz default now(), board_at int, detail jsonb,
+  id integer primary key autoincrement, visit_id text not null, kind text not null, cents integer not null,
+  paypal_id text, status text, ref text not null, at text default (datetime('now')), board_at integer, detail text,
   unique (visit_id, kind, ref));
 create table if not exists events (
-  id bigserial primary key, at timestamptz default now(), board_at int, type text not null,
-  visit_id text, actor text, data jsonb);
+  id integer primary key autoincrement, at text default (datetime('now')), board_at integer, type text not null,
+  visit_id text, actor text, data text);
 create table if not exists disruptions (
-  id text primary key, created_at timestamptz default now(), board_at int, member_id text, text text,
-  kind text, day int, from_min int, affected jsonb, status text not null, proposal jsonb, agent jsonb);
+  id text primary key, created_at text default (datetime('now')), board_at integer, member_id text, text text,
+  kind text, day integer, from_min integer, affected text, status text not null, proposal text, agent text);
 create table if not exists ai_cache (
-  key text primary key, task text not null, model text, output jsonb not null, usage jsonb, ms int,
-  created_at timestamptz default now());
+  key text primary key, task text not null, model text, output text not null, usage text, ms integer,
+  created_at text default (datetime('now')));
 create table if not exists shares (
-  token text primary key, member_id text not null, months jsonb not null, expires_at timestamptz not null,
-  created_at timestamptz default now());
+  token text primary key, member_id text not null, months text not null, expires_at text not null,
+  created_at text default (datetime('now')));
 `;

@@ -50,7 +50,7 @@ export async function finishSigning(store: Store, paypal: PayPal, agreementId: s
   }
   const token = await paypal.vaultFinalize(setupTokenId, agreementId);
   await store.db.query("update households set vault_id = $2, vault_email = $3 where id = $1", [row.household_id, token.paymentTokenId, token.payerEmail ?? null]);
-  await store.db.query("update agreements set status = 'signed', signed_at = now() where id = $1", [agreementId]);
+  await store.db.query("update agreements set status = 'signed', signed_at = datetime('now') where id = $1", [agreementId]);
   await store.event("agreement.signed", null, row.household_id, { agreementId, vault: "saved" });
 
   const a = row.data;

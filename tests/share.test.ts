@@ -9,7 +9,7 @@ let app: App;
 beforeEach(async () => {
   const pp = new FakePayPal();
   pp.payoutDelayMs = 0;
-  app = await makeApp({ ...config({}), dataDir: null }, pp);
+  app = await makeApp({ ...config({}), dbFile: null }, pp);
   app.runner = new LocalRunner({ store: app.store, paypal: pp, payoutPollMs: 5 }, 5);
   await app.store.reset();
 });

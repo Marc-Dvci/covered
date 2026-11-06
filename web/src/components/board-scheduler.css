@@ -1,0 +1,82 @@
+/* The board's look on top of Bryntum's Svalbard theme: the same ink, money colours and type as the phones. */
+.board-scheduler {
+  height: max(600px, calc(100vh - 262px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  --b-widget-font-family: var(--font);
+  --b-primary: var(--held);
+  --b-grid-header-background: #fff;
+}
+.board-scheduler .b-scheduler-base,
+.board-scheduler .b-grid-base { font-family: var(--font); color: var(--ink); }
+.board-scheduler .b-grid-header { color: var(--ink-2); font-weight: 700; }
+.board-scheduler .b-sch-header-text { font-size: 0.82rem; }
+
+/* member column */
+.member-cell { display: grid; gap: 0.05rem; line-height: 1.2; padding: 0.1rem 0; width: 100%; }
+.member-cell b { font-size: 0.95rem; }
+.member-cell small { font-size: 0.76rem; color: var(--muted); }
+.member-cell.is-out b, .member-cell.is-out > small, .member-cell.uncovered b { color: var(--risk); }
+.hours { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.4rem; margin-top: 0.1rem; }
+.hours-track { height: 4px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
+.hours-fill { height: 100%; background: var(--ink-2); }
+.hours-fill.full { background: var(--fee); }
+
+/* bars: wash, border and text from the money state */
+.board-scheduler .b-sch-event-wrap { --bar: var(--scheduled); --bar-wash: #fff; }
+.board-scheduler .b-sch-event-wrap.bar-done { --bar: var(--void); --bar-wash: #fff; }
+.board-scheduler .b-sch-event-wrap.bar-holding,
+.board-scheduler .b-sch-event-wrap.bar-held { --bar: var(--held); --bar-wash: var(--held-wash); }
+.board-scheduler .b-sch-event-wrap.bar-in_progress,
+.board-scheduler .b-sch-event-wrap.bar-settling { --bar: var(--progress); --bar-wash: var(--progress-wash); }
+.board-scheduler .b-sch-event-wrap.bar-captured,
+.board-scheduler .b-sch-event-wrap.bar-paid_out { --bar: var(--paid); --bar-wash: var(--paid-wash); }
+.board-scheduler .b-sch-event-wrap.bar-late_cancel { --bar: var(--fee); --bar-wash: var(--fee-wash); }
+.board-scheduler .b-sch-event-wrap.bar-cancelled,
+.board-scheduler .b-sch-event-wrap.bar-voided { --bar: var(--void); --bar-wash: var(--void-wash); }
+.board-scheduler .b-sch-event-wrap.bar-at_risk { --bar: var(--risk); --bar-wash: var(--risk-wash); }
+.board-scheduler .b-sch-event-wrap.bar-proposed { --bar: var(--ghost); --bar-wash: rgba(232, 240, 253, 0.65); }
+
+.board-scheduler .b-sch-event-wrap .b-sch-event {
+  background: var(--bar-wash);
+  color: var(--bar);
+  border: 1.5px solid var(--bar);
+  border-radius: 5px;
+  box-shadow: none;
+  font-weight: 400;
+}
+.board-scheduler .b-sch-event-wrap.bar-done .b-sch-event { border-color: var(--line); }
+.board-scheduler .b-sch-event-wrap.bar-proposed .b-sch-event { border-style: dashed; }
+.board-scheduler .b-sch-event-wrap.bar-cancelled .b-sch-event-content,
+.board-scheduler .b-sch-event-wrap.bar-voided .b-sch-event-content { text-decoration: line-through; }
+.board-scheduler .b-sch-event-wrap .b-sch-event.b-sch-event-selected,
+.board-scheduler .b-sch-event-wrap.b-event-selected .b-sch-event { box-shadow: 0 0 0 3px var(--ink); }
+.board-scheduler .b-sch-event-content { display: grid; gap: 0; font-size: 0.78rem; line-height: 1.2; min-width: 0; overflow: hidden; --b-sch-event-padding-inline: 0.45rem; }
+.board-scheduler .b-sch-event-content b { font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-scheduler .b-sch-event-content span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* travel to the next home */
+.board-scheduler .b-sch-event-buffer { color: var(--muted); }
+.board-scheduler .b-sch-event-buffer-after { border-bottom: 2px dotted var(--muted); }
+
+/* someone is out: their row says so across the whole day */
+.board-scheduler .b-sch-resourcetimerange.out-of-office,
+.board-scheduler .out-of-office.b-sch-resourcetimerange {
+  background: repeating-linear-gradient(135deg, transparent 0 7px, var(--risk-wash) 7px 14px);
+  color: var(--risk);
+  font-weight: 700;
+}
+
+/* the demo clock's now */
+.board-scheduler .now-line.b-sch-timerange,
+.board-scheduler .b-sch-line.now-line { border-inline-start: 2px solid var(--risk); background: none; color: var(--risk); --b-sch-time-range-line-color: var(--risk); }
+.board-scheduler .b-time-ranges-header-canvas .now-line { background: var(--risk); color: #fff; font-weight: 700; font-size: 0.72rem; border-radius: 3px; height: 1.25rem; padding: 0 0.35rem; display: flex; align-items: center; width: auto; bottom: 0.2rem; top: auto; }
+.board-scheduler .b-time-ranges-header-canvas .now-line label { color: #fff; margin: 0; padding: 0; }
+
+/* each member's own hours: outside them the row is shaded */
+.board-scheduler .b-sch-resource-non-working-time { background: repeating-linear-gradient(0deg, var(--wash), var(--wash)); opacity: 1; }
+
+/* tip */
+.visit-tip { display: grid; gap: 0.15rem; font-family: var(--font); font-size: 0.9rem; color: var(--ink); max-width: 320px; }
+.visit-tip .mono { font-size: 0.8rem; color: var(--muted); }

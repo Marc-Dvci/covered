@@ -9,7 +9,7 @@ export interface VisitRow extends Visit {
   hold: { orderId: string; authorizationId: string; cents: number; placedAt: number; status: string } | null;
   capture: { captureId: string; cents: number; feeCents?: number; at: number } | null;
   void: { at: number; status: string } | null;
-  payout: { batchId: string; senderBatchId: string; status: string; items: { memberId: string; cents: number; wallet: string; transactionId?: string; status?: string }[]; sentAt: number; finalAt?: number; finalMs?: number } | null;
+  payout: { batchId: string; senderBatchId: string; status: string; items: { memberId: string; cents: number; wallet: string; transactionId?: string; status?: string }[]; sentAt: number; sentMs?: number; finalAt?: number; finalMs?: number } | null;
   outcome: Outcome | null;
   settlement: Settlement | null;
   checkinAt: number | null;
@@ -51,6 +51,7 @@ export class Store {
   constructor(readonly db: Db) {}
 
   async migrate(): Promise<void> {
+    if ((await this.db.query("select 1 from sqlite_master where type = 'table' and name = 'shares'")).length) return;
     for (const stmt of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) await this.db.query(stmt);
   }
 
@@ -65,7 +66,9 @@ export class Store {
       return [who!.trim(), { wallet: (wallet === "VENMO" ? "VENMO" : "PAYPAL") as "PAYPAL" | "VENMO", receiver: receiver!.trim() }];
     }));
     await this.db.tx(async (q) => {
-      for (const t of ["kv", "members", "households", "agreements", "visits", "money", "events", "disruptions", "shares"]) await q(`delete from ${t}`);
+      // the daily model and reset allowances survive a reset: resetting must not refill them
+      await q("delete from kv where key not like 'ai_calls:%' and key not like 'demo_resets:%'");
+      for (const t of ["members", "households", "agreements", "visits", "money", "events", "disruptions", "shares"]) await q(`delete from ${t}`);
       for (const m of seedMembers) {
         const payout = route.get(m.id) ?? route.get("*") ?? m.payout;
         await q("insert into members(id, data) values ($1, $2)", [m.id, JSON.stringify({ ...m, payout })]);
@@ -100,15 +103,14 @@ export class Store {
     return id && (await this.visit(id)) ? id : null;
   }
 
-  // ---- clock: board minutes, running at real speed from the last time it was set
+  // ---- clock: board minutes. The demo's day moves only when someone moves it, so an idle demo stays at 07:10
 
   async now(): Promise<number> {
-    const c = (await this.kvGet<{ at: number; setAtMs: number }>("clock")) ?? { at: 0, setAtMs: Date.now() };
-    return c.at + Math.floor((Date.now() - c.setAtMs) / 60_000);
+    return (await this.kvGet<number>("clock")) ?? 0;
   }
 
   async setClock(at: number): Promise<void> {
-    await this.kvSet("clock", { at, setAtMs: Date.now() });
+    await this.kvSet("clock", at);
   }
 
   async kvGet<T>(key: string): Promise<T | null> {
@@ -161,9 +163,15 @@ export class Store {
       params.push(JSON_COLS.has(col) ? (v === null ? null : JSON.stringify(v)) : v);
       sets.push(`${col} = $${params.length}`);
     }
-    const r = await this.db.query(`update visits set ${sets.join(", ")}, updated_at = now() where id = $1 returning *`, params);
+    const r = await this.db.query(`update visits set ${sets.join(", ")}, updated_at = datetime('now') where id = $1 returning *`, params);
     if (!r[0]) throw new Error(`no visit ${id}`);
     return toVisit(r[0]);
+  }
+
+  async setStates(ids: string[], state: VisitState): Promise<void> {
+    await this.db.tx(async (q) => {
+      for (const id of ids) await q("update visits set state = $2, updated_at = datetime('now') where id = $1", [id, state]);
+    });
   }
 
   async insertVisit(v: Visit): Promise<void> {

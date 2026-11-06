@@ -1,0 +1,7 @@
+// The public site: static front end on Cloudflare Pages, /api/* forwarded to the covered-api Worker.
+{
+  "name": "covered",
+  "pages_build_output_dir": "../../dist",
+  "compatibility_date": "2026-11-01",
+  "services": [{ "binding": "API", "service": "covered-api" }]
+}

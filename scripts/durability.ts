@@ -10,7 +10,7 @@ import { PayPalError } from "../server/paypal/types.ts";
 import { LocalRunner } from "../server/runner.ts";
 
 loadEnv();
-const cfg = { ...config(), dataDir: null };
+const cfg = { ...config(), dbFile: null };
 if (!cfg.paypalClientId || !cfg.paypalSecret || !cfg.demoVaultId || !cfg.sandboxPayouts) {
   console.error("needs PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, COVERED_DEMO_VAULT_ID and COVERED_SANDBOX_PAYOUTS");
   process.exit(2);

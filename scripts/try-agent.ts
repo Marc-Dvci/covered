@@ -5,7 +5,7 @@ import { openDisruption, propose } from "../server/dispatch/agent.ts";
 import { STORY } from "../shared/seed.ts";
 
 loadEnv();
-const cfg = { ...config(), dataDir: null };
+const cfg = { ...config(), dbFile: null };
 const app = await makeApp(cfg);
 await app.store.reset();
 await sweep(app);

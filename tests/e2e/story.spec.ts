@@ -16,6 +16,7 @@ async function axe(page: Page, name: string) {
 
 const api = (page: Page, path: string, body: unknown = {}) =>
   page.evaluate(async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(), [path, body] as const);
+const bar = (page: Page, visit: string) => page.locator(`.b-sch-event-wrap[data-event-id="${visit}"]`);
 const clock = (page: Page, hhmm: string) => api(page, "/api/clock", { at: 3 * 1440 + Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) });
 
 test.afterAll(() => writeFileSync("docs/axe-report.json", JSON.stringify(report, null, 1)));
@@ -26,16 +27,16 @@ test("Thursday: Sam is out, the board is covered, everyone is paid", async ({ pa
   await axe(page, "home");
 
   await page.goto("/board");
-  await expect(page.locator('[data-visit="v-thu-okafor"][data-kind="real"]')).toContainText("$157.50 held");
+  await expect(bar(page, "v-thu-okafor")).toContainText("$157.50 held");
   await axe(page, "board");
   await page.getByRole("button", { name: "Send as member" }).click();
   await page.getByRole("button", { name: "Find cover" }).click();
   await expect(page.getByRole("heading", { name: "Proposal: 3 of 3 covered" })).toBeVisible();
-  await expect(page.locator('[data-member="marek"] [data-kind="ghost"]')).toHaveCount(1);
-  await expect(page.locator('[data-member="teresa"] [data-kind="ghost"]')).toHaveCount(2);
+  await expect(page.locator('.bar-proposed[data-resource-id="marek"]')).toHaveCount(1);
+  await expect(page.locator('.bar-proposed[data-resource-id="teresa"]')).toHaveCount(2);
   await axe(page, "board-proposal");
   await page.getByRole("button", { name: "Approve and send" }).click();
-  await expect(page.locator('[data-member="teresa"] [data-visit="v-thu-santos"][data-kind="real"]')).toBeVisible();
+  await expect(page.locator('.b-sch-event-wrap[data-event-id="v-thu-santos"][data-resource-id="teresa"]')).toBeVisible();
 
   await page.goto("/h/okafor");
   await axe(page, "household-ask");
@@ -70,7 +71,7 @@ test("Thursday: Sam is out, the board is covered, everyone is paid", async ({ pa
 
   // the Okafors dispute the charge: the coordinator opens the evidence from the visit
   await page.goto("/board");
-  await page.locator('[data-visit="v-thu-okafor"][data-kind="real"]').click();
+  await bar(page, "v-thu-okafor").click();
   await page.getByRole("link", { name: "Evidence if the household disputes" }).click();
   await expect(page.getByRole("heading", { name: "Evidence for a dispute: The Okafors" })).toBeVisible();
   await expect(page.getByText("Member checked in at the door")).toBeVisible();

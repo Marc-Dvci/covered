@@ -41,7 +41,7 @@ export function AboutPage() {
           <h2>This deployment</h2>
           <dl className="kv">
             <dt>PayPal</dt><dd>{data.mode.paypal === "sandbox" ? `PayPal sandbox (${data.mode.currency})` : "deterministic stand-in (no PayPal keys set)"}</dd>
-            <dt>Money tasks</dt><dd>{data.mode.runner === "render" ? "Render Workflows" : "in-process runner with the same retry policy"}</dd>
+            <dt>Money tasks</dt><dd>{data.mode.runner === "cloudflare" ? "Cloudflare Workflows" : "in-process runner with the same retry policy"}</dd>
             <dt>Model</dt><dd>{data.ai.live ? `Gemini API, live until ${data.ai.until}, ${data.ai.callsToday} of ${data.ai.dailyCap} calls used today` : "recorded answers and deterministic fallbacks"}</dd>
             <dt>Workflow runs</dt><dd>{data.taskRuns.map((r) => `${r.n} ${r.status}`).join(", ") || "none yet"}</dd>
             <dt>Money moved</dt><dd>{data.money.map((m) => `${m.kind} ${m.n} (${dollars(Number(m.cents))})`).join(", ") || "none yet"}</dd>

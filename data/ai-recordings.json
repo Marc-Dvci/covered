@@ -1,0 +1,325 @@
+{
+ "agreement-draft/68e413639f2ada43d61979c65725ebe7": {
+  "task": "agreement-draft",
+  "model": "gemini-3.6-flash",
+  "ms": 2427,
+  "usage": {
+   "promptTokenCount": 429,
+   "candidatesTokenCount": 245,
+   "totalTokenCount": 674,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 166
+    },
+    {
+     "modality": "AUDIO",
+     "tokenCount": 263
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "scope": [
+    "kitchen",
+    "bathrooms",
+    "floors",
+    "changing sheets"
+   ],
+   "pets": true,
+   "fragrance_free": false,
+   "deep_clean": false,
+   "same_cleaner": true,
+   "frequency": "weekly",
+   "location": "Capitol Hill",
+   "member_late_fee_percent": 50,
+   "member_notice_hours": 24,
+   "member_rate_per_hour": 38,
+   "member_terms_english": "Hello, I'm Teresa. I charge $38 per hour. If you cancel with less than 24 hours notice, I charge half the amount.",
+   "member_transcript": "Olá, sou a Teresa. Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade do valor.",
+   "minutes": 180,
+   "start": "10:00",
+   "weekday": 5
+  }
+ },
+ "agreement-draft/cd97a709eecfb2c233ca51aabf9dc8e1": {
+  "task": "agreement-draft",
+  "model": "gemini-3.5-flash",
+  "ms": 2330,
+  "usage": {
+   "promptTokenCount": 191,
+   "candidatesTokenCount": 225,
+   "totalTokenCount": 416,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 191
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "scope": [
+    "kitchen",
+    "bathrooms",
+    "floors",
+    "changing sheets"
+   ],
+   "pets": true,
+   "fragrance_free": false,
+   "deep_clean": false,
+   "same_cleaner": true,
+   "frequency": "weekly",
+   "location": "Capitol Hill",
+   "member_late_fee_percent": null,
+   "member_notice_hours": 24,
+   "member_rate_per_hour": 38,
+   "member_terms_english": "I charge $38 per hour. If cancelled with less than 24 hours notice, I charge half.",
+   "member_transcript": "Cobro 38 dólares por hora. Se cancelarem com menos de 24 horas, cobro metade.",
+   "minutes": 180,
+   "start": "10:00",
+   "weekday": 5
+  }
+ },
+ "agreement-readback/a1a52c151174e7224e03da0dade1b799": {
+  "task": "agreement-readback",
+  "model": "gemini-3.5-flash-lite",
+  "ms": 1234,
+  "usage": {
+   "promptTokenCount": 249,
+   "candidatesTokenCount": 233,
+   "totalTokenCount": 482,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 249
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "text": "A família The Parks e a cooperativa concordam com a limpeza residencial em Capitol Hill. Todos os sábados às 10:00, por 3 horas. Cada visita: cozinha; banheiros; pisos; troca de lençóis. Tarifa de $38.00 por hora, portanto $114.00 por visita. 24 horas antes de cada visita, $133.00 são retidos no seu PayPal (a visita mais até 30 minutos extras, que você aprova no final). A visita é paga quando termina e o restante é liberado. Cancelar com mais de 24 horas de antecedência: nada a pagar. Cancelar depois: $57.00 (50%). Se ninguém puder deixar o limpador entrar: 100% da visita. Você pediu o mesmo limpador todas as vezes. Se essa pessoa estiver ausente, você será consultado antes que qualquer outra pessoa venha. Você pode encerrar o acordo a qualquer momento na sua página; as retenções param imediatamente."
+  }
+ },
+ "agreement-readback/c3b06a4941d8914ebf866c70e6fe9554": {
+  "task": "agreement-readback",
+  "model": "gemini-3.5-flash-lite",
+  "ms": 1477,
+  "usage": {
+   "promptTokenCount": 248,
+   "candidatesTokenCount": 258,
+   "totalTokenCount": 506,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 248
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "text": "The Parks와 협동조합은 Capitol Hill에서의 가정 청소에 동의합니다. 매주 토요일 10:00에 3시간 동안 진행됩니다. 각 방문 시 청소 구역: 주방, 욕실, 바닥, 시트 교환. 시간당 요금은 $38.00이며, 따라서 방문당 $114.00입니다. 각 방문 24시간 전에 $133.00가 PayPal에 보류됩니다(방문 비용 및 종료 시 승인하는 최대 30분의 추가 시간 포함). 방문이 끝나면 비용이 지불되고 나머지는 해제됩니다. 24시간 이상 전에 취소하는 경우: 지불할 금액 없음. 늦게 취소하는 경우: $57.00(50%). 청소부가 들어갈 수 있게 해줄 사람이 없는 경우: 방문 비용의 100%. 귀하는 매번 동일한 청소부를 요청했습니다. 해당 청소부가 부재중인 경우, 다른 사람이 오기 전에 귀하에게 문의할 것입니다. 페이지에서 언제든지 계약을 중단할 수 있으며, 보류는 즉시 중단됩니다."
+  }
+ },
+ "cover-agent/2f72259380a48046b6d128c8c194a982": {
+  "task": "cover-agent",
+  "model": "gemini-3-flash-preview",
+  "ms": 6305,
+  "usage": {
+   "promptTokenCount": 3877,
+   "candidatesTokenCount": 69,
+   "totalTokenCount": 4646,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 3877
+    }
+   ],
+   "thoughtsTokenCount": 700,
+   "serviceTier": "standard"
+  },
+  "output": {
+   "parts": [
+    {
+     "functionCall": {
+      "name": "hold_status",
+      "args": {
+       "visit_id": "v-thu-okafor"
+      },
+      "id": "call_625788"
+     },
+     "thoughtSignature": "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"
+    },
+    {
+     "functionCall": {
+      "name": "hold_status",
+      "args": {
+       "visit_id": "v-thu-santos"
+      },
+      "id": "call_625789"
+     }
+    },
+    {
+     "functionCall": {
+      "name": "hold_status",
+      "args": {
+       "visit_id": "v-thu-murphy"
+      },
+      "id": "call_625790"
+     }
+    }
+   ],
+   "role": "model"
+  }
+ },
+ "cover-agent/4d4ce3d36ef28ec59c138fa6a17b6805": {
+  "task": "cover-agent",
+  "model": "gemini-3-flash-preview",
+  "ms": 5821,
+  "usage": {
+   "promptTokenCount": 4776,
+   "candidatesTokenCount": 684,
+   "totalTokenCount": 6133,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 4776
+    }
+   ],
+   "thoughtsTokenCount": 673,
+   "serviceTier": "standard"
+  },
+  "output": {
+   "parts": [
+    {
+     "functionCall": {
+      "name": "submit_plan",
+      "args": {
+       "messages": [
+        {
+         "language": "en",
+         "to_id": "sam",
+         "text": "Hi Sam, I'm sorry to hear about your son. I've arranged cover for your visits today so you can stay with him.",
+         "english": "Hi Sam, I'm sorry to hear about your son. I've arranged cover for your visits today so you can stay with him."
+        },
+        {
+         "to_id": "marek",
+         "language": "pl",
+         "text": "Cześć Marek, czy możesz zastąpić Sama u państwa Okafor w Queen Anne dzisiaj od 09:00 do 13:00? Dziękujemy za pomoc.",
+         "english": "Hi Marek, can you cover for Sam at the Okafors in Queen Anne today from 09:00 to 13:00? Thanks for the help."
+        },
+        {
+         "english": "Hi, Sam is out today. Marek can come to your home in Queen Anne from 09:00 to 13:00 instead; please let us know if this works for you, as you can say no.",
+         "to_id": "okafor",
+         "language": "en",
+         "text": "Hi, Sam is out today. Marek can come to your home in Queen Anne from 09:00 to 13:00 instead; please let us know if this works for you, as you can say no."
+        },
+        {
+         "language": "pt",
+         "to_id": "teresa",
+         "english": "Hi Teresa, can you cover Sam's visits today? It would be at the Santoses from 14:00 to 16:00 and the Murphys from 16:30 to 18:00. Thank you!",
+         "text": "Olá Teresa, você pode cobrir as visitas do Sam hoje? Seria nos Santoses das 14:00 às 16:00 e nos Murphys das 16:30 às 18:00. Obrigada!"
+        },
+        {
+         "to_id": "santos",
+         "text": "Olá, o Sam está fora hoje. A Teresa virá à sua casa em Columbia City das 14:00 às 16:00 para a limpeza.",
+         "english": "Hi, Sam is out today. Teresa will come to your home in Columbia City from 14:00 to 16:00 for the cleaning.",
+         "language": "pt"
+        },
+        {
+         "text": "Hi, Sam is out today. Teresa will be coming to your home in Seward Park from 16:30 to 18:00 instead.",
+         "to_id": "murphy",
+         "english": "Hi, Sam is out today. Teresa will be coming to your home in Seward Park from 16:30 to 18:00 instead.",
+         "language": "en"
+        }
+       ],
+       "plan_rank": 1,
+       "why": "This plan covers all three visits using Marek and Teresa. It respects the Okafors' request for the same cleaner by offering them the choice to decline the substitute."
+      },
+      "id": "call_622601"
+     },
+     "thoughtSignature": "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"
+    }
+   ],
+   "role": "model"
+  }
+ },
+ "cover-agent/cdbc9f2c250728231060abf8399ce281": {
+  "task": "cover-agent",
+  "model": "gemini-3.5-flash",
+  "ms": 5899,
+  "usage": {
+   "promptTokenCount": 1075,
+   "candidatesTokenCount": 41,
+   "totalTokenCount": 1257,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 1075
+    }
+   ],
+   "thoughtsTokenCount": 141,
+   "serviceTier": "standard"
+  },
+  "output": {
+   "parts": [
+    {
+     "functionCall": {
+      "name": "find_cover",
+      "args": {
+       "visit_ids": [
+        "v-thu-okafor",
+        "v-thu-santos",
+        "v-thu-murphy"
+       ]
+      },
+      "id": "call_559054"
+     },
+     "thoughtSignature": "EpwECpkEAWkUfRPBH+gBf0pRoFCibrxlxWUkgD7HJTJDCFp7T07eQb/3ymtN5uBoiS2jUEwkIjR+0AbdfEt90jOsVKdWg3X+JsCq9E9rHahtxpGPxDe3PoagVmV0ZRvY0XaDybAtwq34piyrRZMeC6LSbF8/QTEC87e0AnrxWLT2DnB7AifvBm1WaJsySSYYFITZRIPfJYDUraVyf2qE1gLRmlO+yRWE+CZ4fWSVjuyORNct6NczQiv8oGYGGxZksQruOzCk+pWROIMAsdvfaWF81Jsr90ti2ysS7v4V1EGiU634fTSAR3YGjXC9ypT6TWBr17Hrxk678GzI0ikomhglfz364L6r/ppbbqslhm/XyXmgm6HHQq3izff5HEq8jQOjVF5Fb2TXVwgRMb1PkkKA+NjjJFPoHKXcx38JbcLCco/gN6TlsfK87/iM820Zx0E8VxT02P5iFLHEFT+M15EG8UlQXRkJH3HFsMncsTKZjubebZ5L+KzwAvWmMxeXbCYzdbyTdoARKRmsbPBSOeKh8rH0TLiv53LKVFhBkV9bjpKkJj02xSHZ9Rf2AkSZzY2TzFJ7NN/g8OJVVAnBasQgZD+De2BTNkDBG78WWePINrRQZ8EOqphDMWW0LSm6dYk7h0aldIvKNIS+Wz0HmtZRKbmwuFUkgM/hfqkJRsR5/wY0rC8TUf54MYDH9gsN4cyy1brKuar8JKfKppjl"
+    }
+   ],
+   "role": "model"
+  }
+ },
+ "cover-letter/c3b995d4565763959cc9e1e649759dae": {
+  "task": "cover-letter",
+  "model": "gemini-3.5-flash-lite",
+  "ms": 757,
+  "usage": {
+   "promptTokenCount": 103,
+   "candidatesTokenCount": 75,
+   "totalTokenCount": 178,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 103
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "text": "As a member-owner of a house-cleaning cooperative, I am presenting my income statement to verify my earnings. For November 2026, I completed 1 visit totaling 2.07 hours, resulting in 1 payout through PayPal. My total earnings for this period are $66.50."
+  }
+ },
+ "intake/d83125ceed5aa272cd49b9a3509aa0e2": {
+  "task": "intake",
+  "model": "gemini-3.5-flash-lite",
+  "ms": 820,
+  "usage": {
+   "promptTokenCount": 99,
+   "candidatesTokenCount": 21,
+   "totalTokenCount": 120,
+   "promptTokensDetails": [
+    {
+     "modality": "TEXT",
+     "tokenCount": 99
+    }
+   ],
+   "serviceTier": "standard"
+  },
+  "output": {
+   "kind": "out_today",
+   "from_time": null
+  }
+ }
+}

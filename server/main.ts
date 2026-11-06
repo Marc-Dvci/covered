@@ -1,33 +1,32 @@
-// The web service: API + the built front end. On first start with an empty database it loads the
-// demo cooperative. Without a Render cron job, it sweeps for due holds every 30 seconds itself.
-import fastifyStatic from "@fastify/static";
-import Fastify from "fastify";
+// The quickstart server on Node: API + the built front end, on a local SQLite file, with no keys needed.
+// The deployed service runs the same routes on Cloudflare (worker/index.ts).
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join, relative } from "node:path";
 import { Gemini } from "./ai/gemini.ts";
 import { routes } from "./api.ts";
-import { config, loadEnv, makeApp, ROOT, sweep } from "./context.ts";
+import { config, loadEnv, makeApp, ROOT, seedIfEmpty, sweep } from "./context.ts";
 
 loadEnv();
 const cfg = config();
 const app = await makeApp(cfg);
-if (!(await app.store.members()).length) {
-  await app.store.reset(cfg.demoVaultId, cfg.sandboxPayouts);
-  await sweep(app);
-}
+await seedIfEmpty(app);
 const ai = new Gemini(cfg, app.store);
-const server = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" }, trustProxy: true, bodyLimit: 1024 * 1024 });
+const server = new Hono();
 routes(server, app, ai);
 
 const dist = join(ROOT, "dist");
 if (existsSync(dist)) {
-  await server.register(fastifyStatic, { root: dist, wildcard: false });
-  server.setNotFoundHandler((req, reply) => (req.url.startsWith("/api/") ? reply.code(404).send({ error: "not found" }) : reply.sendFile("index.html")));
+  server.use("*", serveStatic({ root: relative(process.cwd(), dist) }));
+  server.get("*", async (c) => c.html(await readFile(join(dist, "index.html"), "utf8")));
 }
 
-if (app.runner.kind === "local" || process.env.COVERED_SWEEP_IN_WEB === "1") {
-  setInterval(() => void sweep(app).catch((e) => server.log.error(e)), 30_000).unref();
-}
+// Cloudflare has a cron trigger; here the same sweep runs on a timer
+setInterval(() => void sweep(app).catch((e) => console.error(e)), 30_000).unref();
 
-await server.listen({ port: cfg.port, host: "0.0.0.0" });
-server.log.info(`Covered on ${cfg.publicUrl}: PayPal ${app.paypal.live ? "sandbox" : "stand-in"}, tasks ${app.runner.kind}, model ${ai.live ? "Gemini" : "recorded only"}`);
+serve({ fetch: server.fetch, port: cfg.port, hostname: "0.0.0.0" }, () => {
+  console.log(`Covered on ${cfg.publicUrl}: PayPal ${app.paypal.live ? "sandbox" : "stand-in"}, tasks in process, model ${ai.live ? "Gemini" : "recorded only"}`);
+});

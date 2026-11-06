@@ -97,7 +97,7 @@ export async function getDisruption(store: Store, id: string): Promise<Disruptio
 }
 
 export async function listDisruptions(store: Store): Promise<Disruption[]> {
-  return (await store.db.query<Record<string, unknown>>("select * from disruptions order by created_at desc")).map(rowToDisruption);
+  return (await store.db.query<Record<string, unknown>>("select * from disruptions order by rowid desc")).map(rowToDisruption);
 }
 
 function rowToDisruption(r: Record<string, unknown>): Disruption {

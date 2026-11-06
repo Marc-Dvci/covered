@@ -3,13 +3,11 @@
 // cap or past a visitor's hourly allowance; callers then take their deterministic path. The key stays
 // on the server. On the free tier a busy model is skipped after one attempt and the next one is tried.
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import type { Config } from "../context.ts";
-import { ROOT } from "../context.ts";
+import recorded from "../../data/ai-recordings.json" with { type: "json" };
+import type { Config } from "../core.ts";
 import type { Store } from "../store.ts";
 
-export const RECORDINGS = join(ROOT, "data", "ai-recordings");
+const RECORDINGS = recorded as unknown as Record<string, { output: unknown; model: string }>;
 
 export class AIUnavailable extends Error {}
 
@@ -29,7 +27,7 @@ export interface CallMeta {
 export class Gemini {
   private visitors = new Map<string, number[]>();
   last: CallMeta | null = null;
-  record = process.env.COVERED_RECORD === "1";
+  record = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.COVERED_RECORD === "1";
 
   constructor(private cfg: Config, private store: Store) {}
 
@@ -42,9 +40,8 @@ export class Gemini {
   }
 
   private async lookup(task: string, key: string): Promise<{ output: unknown; model: string } | null> {
-    const f = join(RECORDINGS, task, `${key}.json`);
-    if (existsSync(f)) {
-      const j = JSON.parse(readFileSync(f, "utf8")) as { output: unknown; model: string };
+    const j = RECORDINGS[`${task}/${key}`];
+    if (j) {
       this.last = { source: "recorded", model: j.model, ms: 0 };
       return j;
     }
@@ -60,8 +57,11 @@ export class Gemini {
     await this.store.db.query("insert into ai_cache(key, task, model, output, usage, ms) values ($1,$2,$3,$4,$5,$6) on conflict (key) do nothing",
       [key, task, model, JSON.stringify(output), JSON.stringify(usage ?? null), ms]);
     if (this.record) {
-      mkdirSync(join(RECORDINGS, task), { recursive: true });
-      writeFileSync(join(RECORDINGS, task, `${key}.json`), JSON.stringify({ task, model, ms, usage, output }, null, 1));
+      // recording the demo path's answers is a local step (COVERED_RECORD=1), never run on the deployed service
+      RECORDINGS[`${task}/${key}`] = { task, model, ms, usage, output } as (typeof RECORDINGS)[string];
+      const { writeFileSync } = await import("node:fs");
+      const sorted = Object.fromEntries(Object.entries(RECORDINGS).sort(([a], [b]) => a.localeCompare(b)));
+      writeFileSync(new URL("../../data/ai-recordings.json", import.meta.url), `${JSON.stringify(sorted, null, 1)}\n`);
     }
   }
 

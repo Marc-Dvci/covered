@@ -14,7 +14,7 @@ let pp: FakePayPal;
 beforeEach(async () => {
   pp = new FakePayPal();
   pp.payoutDelayMs = 0;
-  app = await makeApp({ ...config({}), dataDir: null }, pp);
+  app = await makeApp({ ...config({}), dbFile: null }, pp);
   app.runner = new LocalRunner({ store: app.store, paypal: pp, payoutPollMs: 5, payoutWaitMs: 2000 }, 5);
   await app.store.reset();
 });

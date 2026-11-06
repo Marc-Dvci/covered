@@ -14,3 +14,4 @@ shared/rules/cases.json
 tests/fixtures
 web/public/_routes.json
 *.md
+examples/*.json

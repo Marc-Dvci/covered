@@ -39,6 +39,24 @@ describe("PayPal webhooks", () => {
     expect(e).toMatchObject({ visit_id: "v-thu-weber", data: { type: "PAYMENT.CAPTURE.COMPLETED", verified: true } });
   });
 
+  it("ties a payout batch delivery to its visit by the sender batch id", async () => {
+    const batch = {
+      id: "WH-2",
+      event_type: "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      resource: { batch_header: { sender_batch_header: { sender_batch_id: `covered-${await app.store.payRef("v-thu-weber")}` } } },
+    };
+    const r = await server().request("/api/paypal/webhook", {
+      method: "POST",
+      body: JSON.stringify(batch),
+      headers: { "content-type": "application/json", "paypal-transmission-sig": "stand-in:WH-ID" },
+    });
+    expect(r.status).toBe(200);
+    expect((await app.store.events(5)).find((x) => x.type === "paypal.webhook")).toMatchObject({
+      visit_id: "v-thu-weber",
+      data: { type: "PAYMENT.PAYOUTSBATCH.SUCCESS" },
+    });
+  });
+
   it("refuses a forged delivery and records the refusal", async () => {
     const r = await post("forged");
     expect(r.status).toBe(400);

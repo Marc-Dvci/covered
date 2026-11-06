@@ -52,14 +52,14 @@ export function hm(s: string): number {
 type M = [id: string, name: string, langs: Lang[], skills: Skill[], cap: number, area: string, avail: ReturnType<typeof weekdays>, wallet: "PAYPAL" | "VENMO"];
 const MEMBERS: M[] = [
   ["sam", "Sam Becker", ["en"], ["pets", "deep_clean"], 32, "Columbia City", weekdays("08:00", "18:30", [0, 1, 2, 3, 4]), "PAYPAL"],
-  ["teresa", "Teresa Almeida", ["pt", "en"], ["pets", "eco"], 32, "Beacon Hill", weekdays("08:00", "18:00", [0, 1, 2, 3, 4]), "PAYPAL"],
+  ["teresa", "Teresa Almeida", ["pt", "en"], ["pets", "eco"], 32, "Beacon Hill", weekdays("08:00", "18:00", [0, 1, 2, 3, 4]), "VENMO"],
   ["marek", "Marek Nowak", ["pl", "en"], ["deep_clean", "pets"], 36, "Greenwood", weekdays("07:30", "17:00", [0, 1, 2, 3, 4, 5]), "PAYPAL"],
   ["grace", "Grace Liu", ["zh", "en"], ["eco", "pets"], 24, "University District", weekdays("09:00", "17:00", [0, 1, 2, 3]), "PAYPAL"],
-  ["amara", "Amara Diallo", ["fr", "en"], ["pets", "deep_clean", "eco"], 30, "Rainier Valley", weekdays("08:00", "16:00", [1, 2, 3, 4, 5]), "PAYPAL"],
+  ["amara", "Amara Diallo", ["fr", "en"], ["pets", "deep_clean", "eco"], 30, "Rainier Valley", weekdays("08:00", "16:00", [1, 2, 3, 4, 5]), "VENMO"],
   ["lena", "Lena Petrova", ["ru", "en"], ["deep_clean"], 28, "Ballard", weekdays("10:00", "19:00", [0, 1, 2, 3, 4]), "PAYPAL"],
-  ["tomas", "Tomás Reyes", ["es", "en"], ["pets"], 36, "West Seattle", weekdays("07:00", "15:30", [0, 1, 2, 3, 4]), "PAYPAL"],
+  ["tomas", "Tomás Reyes", ["es", "en"], ["pets"], 36, "West Seattle", weekdays("07:00", "15:30", [0, 1, 2, 3, 4]), "VENMO"],
   ["joy", "Joy Mensah", ["en"], ["eco"], 20, "Capitol Hill", weekdays("09:00", "18:00", [0, 2, 4]), "PAYPAL"],
-  ["ines", "Ines Duarte", ["es", "pt", "en"], ["pets", "eco"], 30, "Fremont", weekdays("09:00", "17:00", [0, 1, 2, 3, 4]), "PAYPAL"],
+  ["ines", "Ines Duarte", ["es", "pt", "en"], ["pets", "eco"], 30, "Fremont", weekdays("09:00", "17:00", [0, 1, 2, 3, 4]), "VENMO"],
   ["kofi", "Kofi Asante", ["en", "fr"], ["deep_clean", "pets"], 30, "Mount Baker", weekdays("08:00", "17:00", [0, 1, 2, 3, 4, 5]), "PAYPAL"],
 ];
 

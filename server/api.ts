@@ -519,7 +519,13 @@ export function routes(server: Hono, app: App, ai: Gemini) {
         return c.json({ error: "webhook not verified" }, 400);
       }
       const r = body.resource ?? {};
-      const invoice = String(r.invoice_id ?? (r.disputed_transactions as { invoice_number?: string }[] | undefined)?.[0]?.invoice_number ?? "");
+      const batch = r.batch_header as { sender_batch_header?: { sender_batch_id?: string } } | undefined;
+      const invoice = String(
+        r.invoice_id ??
+          (r.disputed_transactions as { invoice_number?: string }[] | undefined)?.[0]?.invoice_number ??
+          batch?.sender_batch_header?.sender_batch_id ??
+          "",
+      );
       const visitId = await app.store.visitForInvoice(invoice);
       await app.store.event("paypal.webhook", visitId, "paypal", { type: body.event_type, id: body.id, resourceId: r.id, verified: true });
       return { ok: true };

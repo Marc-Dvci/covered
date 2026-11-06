@@ -99,7 +99,8 @@ export class Store {
       await q("delete from kv where key not like 'ai_calls:%' and key not like 'demo_resets:%'");
       for (const t of ["members", "households", "agreements", "visits", "money", "events", "disruptions", "shares"]) await q(`delete from ${t}`);
       for (const m of seedMembers) {
-        const payout = route.get(m.id) ?? route.get("*") ?? m.payout;
+        // pay goes to a PayPal receiver: the sandbox refuses Venmo, so nothing here claims it
+        const payout = route.get(m.id) ?? route.get("*") ?? { wallet: "PAYPAL" as const, receiver: `${m.id}@members.example` };
         await q("insert into members(id, data) values ($1, $2)", [m.id, JSON.stringify({ ...m, payout })]);
       }
       for (const h of seedHouseholds) {

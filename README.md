@@ -1,6 +1,6 @@
 # Covered: cleaners' pay held before the work starts
 
-[![ci](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml) [![codeql](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml) [![live demo](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml) ![tests](https://img.shields.io/badge/tests-388%20passing-137a3f) ![decision core coverage](https://img.shields.io/badge/decision%20core%20coverage-97.7%25-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
+[![ci](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml) [![codeql](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml) [![live demo](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml) ![tests](https://img.shields.io/badge/tests-396%20passing-137a3f) ![decision core coverage](https://img.shields.io/badge/decision%20core%20coverage-97.7%25-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
 
 [![The film: a cleaner calls in sick at 07:10, and the money stays with the visit. Click to watch.](docs/film-thumbnail.jpg)](https://github.com/Marc-Dvci/covered#see-it-work)
 
@@ -14,7 +14,11 @@ I audit payment systems for a living. In this trade, the cancellation fee and th
 |---|---|
 | Live demo, no login | **[covered-coop.pages.dev/board](https://covered-coop.pages.dev/board)**: Thursday, 07:10. A line above the board tells you each next step |
 | Built with | PayPal Server SDK (Vault v3, Orders v2, Payments, Transaction Search), PayPal Payouts and Webhooks, Bryntum Scheduler Enterprise 8.0, Gemini API, Cloudflare Workers, Workflows, Durable Objects and Pages, TypeScript, React, Hono |
-| Headline result | The whole day on the PayPal sandbox in US dollars: 15 holds placed in 10 s, a $140.00 capture and a $35.00 late-cancel fee with the rest released, payouts final in about 25 s. A crash between capture and payout ends in exactly 1 capture and 1 payout |
+| Track | PayPal AI Hackathon, with the Bryntum and APIMatic sponsor prizes |
+| Headline result | The whole day on the PayPal sandbox in US dollars: 15 holds placed in 10 s, a $140.00 capture and a $35.00 late-cancel fee with the rest released, payouts final in about 25 s, and each one matched in PayPal's Transaction Search. A crash between capture and payout ends in exactly 1 capture and 1 payout |
+
+> [!TIP]
+> Run it with no keys and no account: `npm ci && npm run build && npm start`, then http://localhost:8787. Or `docker compose up demo`. More in [Run it](#run-it).
 
 ## For judges
 
@@ -48,6 +52,10 @@ I audit payment systems for a living. In this trade, the cancellation fee and th
 <td><em>Mr. Lindqvist sees the $35.00 fee before he confirms, and $52.50 of the $87.50 hold is released.</em></td>
 </tr>
 </table>
+
+<img src="docs/screens/income-statement.png" width="850" alt="Marek Nowak's income statement on the live site: $166.25 paid in 2 payouts, Matched in PayPal 2 / 2. Two lines, The Okafors $133.00 and Mr. Lindqvist's late cancel $33.25, each with its PayPal transaction id and the word matched. A button makes a link for a landlord.">
+
+*Marek's statement on the live site: each payout matched by its transaction id in PayPal's Transaction Search, 2 of 2.*
 
 ## Who it is for
 
@@ -180,10 +188,11 @@ Full numbers and run details are in [docs/EVIDENCE.md](docs/EVIDENCE.md).
 | Cover solver, development set (60 scenarios) | 55 of 55 placeable visits placed, 0 rules broken; "first free member" baseline: 68 of 86 placements break a rule | `npm run eval` |
 | Cover solver, held-out set (20 scenarios, labelled before the solver ran) | 20 of 20 placed, 0 rules broken; baseline: 26 of 29 break a rule | `npx tsx eval/run.ts --heldout` |
 | Live demo day on the PayPal sandbox, in USD | 15 holds in 10 s; 2 captures including a partial capture with release; payouts final in 23.7 s and 25.5 s; 18 verified webhooks, 0 refused | `npx tsx scripts/walk.ts`, [docs/live-run.json](docs/live-run.json) |
+| Income statement against PayPal's Transaction Search, on the live site | 2 of 2 lines matched by transaction id, once PayPal had indexed the payouts | Play the story, wait 2 to 3 hours, then `scripts/examples.ts`; [the statement](examples/income-statement-marek.json) |
 | Crash between capture and payout, on the live Cloudflare Workflows | Step retried: 1 capture, 1 payout; PayPal refused a second capture and a second payout batch | `npx tsx scripts/durability.ts`, [docs/durability-sandbox.json](docs/durability-sandbox.json) |
 | Self-attack: 13 hostile inputs (prompt injection, rate changes by message, forged webhook, dispute, crash) | 13 / 13 handled | `npx tsx scripts/self-attack.ts`, [docs/self-attack.json](docs/self-attack.json) |
 | Accessibility: axe-core (WCAG 2.1 AA) on every screen of the story, the board included | 0 violations | `npm run e2e`, [docs/axe-report.json](docs/axe-report.json) |
-| Tests | 377 unit and integration, in random order, with no network and no keys; 11 browser tests | `npm test`, `npm run e2e` |
+| Tests | 379 unit and integration, in random order, with no network and no keys; 17 browser tests | `npm test`, `npm run e2e` |
 | Decision core coverage: pay rules, agreement checklist, solver, money tasks, visit actions, board data, runner | 97.7% of lines, 92% of branches | `npm run test:coverage` |
 
 Open the outputs without running anything: [examples/](examples/README.md) holds an income statement, a landlord's view and the evidence for a dispute.
@@ -290,6 +299,7 @@ npm run deploy                             # the Worker, then the Pages site in 
 | One failed token request does not break the PayPal client | `server/paypal/sandbox.ts` | `tests/paypal-client.test.ts` "one failed token request does not break the client for later calls" |
 | The drag guard names the household, never an internal id | `server/dispatch/solver.ts` `readableReasons` | `tests/crud-extras.test.ts` "a member busy elsewhere is told apart by the household's name, never an internal visit id" |
 | Unverified PayPal webhooks are refused | `server/api.ts`, `server/paypal/sandbox.ts` `verifyWebhook` | `tests/webhook.test.ts` "refuses a forged delivery and records the refusal" |
+| A statement line reads as matched only once PayPal's Transaction Search lists its transaction id | `server/statements.ts` | `tests/api.test.ts` "a line stays pending until Transaction Search lists its transaction" |
 | A dispute is answered from the ledger | `server/evidence.ts` | `tests/lifecycle.test.ts` "answers a dispute from the ledger: terms, attendance and every PayPal id" |
 | The landlord link is signed, expires, and hides households | `server/statements.ts` `share`, `openShare`, `landlordView` | `tests/share.test.ts` |
 | A visitor lands on a fresh week after a quiet spell, and a reset does not refill the daily allowances | `server/core.ts` `refreshIfIdle`, `server/store.ts` `reset` | `tests/core.test.ts` |
@@ -297,7 +307,7 @@ npm run deploy                             # the Worker, then the Pages site in 
 
 ## Limits
 
-PayPal's Transaction Search lists a payout about 2 hours after it happens on the sandbox, so a line on a fresh statement shows its payout's transaction id and reads as pending until then. The sandbox pays PayPal receivers only. A visit's time stays as agreed: the board moves it between members, not along the day.
+PayPal's Transaction Search lists a payout 2 to 3 hours after it happens on the sandbox, so a line on a fresh statement shows its payout's transaction id and reads as pending until then. The sandbox pays PayPal receivers only. A visit's time stays as agreed: the board moves it between members, not along the day.
 
 ## Licence
 

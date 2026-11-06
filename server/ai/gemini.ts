@@ -156,7 +156,7 @@ export class Gemini {
     try {
       out = JSON.parse(text) as T;
     } catch {
-      throw new AIUnavailable("unparseable model output");
+      throw new AIUnavailable("unparsable model output");
     }
     await this.keep(task, key, used, out, res.usageMetadata, ms);
     this.last = { source: "live", model: used, ms };

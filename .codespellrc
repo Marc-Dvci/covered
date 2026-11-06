@@ -1,0 +1,3 @@
+[codespell]
+# code names, a member's name and the Portuguese in the fixtures and the interface
+ignore-words-list = afterall,alis,checkin,ines,meu,momento,residencial,te,travelin

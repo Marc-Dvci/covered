@@ -69,9 +69,20 @@ The whole story, driven through the browser on the deployed service: Cloudflare 
 
 The sweep started 15 holds at 07:10, and all 15 were held 10 seconds later. From the moment Marek checked out to the moment his phone showed the money as paid took 26 seconds. The last 40 events of that run held 18 PayPal webhook deliveries confirmed by `verify-webhook-signature`, each tied to its visit, and none refused.
 
-[`examples/`](../examples/README.md) holds the income statement, the landlord link's view and the dispute evidence from a run of this story.
+### 3.3 The income statement against Transaction Search ([`examples/income-statement-marek.json`](../examples/income-statement-marek.json))
 
-### 3.3 Crash between capture and payout (`npx tsx scripts/durability.ts`, `docs/durability-sandbox.json`)
+Later the same day, the story was played once more on the live site and left in place until PayPal's Transaction Search had indexed its payouts. The statement queries PayPal when it loads, and a line reads as matched only when PayPal returns its transaction id.
+
+| Line | Paid | Payout batch, final | PayPal transaction | Transaction Search |
+|---|---|---|---|---|
+| The Okafors, visit, 4.08 h | $133.00 | `MGE2BMNMDPHVL`, 12:33:23 UTC | `7VY05255U3665311M` | matched |
+| Mr. Lindqvist, late cancellation | $33.25 | `YYS828HJXJTKA`, 12:34:07 UTC | `8J331240H8417253L` | matched |
+
+The statement was read every 15 minutes: 0 of 2 from 12:34 to 14:50 UTC, and **2 of 2** at 15:05 UTC. On the sandbox, then, a payout was listed between 2 h 16 min and 2 h 32 min after it was final.
+
+[`examples/`](../examples/README.md) holds that statement, the landlord link's view and the dispute evidence from this run.
+
+### 3.4 Crash between capture and payout (`npx tsx scripts/durability.ts`, `docs/durability-sandbox.json`)
 
 On the live site, the settlement step was made to fail once after the capture and before the payout. Cloudflare Workflows retried the step.
 
@@ -85,7 +96,7 @@ On the live site, the settlement step was made to fail once after the capture an
 
 The step reads the visit and does only what is not yet recorded, so the retry captured nothing and paid once. Each demo reset draws a new run tag for every PayPal id, so the week can be replayed on the sandbox without colliding with an earlier run.
 
-### 3.4 Cloudflare's free plan
+### 3.5 Cloudflare's free plan
 
 The live service runs on Cloudflare's free plan, so it cannot be billed. During one full run of the story (`wrangler tail`), all 239 recorded requests, ledger calls and Workflow runs ended with outcome `ok`. The board's read took 7 ms of CPU at the median and 20 ms at most; a Workflow run took 56 ms at the median and 85 ms at most.
 
@@ -135,8 +146,8 @@ axe-core (WCAG 2.0 A/AA, 2.1 AA) runs on each screen, with the Bryntum board in 
 
 | What | Result | Command |
 |---|---|---|
-| Unit and integration tests, in random order, with no network and no keys | 377 passing, 0 skipped | `npm test` |
-| Browser tests in Chromium | 11 passing | `npm run e2e` |
+| Unit and integration tests, in random order, with no network and no keys | 379 passing, 0 skipped | `npm test` |
+| Browser tests in Chromium | 17 passing | `npm run e2e` |
 | Decision core coverage: pay rules, agreement checklist, solver, money tasks, visit actions, board data, runner | 97.7% of lines, 92% of branches; CI floor 90% and 80% | `npm run test:coverage` |
 | The deployed shape in Cloudflare's own runtime (Worker, Durable Object, Workflows), with no account and no keys | holds placed and a visit settled | `npx tsx scripts/worker-smoke.ts` |
 | The Docker image, started and called | answers `/api/health`, the board and the page; runs as a non-root user | CI job `docker` |

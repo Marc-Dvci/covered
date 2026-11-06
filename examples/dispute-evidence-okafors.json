@@ -34,21 +34,21 @@
   {
    "step": "hold",
    "amount": "$157.50",
-   "paypalId": "94P40114P45909612",
+   "paypalId": "7RV01904L8601074L",
    "status": "CREATED",
    "at": "2026-11-19 07:10"
   },
   {
    "step": "capture",
    "amount": "$140.00",
-   "paypalId": "8N349575XE060752F",
+   "paypalId": "59N69929NL637621R",
    "status": "COMPLETED",
    "at": "2026-11-19 13:05"
   },
   {
    "step": "payout to Marek Nowak",
    "amount": "$133.00",
-   "paypalId": "26R38524PH9616137",
+   "paypalId": "7VY05255U3665311M",
    "status": "SUCCESS",
    "at": "2026-11-19 13:05"
   }
@@ -75,7 +75,7 @@
    "by": "The Okafors"
   },
   {
-   "at": "2026-11-19 13:05",
+   "at": "2026-11-19 09:00",
    "what": "Member checked in at the door",
    "by": "Marek Nowak"
   },
@@ -95,10 +95,10 @@
    "by": "cooperative system"
   },
   {
-   "at": "2026-11-19 13:30",
+   "at": "2026-11-19 13:05",
    "what": "Payout success",
    "by": "cooperative system"
   }
  ],
- "summary": "The Okafors booked 4 hours at $35.00 an hour for 2026-11-19 09:00. Marek Nowak checked in at 09:00 and out at 13:05 (245 minutes). Visit completed: $140.00 was captured (PayPal capture 8N349575XE060752F), and $17.50 of the hold was released."
+ "summary": "The Okafors booked 4 hours at $35.00 an hour for 2026-11-19 09:00. Marek Nowak checked in at 09:00 and out at 13:05 (245 minutes). Visit completed: $140.00 was captured (PayPal capture 59N69929NL637621R), and $17.50 of the hold was released."
 }

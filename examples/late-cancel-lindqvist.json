@@ -1,25 +1,25 @@
 [
  {
-  "id": 224,
+  "id": 808,
   "visit_id": "v-thu-lindqvist",
   "kind": "hold",
   "cents": 8750,
-  "paypal_id": "20790819RS5648122",
+  "paypal_id": "6SK91414RX651044W",
   "status": "CREATED",
   "ref": "v-thu-lindqvist",
-  "at": "2026-11-06 10:05:18",
+  "at": "2026-11-06 12:32:25",
   "board_at": 4750,
   "detail": null
  },
  {
-  "id": 247,
+  "id": 831,
   "visit_id": "v-thu-lindqvist",
   "kind": "capture",
   "cents": 3500,
-  "paypal_id": "0WF754179D956425E",
+  "paypal_id": "1M2920583P0860615",
   "status": "COMPLETED",
   "ref": "v-thu-lindqvist",
-  "at": "2026-11-06 10:06:10",
+  "at": "2026-11-06 12:33:42",
   "board_at": 5130,
   "detail": {
    "feeCents": 171,
@@ -27,14 +27,14 @@
   }
  },
  {
-  "id": 248,
+  "id": 832,
   "visit_id": "v-thu-lindqvist",
   "kind": "payout",
   "cents": 3325,
-  "paypal_id": "7M3SUNZWXX6X8",
+  "paypal_id": "YYS828HJXJTKA",
   "status": "SUCCESS",
-  "ref": "covered-d92bfe-v-thu-lindqvist-marek",
-  "at": "2026-11-06 10:06:12",
+  "ref": "covered-8b0d1b-v-thu-lindqvist-marek",
+  "at": "2026-11-06 12:33:43",
   "board_at": 5130,
   "detail": {
    "memberId": "marek"

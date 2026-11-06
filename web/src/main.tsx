@@ -1,6 +1,6 @@
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./styles.css";
 import { Top } from "./components/Top.tsx";
 import { AboutPage } from "./pages/About.tsx";
@@ -47,6 +47,7 @@ function WithTop() {
           <Route path="/join" element={<JoinPage />} />
           <Route path="/evidence/:id" element={<EvidencePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </>

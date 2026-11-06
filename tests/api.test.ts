@@ -355,6 +355,48 @@ describe("check-in, check-out and the money", () => {
     expect(st.lines[0]?.reconciled).toBe("matched");
   });
 
+  describe("a statement against PayPal's Transaction Search", () => {
+    interface Statement {
+      lines: { transactionId: string | null; reconciled: string }[];
+      reconciledCount: number;
+      searchError: string | null;
+    }
+    const statement = async () => read<Statement>(await send("/api/members/lena/statement", "GET"));
+    const finishVisit = async () => {
+      await holdAll();
+      await send("/api/clock", "POST", { at: at("10:00") });
+      await send("/api/visits/v-thu-weber/checkin", "POST", { memberId: "lena" });
+      await send("/api/clock", "POST", { at: at("13:00") });
+      await send("/api/visits/v-thu-weber/checkout", "POST", { memberId: "lena", extraApproved: false });
+      await app.runner.idle();
+    };
+
+    it("a line stays pending until Transaction Search lists its transaction", async () => {
+      await finishVisit();
+      const listed = pp.transactions.bind(pp);
+      pp.transactions = async () => [];
+      const before = await statement();
+      expect(before.lines[0]?.transactionId).toBeTruthy();
+      expect(before.lines[0]?.reconciled).toBe("pending");
+      expect(before.reconciledCount).toBe(0);
+      pp.transactions = listed;
+      const after = await statement();
+      expect(after.lines[0]?.reconciled).toBe("matched");
+      expect(after.reconciledCount).toBe(1);
+    });
+
+    it("a failed search keeps the payout's id, marks nothing as matched, and says why", async () => {
+      await finishVisit();
+      pp.transactions = async () => {
+        throw new Error("search is down");
+      };
+      const st = await statement();
+      expect(st.lines[0]?.transactionId).toBeTruthy();
+      expect(st.lines[0]?.reconciled).toBe("pending");
+      expect(st.searchError).toBe("search is down");
+    });
+  });
+
   it("cancel-preview shows the late fee inside the notice and the release", async () => {
     await holdAll();
     await app.store.setClock(at("08:30"));

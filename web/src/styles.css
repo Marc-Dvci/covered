@@ -90,6 +90,9 @@ small,
   padding: 0.55rem 0.95rem;
   font-weight: 700;
 }
+a.btn:not(.quiet) {
+  text-decoration: none;
+}
 .btn:hover {
   background: var(--ink-2);
 }
@@ -397,6 +400,8 @@ label {
   grid-template-columns: auto 1fr;
   gap: 0.25rem 0.9rem;
   font-size: 0.92rem;
+  align-content: start;
+  align-items: baseline;
 }
 .kv dt {
   color: var(--muted);
@@ -502,6 +507,7 @@ label {
 .stack {
   display: grid;
   gap: 0.6rem;
+  align-content: start;
 }
 .page {
   max-width: 980px;
@@ -570,6 +576,7 @@ th.num {
 .stat {
   display: grid;
   gap: 0.1rem;
+  align-content: start;
 }
 .stat b {
   font-size: 1.7rem;

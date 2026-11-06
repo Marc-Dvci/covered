@@ -126,3 +126,33 @@ test("the about page shows the evaluation", async ({ page }) => {
   await expect(page.getByText("55 / 55")).toBeVisible();
   await axe(page, "about");
 });
+
+test("a draft's terms start right under their heading, beside a longer checklist", async ({ page }) => {
+  await page.goto("/join");
+  await page.getByRole("button", { name: "Draft the agreement" }).click();
+  await expect(page.getByRole("button", { name: "Sign and save PayPal" })).toBeEnabled();
+  const heading = await page.getByRole("heading", { name: "Terms", exact: true }).boundingBox();
+  const first = await page.locator("dl.kv dt").first().boundingBox();
+  expect(first!.y - (heading!.y + heading!.height)).toBeLessThan(40);
+});
+
+test("the evaluation's figures line up across their columns", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByText("55 / 55")).toBeVisible();
+  const figures = await page
+    .locator(".stats")
+    .first()
+    .locator(".stat b")
+    .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+  expect(new Set(figures).size).toBe(1);
+});
+
+test.describe("an address with no page lands on the home page", () => {
+  for (const path of ["/m", "/h", "/evidence", "/no-such-page"]) {
+    test(path, async ({ page }) => {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/$/);
+      await expect(page.getByRole("link", { name: "Open the coordinator's board" })).toBeVisible();
+    });
+  }
+});

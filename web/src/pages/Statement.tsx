@@ -56,7 +56,7 @@ export function StatementPage() {
       )}
       {!data.searchError && data.reconciledCount < data.lines.length && (
         <p className="muted">
-          On the sandbox, PayPal's Transaction Search lists a payout about 2 hours after it happens. Until then, its line reads as pending.
+          On the sandbox, PayPal's Transaction Search lists a payout 2 to 3 hours after it happens. Until then, its line reads as pending.
         </p>
       )}
       <p className="why">{data.letter.text}</p>

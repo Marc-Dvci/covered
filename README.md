@@ -51,7 +51,7 @@ I audit payment systems for a living. In this trade, the cancellation fee and th
 
 ## Who it is for
 
-On 15 September 2026, Seattle's council passed Council Bill 121266, 9 to 0[^vote]. From 1 July 2027, a domestic worker must get a written agreement that includes a cancellation policy, and records of hours and pay[^ols]. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.
+On 15 September 2026, Seattle's council passed Council Bill 121266, 9 to 0[^vote]. From 1 July 2027, a domestic worker's written agreement must state "the work cancellation policy, such as the acceptable notification period and any cancellation payment owed to the domestic worker", in English and in the worker's primary language, and the hiring entity must keep pay and hour records for three years[^ord]. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.
 
 Covered is for a cleaning cooperative: a coordinator who plans the week, members who clean, and the households they clean for. It turns two lines of the ordinance into money that moves: the cancellation policy is a PayPal authorization, and the pay record is a PayPal transaction.
 
@@ -63,8 +63,8 @@ Covered is for a cleaning cooperative: a coordinator who plans the week, members
   - cover plans when someone is out;
   - a monthly income statement with a PayPal transaction id on every line.
 
-[^vote]: [Council vote, 15 September 2026](https://citizenportal.ai/articles/10000185/washington/king-county/seattle/council-updates-domesticworker-labor-standards-to-align-with-new-state-law-passes-unanimously); [the mayor's signature](https://www.thefactsnewspaper.com/post/mayor-wilson-signs-bill-to-strengthen-rights-for-domestic-workers-in-seattle).
-[^ols]: [Seattle Office of Labor Standards, proposed amendments](https://laborstandards.seattle.gov/2026/08/06/seattle-office-of-labor-standards-announces-proposed-amendments-to-the-domestic-workers-ordinance/); [the domestic workers page, with the $21.30 minimum for 2026](https://www.seattle.gov/laborstandards/ordinances/domestic-workers).
+[^vote]: [Council meeting minutes, 15 September 2026](https://seattle.legistar.com/View.ashx?M=M&ID=1443464&GUID=D9611EDE-3DA0-4F01-A044-46B87B387DE9): 9 in favor, none opposed.
+[^ord]: [Ordinance 127508, adding section 14.23.025 to the Seattle Municipal Code](https://seattle.legistar.com/LegislationDetail.aspx?ID=8159864&GUID=032E91EF-CDF9-48EF-8FC7-26D89A4D4207); [the domestic workers page, with the $21.30 minimum for 2026](https://www.seattle.gov/laborstandards/ordinances/domestic-workers).
 
 ## How it works
 
@@ -153,7 +153,7 @@ All of it runs on the free plan.
 | Reads a member's message: out today, out from a time, or nothing to do | Finds the affected visits |
 | Chooses among the solver's plans through function calling, and explains the choice | Lists only valid plans: availability, skills (pets, deep clean, fragrance-free), travel time between homes, weekly hours cap, same-cleaner consent |
 | Writes each message in the recipient's language | Refuses any message with a number the tools did not give, and sends the template instead |
-| Drafts the agreement from the household's words and the member's voice note | Decides whether it can be signed: the ordinance's fields and the Seattle minimum rate ($21.30/h) |
+| Drafts the agreement from the household's words and the member's voice note | Decides whether it can be signed: the terms the ordinance names and the Seattle minimum rate ($21.30/h) |
 | Translates the agreement read-back | Refuses a translation that changes, drops or adds a number |
 | Writes the cover letter on the income statement | Computes every figure in it |
 
@@ -285,7 +285,7 @@ npm run deploy                             # the Worker, then the Pages site in 
 | A signed agreement cannot be edited | `server/api.ts` | `tests/regressions.test.ts` "a signed agreement cannot be edited back to a draft" |
 | A message with a number the tools did not give is not sent | `server/ai/gemini.ts` `numbersOk` | `tests/agent.test.ts` "accepts numbers the tools gave and rejects invented ones" |
 | A translated read-back that changes a number is not shown | `server/agreements.ts` `keepsNumbers` | `tests/agent.test.ts` "rejects the live Portuguese answer that turned the $133.00 hold into $114.00" |
-| An agreement below the Seattle minimum or missing an ordinance field cannot be signed | `shared/agreement.ts` `missing` | `tests/shared.test.ts`, `scripts/self-attack.ts` |
+| An agreement below the Seattle minimum or missing a term the ordinance names cannot be signed | `shared/agreement.ts` `missing` | `tests/shared.test.ts`, `scripts/self-attack.ts` |
 | A refused hold puts the visit at risk; the household saves PayPal again and the hold is placed | `server/tasks.ts`, `server/signup.ts` `startRepair`, `finishRepair` | `tests/lifecycle.test.ts` "holds again once the household saves PayPal again" |
 | One failed token request does not break the PayPal client | `server/paypal/sandbox.ts` | `tests/paypal-client.test.ts` "one failed token request does not break the client for later calls" |
 | The drag guard names the household, never an internal id | `server/dispatch/solver.ts` `readableReasons` | `tests/crud-extras.test.ts` "a member busy elsewhere is told apart by the household's name, never an internal visit id" |
@@ -297,7 +297,7 @@ npm run deploy                             # the Worker, then the Pages site in 
 
 ## Limits
 
-PayPal's Transaction Search lists a payout some hours after it happens on the sandbox, so a line on a fresh statement shows its payout's transaction id until then. The sandbox pays PayPal receivers only. A visit's time stays as agreed: the board moves it between members, not along the day.
+PayPal's Transaction Search lists a payout about 2 hours after it happens on the sandbox, so a line on a fresh statement shows its payout's transaction id and reads as pending until then. The sandbox pays PayPal receivers only. A visit's time stays as agreed: the board moves it between members, not along the day.
 
 ## Licence
 

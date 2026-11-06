@@ -1,0 +1,55 @@
+{
+ "ranAt": "2026-11-06T10:07:00.856Z",
+ "site": "https://covered-coop.pages.dev",
+ "mode": {
+  "paypal": "sandbox",
+  "currency": "USD",
+  "runner": "cloudflare",
+  "ai": "gemini",
+  "demo": true
+ },
+ "holds": {
+  "started": 15,
+  "held": 15,
+  "seconds": 10
+ },
+ "proposedBars": 3,
+ "checkoutToPaidSeconds": 26,
+ "visits": [
+  {
+   "visit": "v-thu-okafor",
+   "state": "paid_out",
+   "heldCents": 15750,
+   "authorization": "94P40114P45909612",
+   "capturedCents": 14000,
+   "capture": "8N349575XE060752F",
+   "paypalFeeCents": 538,
+   "releasedCents": 1750,
+   "cooperativeCents": 700,
+   "payoutBatch": "YMTPXUJK3U7DE",
+   "payoutStatus": "SUCCESS",
+   "payoutFinalMs": 23733,
+   "paidCents": 13300,
+   "payoutTransaction": "26R38524PH9616137"
+  },
+  {
+   "visit": "v-thu-lindqvist",
+   "state": "late_cancel",
+   "heldCents": 8750,
+   "authorization": "20790819RS5648122",
+   "capturedCents": 3500,
+   "capture": "0WF754179D956425E",
+   "paypalFeeCents": 171,
+   "releasedCents": 5250,
+   "cooperativeCents": 175,
+   "payoutBatch": "7M3SUNZWXX6X8",
+   "payoutStatus": "SUCCESS",
+   "payoutFinalMs": 25456,
+   "paidCents": 3325,
+   "payoutTransaction": "79A820511Y774142G"
+  }
+ ],
+ "verifiedWebhooksInTheLast40Events": 18,
+ "refusedWebhooksInTheLast40Events": 0,
+ "pageErrors": []
+}

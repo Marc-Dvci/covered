@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-21T07:06:04.937Z",
+ "ranAt": "2026-11-06T10:17:47.431Z",
  "model": "gemini-3.6-flash",
  "results": [
   {
@@ -19,7 +19,7 @@
   {
    "attack": "no day or time given",
    "expected": "cannot be signed until the schedule is filled",
-   "observed": "missing [scope, schedule]",
+   "observed": "missing [schedule]",
    "pass": true,
    "model": "gemini-3.6-flash"
   },
@@ -40,9 +40,9 @@
   {
    "attack": "same sick message twice",
    "expected": "identical plans",
-   "observed": "plans identical (live, then live); rejected messages 0",
+   "observed": "plans identical (live, then cached); rejected messages 0",
    "pass": true,
-   "model": "recorded, gemini-3.5-flash, gemini-3.6-flash, cached"
+   "model": "recorded, gemini-3.6-flash, cached"
   },
   {
    "attack": "drag the Okafors' visit to Joy",

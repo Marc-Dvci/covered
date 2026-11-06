@@ -1,0 +1,104 @@
+{
+ "visitId": "v-thu-okafor",
+ "household": {
+  "name": "The Okafors",
+  "area": "Queen Anne"
+ },
+ "members": [
+  "Marek Nowak"
+ ],
+ "scheduled": {
+  "date": "2026-11-19",
+  "start": "09:00",
+  "end": "13:00",
+  "timeZone": "America/Los_Angeles"
+ },
+ "terms": {
+  "rate": "$35.00",
+  "price": "$140.00",
+  "hold": "$157.50",
+  "noticeHours": 24,
+  "lateCancelPct": 50,
+  "lockoutPct": 100,
+  "extraAllowanceMinutes": 30
+ },
+ "agreementId": null,
+ "attendance": {
+  "checkIn": "2026-11-19 09:00",
+  "checkOut": "2026-11-19 13:05",
+  "minutesOnSite": 245,
+  "extraApproved": false
+ },
+ "outcome": "visit completed",
+ "money": [
+  {
+   "step": "hold",
+   "amount": "$157.50",
+   "paypalId": "94P40114P45909612",
+   "status": "CREATED",
+   "at": "2026-11-19 07:10"
+  },
+  {
+   "step": "capture",
+   "amount": "$140.00",
+   "paypalId": "8N349575XE060752F",
+   "status": "COMPLETED",
+   "at": "2026-11-19 13:05"
+  },
+  {
+   "step": "payout to Marek Nowak",
+   "amount": "$133.00",
+   "paypalId": "26R38524PH9616137",
+   "status": "SUCCESS",
+   "at": "2026-11-19 13:05"
+  }
+ ],
+ "timeline": [
+  {
+   "at": "2026-11-19 07:10",
+   "what": "Hold placed on the household's PayPal: $157.50",
+   "by": "cooperative system"
+  },
+  {
+   "at": "2026-11-19 07:10",
+   "what": "Household asked whether Marek Nowak may come instead",
+   "by": "Dana (coordinator)"
+  },
+  {
+   "at": "2026-11-19 09:00",
+   "what": "Household agreed to Marek Nowak",
+   "by": "The Okafors"
+  },
+  {
+   "at": "2026-11-19 09:00",
+   "what": "Visit given to Marek Nowak",
+   "by": "The Okafors"
+  },
+  {
+   "at": "2026-11-19 13:05",
+   "what": "Member checked in at the door",
+   "by": "Marek Nowak"
+  },
+  {
+   "at": "2026-11-19 13:05",
+   "what": "Member checked out after 245 minutes",
+   "by": "Marek Nowak"
+  },
+  {
+   "at": "2026-11-19 13:05",
+   "what": "Captured $140.00, released $17.50",
+   "by": "cooperative system"
+  },
+  {
+   "at": "2026-11-19 13:05",
+   "what": "Payout sent to the member",
+   "by": "cooperative system"
+  },
+  {
+   "at": "2026-11-19 13:30",
+   "what": "Payout success",
+   "by": "cooperative system"
+  }
+ ],
+ "summary": "The Okafors booked 4 hours at $35.00 an hour for 2026-11-19 09:00. Marek Nowak checked in at 09:00 and out at 13:05 (245 minutes). Visit completed: $140.00 was captured (PayPal capture 8N349575XE060752F), and $17.50 of the hold was released."
+}

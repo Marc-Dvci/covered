@@ -210,3 +210,17 @@
   font-size: 0.8rem;
   color: var(--muted);
 }
+
+/* the week is an overview: names only, and the tooltip has the rest */
+.board-scheduler.view-week .b-sch-event-content span {
+  display: none;
+}
+.board-scheduler.view-week .b-sch-event-content {
+  --b-sch-event-padding-inline: 0.2rem;
+}
+.board-scheduler.view-week .b-sch-event-content b {
+  font-size: 0.7rem;
+}
+.board-scheduler.view-week .b-sch-header-row-1 .b-sch-header-text {
+  font-size: 0.7rem;
+}

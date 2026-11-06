@@ -1,80 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 790" width="1200" height="790" font-family="Atkinson Hyperlegible, system-ui, -apple-system, Segoe UI, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="760" viewBox="0 0 860 760" font-family="Atkinson Hyperlegible, Segoe UI, Helvetica, Arial, sans-serif" fill="#14213d">
+  <rect width="860" height="760" fill="#ffffff"/>
   <defs>
-    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0L10 5L0 10z" fill="#3d4a66"/>
-    </marker>
-    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0L10 5L0 10z" fill="#1d5fd0"/>
-    </marker>
-    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0L10 5L0 10z" fill="#137a3f"/>
-    </marker>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#3d4a66"/></marker>
   </defs>
-  <rect width="1200" height="790" fill="#ffffff"/>
-  <g fill="none" stroke="#c9d1e0" stroke-width="1.5">
-    <rect x="40" y="40" width="300" height="92" rx="10"/>
-    <rect x="450" y="40" width="300" height="92" rx="10"/>
-    <rect x="860" y="40" width="300" height="92" rx="10"/>
-    <rect x="300" y="230" width="600" height="120" rx="10" stroke="#14213d" stroke-width="2"/>
-    <rect x="960" y="230" width="200" height="120" rx="10"/>
-    <rect x="40" y="230" width="200" height="120" rx="10"/>
-    <rect x="40" y="450" width="260" height="110" rx="10"/>
-    <rect x="340" y="450" width="520" height="110" rx="10" stroke="#1d5fd0" stroke-width="2"/>
-    <rect x="300" y="630" width="860" height="130" rx="10" stroke="#137a3f" stroke-width="2"/>
-  </g>
+  <style>
+    .band { font-size: 14px; font-weight: 700; fill: #5f6b84; letter-spacing: 0.04em; }
+    .h { font-size: 16px; font-weight: 700; }
+    .t { font-size: 14.5px; fill: #3d4a66; }
+    .box { fill: #ffffff; stroke: #14213d; stroke-width: 1.5; rx: 8; }
+    .code { fill: #e8f0fd; stroke: #1d5fd0; stroke-width: 1.5; rx: 8; }
+    .model { fill: #f0eafb; stroke: #6d3fc0; stroke-width: 1.5; rx: 8; }
+    .pp { fill: #e5f4eb; stroke: #137a3f; stroke-width: 1.5; rx: 8; }
+    .ln { stroke: #3d4a66; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+  </style>
 
-  <g fill="#14213d">
-    <text x="60" y="76" font-size="20" font-weight="700">Household phone</text>
-    <text x="60" y="104" font-size="15" fill="#5f6b84">agreement, holds, receipts, consent</text>
-    <text x="470" y="76" font-size="20" font-weight="700">Member phone</text>
-    <text x="470" y="104" font-size="15" fill="#5f6b84">check-in, check-out, pay, statement</text>
-    <text x="880" y="76" font-size="20" font-weight="700">Coordinator board</text>
-    <text x="880" y="104" font-size="15" fill="#5f6b84">week board, cover agent, demo clock</text>
+  <text class="band" x="24" y="30">PEOPLE</text>
+  <rect class="box" x="24" y="42" width="330" height="72"/>
+  <text class="h" x="40" y="68">Coordinator: the week</text>
+  <text class="t" x="40" y="94">Bryntum Scheduler Enterprise, drag guard</text>
+  <rect class="box" x="370" y="42" width="225" height="72"/>
+  <text class="h" x="386" y="68">Member's phone</text>
+  <text class="t" x="386" y="94">check in, check out, pay</text>
+  <rect class="box" x="611" y="42" width="225" height="72"/>
+  <text class="h" x="627" y="68">Household's phone</text>
+  <text class="t" x="627" y="94">agreement, consent, fee</text>
 
-    <text x="320" y="266" font-size="20" font-weight="700">Web service on Render (Node, TypeScript)</text>
-    <text x="320" y="294" font-size="15" fill="#3d4a66">Fastify API + React front end. Code decides every amount, fee and payee,</text>
-    <text x="320" y="316" font-size="15" fill="#3d4a66">which covers are valid, and whether an agreement can be signed.</text>
-    <text x="320" y="338" font-size="15" fill="#3d4a66">Webhooks verified with PayPal before they are kept.</text>
+  <path class="ln" d="M430 114V146"/>
+  <text class="band" x="24" y="136">CLOUDFLARE</text>
+  <rect class="box" x="24" y="148" width="812" height="44"/>
+  <text class="h" x="40" y="176">Pages</text>
+  <text class="t" x="100" y="176">the front end, and /api/* forwarded to the Worker by a service binding</text>
+  <path class="ln" d="M430 192V214"/>
 
-    <text x="980" y="266" font-size="20" font-weight="700">Gemini API</text>
-    <text x="980" y="292" font-size="15" fill="#3d4a66">reads messages, picks</text>
-    <text x="980" y="312" font-size="15" fill="#3d4a66">among solver plans,</text>
-    <text x="980" y="332" font-size="15" fill="#3d4a66">drafts, translates</text>
+  <rect class="box" x="24" y="216" width="812" height="212"/>
+  <text class="h" x="40" y="242">API Worker (Hono)</text>
+  <rect class="code" x="40" y="256" width="430" height="156"/>
+  <text class="h" x="56" y="282" fill="#1d5fd0">Code decides</text>
+  <text class="t" x="56" y="308">every amount and fee: 40 pay rules</text>
+  <text class="t" x="56" y="332">who can cover: solver, also the drag guard</text>
+  <text class="t" x="56" y="356">whether an agreement can be signed</text>
+  <text class="t" x="56" y="380">whether a model's numbers are the code's</text>
+  <rect class="model" x="500" y="256" width="320" height="156"/>
+  <text class="h" x="516" y="282" fill="#6d3fc0">Gemini handles words</text>
+  <text class="t" x="516" y="308">reads a member's message</text>
+  <text class="t" x="516" y="332">chooses among the solver's plans</text>
+  <text class="t" x="516" y="356">writes in each person's language</text>
+  <text class="t" x="516" y="380">drafts from text and voice notes</text>
+  <path class="ln" d="M500 322H472"/>
 
-    <text x="60" y="266" font-size="20" font-weight="700">Postgres</text>
-    <text x="60" y="292" font-size="15" fill="#3d4a66">visits, agreements,</text>
-    <text x="60" y="312" font-size="15" fill="#3d4a66">money ledger,</text>
-    <text x="60" y="332" font-size="15" fill="#3d4a66">event log</text>
+  <path class="ln" d="M180 428V452"/>
+  <path class="ln" d="M550 428V452"/>
+  <rect class="box" x="24" y="454" width="300" height="100"/>
+  <text class="h" x="40" y="482">Ledger</text>
+  <text class="t" x="40" y="508">one Durable Object with SQLite:</text>
+  <text class="t" x="40" y="532">visits, money rows, events</text>
+  <rect class="box" x="340" y="454" width="496" height="100"/>
+  <text class="h" x="356" y="482">Workflows: one per money task, each step retried</text>
+  <text class="t" x="356" y="508">place the hold · capture and pay · check the payout</text>
+  <text class="t" x="356" y="532">a cron trigger starts the sweep every 5 minutes</text>
+  <path class="ln" d="M340 504H326"/>
+  <path class="ln" d="M588 554V588"/>
 
-    <text x="60" y="486" font-size="20" font-weight="700">Cron job, every 5 min</text>
-    <text x="60" y="512" font-size="15" fill="#3d4a66">finds visits whose hold</text>
-    <text x="60" y="532" font-size="15" fill="#3d4a66">is due (24 h ahead)</text>
-
-    <text x="360" y="486" font-size="20" font-weight="700" fill="#1d5fd0">Render Workflows</text>
-    <text x="360" y="512" font-size="15" fill="#3d4a66">placeHold: authorize the visit on the household's saved PayPal</text>
-    <text x="360" y="532" font-size="15" fill="#3d4a66">settleVisit: capture or void per the outcome, then pay the members</text>
-    <text x="360" y="552" font-size="15" fill="#3d4a66">each run retried by Render; every PayPal call carries a request id</text>
-
-    <text x="320" y="666" font-size="20" font-weight="700" fill="#137a3f">PayPal sandbox</text>
-    <text x="320" y="692" font-size="15" fill="#3d4a66">Server SDK: Vault v3 (save PayPal at signing), Orders v2 (buyer-absent authorize),</text>
-    <text x="320" y="714" font-size="15" fill="#3d4a66">Payments (capture, partial capture, void), Transaction Search (income statement)</text>
-    <text x="320" y="736" font-size="15" fill="#3d4a66">REST: Payouts to PayPal and Venmo, webhook signature verification</text>
-  </g>
-
-  <g fill="none" stroke="#3d4a66" stroke-width="1.5">
-    <path d="M190 132 L480 228" marker-end="url(#a)"/>
-    <path d="M600 132 L600 228" marker-end="url(#a)"/>
-    <path d="M1010 132 L720 228" marker-end="url(#a)"/>
-    <path d="M900 290 L958 290" marker-start="url(#a)" marker-end="url(#a)"/>
-    <path d="M300 290 L242 290" marker-start="url(#a)" marker-end="url(#a)"/>
-    <path d="M300 505 L338 505" marker-end="url(#b)" stroke="#1d5fd0"/>
-    <path d="M600 352 L600 448" marker-end="url(#b)" stroke="#1d5fd0"/>
-    <path d="M600 562 L600 628" marker-end="url(#g)" stroke="#137a3f"/>
-    <path d="M880 628 L880 352" marker-end="url(#a)" stroke-dasharray="5 5"/>
-  </g>
-  <g font-size="14" fill="#5f6b84">
-    <text x="612" y="410">check-out, cancel: start a run</text>
-    <text x="612" y="602">idempotent money steps</text>
-    <text x="892" y="600">webhooks</text>
-  </g>
+  <text class="band" x="24" y="578">PAYPAL SANDBOX</text>
+  <rect class="pp" x="24" y="590" width="812" height="146"/>
+  <text class="h" x="40" y="618" fill="#137a3f">PayPal Server SDK, generated by APIMatic</text>
+  <text class="t" x="40" y="644">Vault v3: the household saves PayPal once</text>
+  <text class="t" x="440" y="644">Orders v2: the hold, 24 hours ahead, buyer absent</text>
+  <text class="t" x="40" y="668">Payments: capture, partial capture, void</text>
+  <text class="t" x="440" y="668">Transaction Search: reconciles the statement</text>
+  <text class="h" x="40" y="698" fill="#137a3f">REST</text>
+  <text class="t" x="90" y="698">Payouts: the member's pay, polled until final</text>
+  <text class="t" x="90" y="722">Webhooks: kept only when PayPal confirms the signature</text>
 </svg>

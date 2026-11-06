@@ -1,0 +1,35 @@
+{
+ "name": "Marek Nowak",
+ "months": [
+  {
+   "month": "2026-11",
+   "visits": 1,
+   "hours": 4.08,
+   "cents": 16625
+  }
+ ],
+ "totalCents": 16625,
+ "payouts": 2,
+ "reconciled": 0,
+ "lines": [
+  {
+   "date": "2026-11-19 (Thu)",
+   "hours": 4.08,
+   "cents": 13300,
+   "transactionId": "26R38524PH9616137",
+   "reconciled": "pending"
+  },
+  {
+   "date": "2026-11-19 (Thu)",
+   "hours": 0,
+   "cents": 3325,
+   "transactionId": "79A820511Y774142G",
+   "reconciled": "pending"
+  }
+ ],
+ "expiresAt": "2026-12-06T10:07:03.869Z",
+ "letter": {
+  "text": "Please find my attached income statement detailing my earnings as a member-owner of a house-cleaning cooperative. For the month of November 2026, I completed 1 visit totaling 4.08 hours, which resulted in a total payout of $166.25 received via PayPal. I hope this documentation meets your requirements for reviewing my financial standing.",
+  "source": "cached"
+ }
+}

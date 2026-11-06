@@ -1,0 +1,46 @@
+{
+ "memberId": "marek",
+ "memberName": "Marek Nowak",
+ "lines": [
+  {
+   "visitId": "v-thu-okafor",
+   "date": "2026-11-19 (Thu)",
+   "household": "The Okafors",
+   "minutes": 245,
+   "cents": 13300,
+   "kind": "visit",
+   "batchId": "YMTPXUJK3U7DE",
+   "transactionId": "26R38524PH9616137",
+   "payoutStatus": "SUCCESS",
+   "reconciled": "pending"
+  },
+  {
+   "visitId": "v-thu-lindqvist",
+   "date": "2026-11-19 (Thu)",
+   "household": "Mr. Lindqvist",
+   "minutes": 0,
+   "cents": 3325,
+   "kind": "late_cancel",
+   "batchId": "7M3SUNZWXX6X8",
+   "transactionId": "79A820511Y774142G",
+   "payoutStatus": "SUCCESS",
+   "reconciled": "pending"
+  }
+ ],
+ "months": [
+  {
+   "month": "2026-11",
+   "visits": 1,
+   "hours": 4.08,
+   "cents": 16625
+  }
+ ],
+ "totalCents": 16625,
+ "reconciledCount": 0,
+ "searchedAt": "2026-11-06T10:07:02.777Z",
+ "searchError": null,
+ "letter": {
+  "text": "Please find my attached income statement detailing my earnings as a member-owner of a house-cleaning cooperative. For the month of November 2026, I completed 1 visit totaling 4.08 hours, which resulted in a total payout of $166.25 received via PayPal. I hope this documentation meets your requirements for reviewing my financial standing.",
+  "source": "cached"
+ }
+}

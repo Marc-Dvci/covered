@@ -85,9 +85,9 @@ export function MemberPage() {
                       {clock(v.start)}–{clock(v.start + v.minutes)}
                     </b>
                     <span className={`chip s-${v.state}`}>
-                      {v.state === "paid_out"
+                      {v.state === "paid_out" || (v.state === "settling" && pay?.status === "SUCCESS")
                         ? t(lang, "paid")
-                        : v.state === "late_cancel" && v.capture
+                        : v.capture
                           ? dollars(v.capture.cents)
                           : v.hold
                             ? dollars(v.hold.cents)
@@ -103,7 +103,7 @@ export function MemberPage() {
                     </small>
                   )}
                   {pending && <span className="ask">{t(lang, "asked")}</span>}
-                  {v.hold && !["paid_out", "late_cancel", "voided", "cancelled"].includes(v.state) && (
+                  {v.hold && !v.capture && !["paid_out", "late_cancel", "voided", "cancelled"].includes(v.state) && (
                     <small>
                       {dollars(v.hold.cents)} {t(lang, "held")}
                     </small>

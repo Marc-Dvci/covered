@@ -1,46 +1,56 @@
 # Covered: cleaners' pay held before the work starts
 
-![tests](https://img.shields.io/badge/tests-76%20passing-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
+[![ci](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml) [![codeql](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml) [![live demo](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml) ![tests](https://img.shields.io/badge/tests-367%20passing-137a3f) ![decision core coverage](https://img.shields.io/badge/decision%20core%20coverage-97.7%25-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
 
-**Covered runs a house-cleaning cooperative's week: each household's PayPal holds the visit's pay 24 hours ahead, and whoever does the visit is paid through PayPal Payouts when they check out.**
+[![The film: a cleaner calls in sick at 07:10, and the money stays with the visit. Click to watch.](docs/film-thumbnail.jpg)](https://github.com/Marc-Dvci/covered#see-it-work)
 
-I audit payment systems for a living. In this trade, the cancellation fee and the week's pay are usually a promise; Covered makes both an authorization on PayPal before anyone travels.
+**Covered runs a house-cleaning cooperative's week on one board: each household's PayPal holds the visit's pay 24 hours ahead, and whoever does the visit is paid through PayPal Payouts when they check out.**
+
+I audit payment systems for a living. In this trade, the cancellation fee and the week's pay are usually a promise; Covered makes both of them a PayPal object before anyone travels.
+
+[Try it](https://covered-coop.pages.dev/board) · [Film](https://github.com/Marc-Dvci/covered#see-it-work) · [For judges](#for-judges) · [See it work](#see-it-work) · [Run it](#run-it) · [Evidence](docs/EVIDENCE.md)
 
 | | |
 |---|---|
-| Built with | PayPal Server SDK (Vault v3, Orders v2, Payments, Transaction Search), PayPal Payouts, PayPal webhooks, Gemini API, Render Workflows, Render cron and Postgres, TypeScript, React, Fastify |
-| Headline result | A full demo day on the PayPal sandbox: 30 holds, 3 captures including a late-cancel partial capture, 3 payouts final in about 25 s each; a crash between capture and payout ends in exactly 1 capture and 1 payout |
+| Live demo, no login | **[covered-coop.pages.dev/board](https://covered-coop.pages.dev/board)**: Thursday, 07:10. A line above the board tells you each next step |
+| Built with | PayPal Server SDK (Vault v3, Orders v2, Payments, Transaction Search), PayPal Payouts and Webhooks, Bryntum Scheduler Enterprise 8.0, Gemini API, Cloudflare Workers, Workflows, Durable Objects and Pages, TypeScript, React, Hono |
+| Headline result | The whole day on the PayPal sandbox in US dollars: 15 holds placed in 10 s, a $140.00 capture and a $35.00 late-cancel fee with the rest released, payouts final in about 25 s. A crash between capture and payout ends in exactly 1 capture and 1 payout |
 
 ## For judges
 
 | Criterion | Where it is answered |
 |---|---|
-| Technological implementation | [PayPal](#paypal) (six APIs, idempotent money steps), [Gemini, and where it stops](#gemini-and-where-it-stops), [docs/EVIDENCE.md](docs/EVIDENCE.md) sections 3 and 4 |
-| Design | [The demo day](#the-demo-day): coordinator board, member and household phones in their own languages, sign-up by voice |
+| Technological implementation | Hold: [placeHold](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/tasks.ts#L22-L53). Capture, release and payout: [settleMoney](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/tasks.ts#L61-L122). PayPal client: [sandbox.ts](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/paypal/sandbox.ts#L33-L72). Durable steps: [MoneyTask](https://github.com/Marc-Dvci/covered/blob/v1.0.0/worker/index.ts#L69-L98). The model's limits: [Gemini, and where it stops](#gemini-and-where-it-stops). All figures: [docs/EVIDENCE.md](docs/EVIDENCE.md) |
+| Best use of Bryntum | [BoardScheduler.tsx](https://github.com/Marc-Dvci/covered/blob/v1.0.0/web/src/components/BoardScheduler.tsx#L135-L264): event buffers for travel, each member's own calendar, `calendarHighlight` driven by the solver, an asynchronous drop guard, and the week in CrudManager format from [crud.ts](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/crud.ts#L38-L127). See [The board](#the-board) |
+| Design | [See it work](#see-it-work): coordinator board, member and household phones in their own languages, sign-up by voice, 0 axe-core violations |
 | Potential impact | [Who it is for](#who-it-is-for), [The rule](#the-rule) |
-| Innovation | The hold belongs to the visit, so a cover keeps the money in place; the notice window and the hold are the same 24 hours |
-| Presentation | [Measured](#measured), [Run it](#run-it) with no keys |
+| Innovation | The hold belongs to the visit, so a cover keeps the money in place, and the notice window and the hold are the same 24 hours: [the guard](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/actions.ts#L116-L139), [the move](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/actions.ts#L148-L162) |
+| Presentation | [The film](https://github.com/Marc-Dvci/covered#see-it-work), [the live demo](https://covered-coop.pages.dev/board), [Run it](#run-it) with no keys |
 
 ## See it work
 
-![Coordinator board at 07:10 on Thursday, with the agent's proposal](docs/screens/board-proposal.png)
+<img src="docs/gif/board-drag.gif" width="850" alt="A visit is dragged on the Bryntum board. Only members who can take it light up. Over Joy's row the tooltip says she does not work that day and has no pets; over Marek's row it says he fits and the household is asked first. The drop adds a dashed bar.">
 
-*07:10: Sam is out. The agent's plan sits on the board as dashed bars: Marek takes the Okafors (asked first, since they want the same cleaner), Teresa takes the Santoses and the Murphys. Every hold stays where it was.*
+*The drag guard: only the members who can take the visit light up, and a refused row says why. The answers come from the same solver the agent uses, and the server checks again on the drop.*
+
+<img src="docs/gif/agent-plan.gif" width="850" alt="Sam's message is sent, the agent finds cover, its plan appears on the board as dashed bars with messages in Polish and Portuguese, and approving it moves the bars.">
+
+*07:10: Sam is out. The agent's plan lands on the board as dashed bars, Dana approves, the bars move, and every hold stays where it was.*
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screens/member-phone-polish.png" alt="Marek's phone in Polish: the Okafors' visit paid, $133.00, and a $33.25 late-cancel fee"></td>
-<td width="50%"><img src="docs/screens/household-late-cancel.png" alt="Mr. Lindqvist's phone: cancelling now costs $35.00, and $52.50 is released"></td>
+<td width="50%"><img src="docs/gif/phone-paid.gif" width="380" alt="Marek's phone in Polish: he checks in, checks out, and $133.00 reaches him through PayPal Payouts."></td>
+<td width="50%"><img src="docs/gif/phone-cancel.gif" width="380" alt="Mr. Lindqvist's phone: cancelling shows the $35.00 fee before he confirms, and the rest of the hold is released."></td>
 </tr>
 <tr>
-<td><em>Marek's phone, in Polish: $133.00 for the Okafors, and $33.25 from Mr. Lindqvist's late-cancel fee, each paid through PayPal Payouts.</em></td>
-<td><em>Mr. Lindqvist sees the fee before he confirms: $35.00 goes to Marek, and $52.50 of the $87.50 hold is released.</em></td>
+<td><em>Marek's phone, in Polish: check in, check out, and $133.00 paid. The wait on PayPal is cut.</em></td>
+<td><em>Mr. Lindqvist sees the $35.00 fee before he confirms, and $52.50 of the $87.50 hold is released.</em></td>
 </tr>
 </table>
 
 ## Who it is for
 
-Seattle passed Council Bill 121266 on 15 Sep 2026 (9-0). From 1 Jul 2027, domestic workers must get a written agreement that includes a cancellation policy, and records of hours and pay. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.
+On 15 September 2026, Seattle's council passed Council Bill 121266, 9 to 0[^vote]. From 1 July 2027, a domestic worker must get a written agreement that includes a cancellation policy, and records of hours and pay[^ols]. A house cleaner who travels to a door that stays shut, or to a household that cancels at breakfast, loses the morning's pay unless the fee was collected in advance.
 
 Covered is for a cleaning cooperative: a coordinator who plans the week, members who clean, and the households they clean for. It turns two lines of the ordinance into money that moves: the cancellation policy is a PayPal authorization, and the pay record is a PayPal transaction.
 
@@ -52,11 +62,14 @@ Covered is for a cleaning cooperative: a coordinator who plans the week, members
   - cover plans when someone is out;
   - a monthly income statement with a PayPal transaction id on every line.
 
+[^vote]: [Council vote, 15 September 2026](https://citizenportal.ai/articles/10000185/washington/king-county/seattle/council-updates-domesticworker-labor-standards-to-align-with-new-state-law-passes-unanimously); [the mayor's signature](https://www.thefactsnewspaper.com/post/mayor-wilson-signs-bill-to-strengthen-rights-for-domestic-workers-in-seattle).
+[^ols]: [Seattle Office of Labor Standards, proposed amendments](https://laborstandards.seattle.gov/2026/08/06/seattle-office-of-labor-standards-announces-proposed-amendments-to-the-domestic-workers-ordinance/); [the domestic workers page, with the $21.30 minimum for 2026](https://www.seattle.gov/laborstandards/ordinances/domestic-workers).
+
 ## How it works
 
-![Architecture](docs/architecture.png)
+![Architecture: phones and the coordinator's board reach a Cloudflare Pages front end, which forwards to an API Worker. Inside it, code decides every amount, cover and signature, and Gemini only handles words. Below it, a Durable Object ledger and Cloudflare Workflows run the money steps against the PayPal sandbox.](docs/architecture.png)
 
-*The web service decides every amount. Render Workflows run the money steps against PayPal, retried on failure. Gemini reads and writes words, and code checks every number it writes.*
+*Code decides every amount. Workflows run the money steps against PayPal, each step retried on failure. Gemini reads and writes words, and code checks every number it writes.*
 
 ## The rule
 
@@ -67,7 +80,7 @@ The notice window and the payment hold are the same 24 hours.
 | More than 24 hours ahead | Nothing was held, nothing is charged |
 | Inside the 24 hours | The agreed fee (50% by default) is captured with `final_capture`, the rest of the authorization is released, and the fee is paid out to the member who kept the morning free |
 | Nobody lets the cleaner in | The lock-out fee (100% by default) is captured and paid out |
-| The visit happens | The booked time, plus any extra time the household approves at check-out, is captured; the member is paid within the minute |
+| The visit happens | The booked time, plus any extra time the household approves at check-out, is captured, and the member is paid through Payouts |
 
 The hold belongs to the **visit**, not to the member. When Sam calls in sick at 07:10 and Marek covers, the household's hold does not move; it pays whoever checks out. The cooperative keeps a share set in its terms (5% in the demo) and the member gets the rest.
 
@@ -82,22 +95,49 @@ Thursday 19 November 2026, Rainier Home Care Cooperative, Seattle. Every person 
 5. Marek opens his income statement and makes a link for a landlord: months, hours and totals, each line tied to a PayPal transaction, with no household names or addresses.
 6. A new household, the Parks, describes the job in English and reads the agreement in Korean. Teresa states her terms in a Portuguese voice note. The checklist decides when the agreement can be signed, and signing saves the Parks' PayPal.
 
-A demo clock in the coordinator view moves the day forward, so the whole day fits in a few minutes. Every PayPal call is still a real sandbox call.
+A demo clock in the coordinator view moves the day forward, so the whole day fits in a few minutes. Every PayPal call on the live site is a real sandbox call. The week reloads by itself after 30 quiet minutes, so a visitor lands on 07:10.
 
-## PayPal
+## How the sponsors' products are used
+
+### PayPal
 
 | PayPal API | What Covered uses it for | Code |
 |---|---|---|
-| Vault v3 (setup token, payment token) through the PayPal Server SDK | The household saves PayPal once, when it signs | `server/signup.ts`, `server/paypal/sandbox.ts` |
+| Vault v3 (setup token, payment token) through the PayPal Server SDK | The household saves PayPal once, when it signs, on PayPal's own approval page | `server/signup.ts`, `server/paypal/sandbox.ts` |
 | Orders v2, `intent: AUTHORIZE`, vaulted PayPal with `stored_credential` (merchant-initiated, unscheduled) | The hold, placed with no buyer present 24 hours before each visit | `server/tasks.ts` `placeHold` |
-| Payments: capture with `final_capture`, partial capture, void | Check-out, late-cancel fee with release of the remainder, no-cover release | `server/tasks.ts` `settleVisit` |
-| Payouts (REST), to a PayPal email or a Venmo phone | The member's pay, polled until the batch is final | `server/tasks.ts` |
-| Transaction Search | Reconciles the income statement line by line | `server/statements.ts` |
-| Webhooks with `verify-webhook-signature` | Deliveries are kept only when PayPal confirms them, and are tied to the visit by invoice id | `server/api.ts` |
+| Payments: capture with `final_capture`, partial capture, void | Check-out, late-cancel fee with release of the remainder, no-cover release | `server/tasks.ts` `settleMoney` |
+| Payouts (REST) | The member's pay, polled until the batch is final | `server/tasks.ts`, `worker/index.ts` |
+| Transaction Search | Reconciles the income statement line by line, once PayPal has indexed the payout | `server/statements.ts` |
+| Webhooks with `verify-webhook-signature` | Deliveries are kept only when PayPal confirms them, and are tied to the visit by invoice id or sender batch id | `server/api.ts` |
 
-Every money call carries a `PayPal-Request-Id` and an invoice id built from the visit and the demo run. Payouts carry a `sender_batch_id` built the same way. A retried task can never charge or pay twice: on the sandbox, PayPal answers a repeated capture with `AUTHORIZATION_ALREADY_CAPTURED` and a repeated payout with "Batch with given sender_batch_id already exists".
+Every money call carries a `PayPal-Request-Id` and an invoice id built from the visit and the demo run. Payouts carry a `sender_batch_id` built the same way. A retried step can never charge or pay twice: on the sandbox, PayPal answers a repeated capture with `AUTHORIZATION_ALREADY_CAPTURED` and a repeated payout with "Batch with given sender_batch_id already exists".
 
 Orders, Payments, Vault and Transaction Search go through `@paypal/paypal-server-sdk`, the PayPal Server SDK generated by APIMatic.
+
+### The board
+
+The coordinator's week is a [Bryntum Scheduler](https://bryntum.com/products/scheduler/) at the Enterprise tier, version 8.0 (the former Scheduler Pro), from public npm with no Bryntum file in this repository. It runs as Bryntum's trial, whose 14 days count from the first run in each browser.
+
+| Bryntum | What Covered uses it for |
+|---|---|
+| `resourceNonWorkingTime` with a calendar per member | Each row is shaded outside that member's own working hours |
+| `eventBuffer` | Travel to the member's next home, computed from their real next visit |
+| `calendarHighlight` with `collectAvailableResources` | While a bar is in the air, only the members the solver accepts light up |
+| `eventDrag` `validatorFn`, and `beforeEventDropFinalize` with an asynchronous finalize | The solver's reason in the tooltip during the drag, and the server's final check on the drop |
+| `resourceTimeRanges`, `timeRanges` | "Out today" across the absent member's row, and the demo clock's now line |
+| Project in CrudManager format, stores with `syncDataOnLoad` | Each poll applies only what changed, so a moved bar animates and the view keeps its place |
+| Non-continuous time axis | The week shows six working days from 07:00 to 19:00, with the nights removed |
+
+### Cloudflare
+
+| Cloudflare | What Covered uses it for |
+|---|---|
+| Workflows | One instance per money task. Each step is persisted and retried: place the hold; capture and pay; check the payout, with a durable sleep between checks; record the outcome |
+| Durable Object with SQLite | The ledger: visits, money rows, events |
+| Workers and a cron trigger | The API, and the sweep every 5 minutes |
+| Pages | The public site, with `/api/*` forwarded to the Worker by a service binding |
+
+All of it runs on the free plan.
 
 ## Gemini, and where it stops
 
@@ -110,29 +150,43 @@ Orders, Payments, Vault and Transaction Search go through `@paypal/paypal-server
 | Translates the agreement read-back | Refuses a translation that changes, drops or adds a number |
 | Writes the cover letter on the income statement | Computes every figure in it |
 
-The household's text and the member's note are passed as data. The rate, notice and fee come only from the member's own words, and code checks that each number the model extracted appears in what the member said.
+The household's text and the member's note are passed as data. The rate, notice and fee come only from the member's own words, and code checks that each number the model extracted appears in what the member said. The agent has no tool that touches PayPal. [docs/SYSTEM_CARD.md](docs/SYSTEM_CARD.md) covers its uses, limits and human oversight.
 
-The demo path's model answers are recorded in `data/ai-recordings/`, so the deployed demo answers instantly and the repository runs with no key. With a key, live calls go through a reply cache, a daily cap and a per-visitor cap. A busy model falls back to the next one, then to the code-built text.
+The demo path's model answers are recorded in `data/ai-recordings.json`, so the live demo answers instantly and the repository runs with no key. With a key, live calls go through a reply cache, a daily cap and a per-visitor cap. A busy model falls back to the next one, then to the code-built text.
+
+## What it will not do
+
+- Move a visit that is under way, paid or released, or move one to a member who cannot take it. The drag guard and the server both refuse, with the reason.
+- Release a checked-in visit: a member who started gets paid at check-out.
+- Change a signed agreement, or a member's rate by message. A rate changes only through a new agreement.
+- Keep a PayPal webhook whose signature PayPal does not confirm.
 
 ## Measured
 
 Full numbers and run details are in [docs/EVIDENCE.md](docs/EVIDENCE.md).
 
-| What | Result |
-|---|---|
-| Pay-rule table: 40 cases worked out by hand before the engine was written | 40 / 40 |
-| Property tests on the settlement engine | 9,000 random cases: money conserved, capture never above the hold, deterministic |
-| Cover solver, development set (60 scenarios) | 55 of 55 placeable visits placed, 0 rules broken; "first free member" baseline: 68 of 86 placements break a rule |
-| Cover solver, held-out set (20 scenarios, labelled before the solver ran) | 20 of 20 placed, 0 rules broken; baseline: 26 of 29 break a rule |
-| Live PayPal sandbox day | 30 holds placed; three visits captured and paid out, including a partial capture with release; payouts final in 25 s |
-| Crash between capture and payout, on the sandbox | Retried once: 1 capture, 1 payout; PayPal refused a second capture and a second payout batch |
-| Self-attack: 13 hostile inputs (prompt injection, rate changes by message, forged webhook, dispute, crash) | 13 / 13 handled |
-| Accessibility: axe-core (WCAG 2.1 AA) on every screen of the end-to-end story | 0 violations |
-| Unit and integration tests | 76 passing; 4 browser tests drive the real UI in Chromium |
+| What | Result | Reproduce |
+|---|---|---|
+| Pay-rule table: 40 cases worked out by hand before the engine was written | 40 / 40 | `npm test` |
+| Property tests on the settlement engine | 9,000 random cases: money conserved, capture never above the hold, deterministic | `npm test` |
+| Mutation testing of the settlement engine | 143 of 154 mutants killed (92.86%) | Stryker, run once |
+| Cover solver, development set (60 scenarios) | 55 of 55 placeable visits placed, 0 rules broken; "first free member" baseline: 68 of 86 placements break a rule | `npm run eval` |
+| Cover solver, held-out set (20 scenarios, labelled before the solver ran) | 20 of 20 placed, 0 rules broken; baseline: 26 of 29 break a rule | `npx tsx eval/run.ts --heldout` |
+| Live demo day on the PayPal sandbox, in USD | 15 holds in 10 s; 2 captures including a partial capture with release; payouts final in 23.7 s and 25.5 s; 18 verified webhooks, 0 refused | `npx tsx scripts/walk.ts`, [docs/live-run.json](docs/live-run.json) |
+| Crash between capture and payout, on the live Cloudflare Workflows | Step retried: 1 capture, 1 payout; PayPal refused a second capture and a second payout batch | `npx tsx scripts/durability.ts`, [docs/durability-sandbox.json](docs/durability-sandbox.json) |
+| Self-attack: 13 hostile inputs (prompt injection, rate changes by message, forged webhook, dispute, crash) | 13 / 13 handled | `npx tsx scripts/self-attack.ts`, [docs/self-attack.json](docs/self-attack.json) |
+| Accessibility: axe-core (WCAG 2.1 AA) on every screen of the story, the board included | 0 violations | `npm run e2e`, [docs/axe-report.json](docs/axe-report.json) |
+| Tests | 356 unit and integration, in random order, with no network and no keys; 11 browser tests | `npm test`, `npm run e2e` |
+| Decision core coverage: pay rules, agreement checklist, solver, money tasks, visit actions, board data, runner | 97.7% of lines, 92% of branches | `npm run test:coverage` |
+
+Open the outputs without running anything: [examples/](examples/README.md) holds an income statement, a landlord's view and the evidence for a dispute.
+
+> [!IMPORTANT]
+> The cooperative, its members and households are fictional. Payments are real calls to the PayPal sandbox, with no real money. The agreement is a template built on the ordinance's list of fields, not legal advice.
 
 ## Run it
 
-Node 22 or later.
+Node 22.13 or later. No keys, no account:
 
 ```
 npm ci
@@ -140,40 +194,52 @@ npm run build
 npm start
 ```
 
-Open http://localhost:8787. With no keys, Covered runs the whole demo on a deterministic PayPal stand-in and the recorded model answers, with an embedded Postgres (PGlite) under `var/`.
+Open http://localhost:8787. With no keys, Covered runs the whole demo on a deterministic PayPal stand-in and the recorded model answers, with a SQLite file under `var/`.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Marc-Dvci/covered?quickstart=1)
+
+Or with Docker: `docker compose up demo`, then http://127.0.0.1:8787.
 
 To use the PayPal sandbox and Gemini, copy `.env.example` to `.env` and set:
 
 | Variable | Purpose |
 |---|---|
-| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Sandbox REST app with Vault and Payouts enabled |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Sandbox REST app with Vault, Payouts and Transaction Search enabled |
 | `COVERED_DEMO_VAULT_ID` | A sandbox payment token the demo households use for their holds |
-| `COVERED_SANDBOX_PAYOUTS` | Routes the fictional members' payouts to sandbox receivers, e.g. `*=PAYPAL:receiver@personal.example.com` |
+| `COVERED_SANDBOX_PAYOUTS` | Routes the fictional members' pay to a sandbox receiver, e.g. `*=PAYPAL:receiver@personal.example.com` |
 | `PAYPAL_WEBHOOK_ID` | The webhook id deliveries are verified against |
 | `GEMINI_API_KEY` | Google AI Studio key |
-| `DATABASE_URL` | Postgres in production |
 
 Checks:
 
 ```
-npm run typecheck
-npm test                         # unit, property, rule table, lifecycle, webhooks
+npm run lint && npm run format:check && npm run typecheck
+npm test                         # unit, property, rule table, API, lifecycle, webhooks
+npm run test:coverage            # the same, with coverage of the decision core
 npm run eval                     # cover solver on the development set
 npx tsx eval/run.ts --heldout    # held-out set
-npm run e2e                      # the demo story in Chromium, with axe-core
-npx tsx scripts/self-attack.ts   # hostile inputs, written to docs/self-attack.json
-npx tsx scripts/durability.ts    # crash between capture and payout, on the PayPal sandbox
+npm run build && npm run e2e     # the story and the board in Chromium, with axe-core
+npx tsx scripts/worker-smoke.ts  # the deployed shape in Cloudflare's own runtime, no account needed
 ```
 
-## Deploy on Render
+Against a deployment (`LIVE_URL`, and PayPal keys for the durability check):
 
-`render.yaml` is a Blueprint for the web service, the Postgres database and the cron job. The Workflow service is created next to it from the same repository:
+```
+npx tsx probe/probe.ts           # every PayPal step, reads probe/.env
+npx tsx scripts/walk.ts          # the story through the real UI
+npx tsx scripts/durability.ts    # crash between capture and payout
+npx tsx scripts/self-attack.ts   # hostile inputs
+```
 
-1. New Blueprint from this repository; fill the variables marked `sync: false`.
-2. New Workflow service from this repository, start command `node --import tsx server/workflows.ts`, slug `covered-workflows`, with the same `DATABASE_URL`, PayPal variables and `COVERED_DEMO_VAULT_ID`.
-3. Set `RENDER_API_KEY` on the web service and the cron job. The web service then starts `placeHold` and `settleVisit` as Workflow task runs, and the cron job starts `sweep` every 5 minutes.
+## Deploy on Cloudflare
 
-Without `RENDER_API_KEY`, the same tasks run in-process with the same retry policy (3 retries, 1 s, backoff 1.5).
+Free plan, with no credit card:
+
+```
+npx wrangler login
+npx wrangler secret bulk secrets.json      # the variables above
+npm run deploy                             # the Worker, then the Pages site in deploy/pages
+```
 
 ## Repository
 
@@ -182,40 +248,48 @@ Without `RENDER_API_KEY`, the same tasks run in-process with the same retry poli
 | `shared/rules/` | Pay-rule table (`cases.json`) and the settlement engine |
 | `shared/agreement.ts` | The agreement and the ordinance checklist |
 | `shared/seed.ts` | The fictional cooperative: 10 members, 36 households, one week of visits |
-| `server/tasks.ts`, `server/workflows.ts`, `server/runner.ts` | Money tasks, the Render Workflows entry point, the local runner |
+| `server/tasks.ts`, `server/runner.ts` | The money tasks and the in-process runner |
 | `server/paypal/` | Sandbox client (Server SDK + REST) and the deterministic stand-in |
 | `server/dispatch/` | Solver, cover agent, approval |
 | `server/agreements.ts`, `server/signup.ts` | Agreement drafting, read-back, signing and vaulting |
 | `server/statements.ts`, `server/evidence.ts` | Income statement, landlord link, dispute evidence |
-| `server/crud.ts` | The week in scheduler CrudManager format: resources, availability calendars, events with travel buffers |
+| `server/crud.ts` | The week in scheduler CrudManager format, and the drag guard's verdicts |
+| `worker/` | The deployed service: Workers entry, Workflows, the Durable Object ledger |
 | `eval/` | Cover scenarios, labels from an exhaustive oracle, results |
 | `web/` | React front end: board, member phone, household phone, sign-up, statement, evidence |
 | `tests/` | Vitest suites and the Playwright story |
+| `examples/` | Outputs of a run on the live site |
 
 ## Claims
 
 | Claim | Code | Checked by |
 |---|---|---|
 | Holds are placed only for visits inside the notice window | `server/tasks.ts` `dueForHold`, `placeHold` | `tests/lifecycle.test.ts` "places holds only for visits inside the notice window" |
-| A late cancellation captures the fee and releases the rest | `shared/rules/settle.ts`, `server/tasks.ts` `settleVisit` | `tests/lifecycle.test.ts`, `shared/rules/cases.json` (40 cases), `probe/RESULTS-EUR.md` |
+| A late cancellation captures the fee and releases the rest | `shared/rules/settle.ts`, `server/tasks.ts` `settleMoney` | `tests/lifecycle.test.ts` "charges the late-cancel fee inside the window and releases the rest", `shared/rules/cases.json` |
 | Money is conserved on every outcome | `shared/rules/settle.ts` | `tests/rules.test.ts` (9,000 random cases) |
-| A retried task never captures or pays twice | `server/tasks.ts`, `server/paypal/types.ts` `requestId` | `tests/lifecycle.test.ts` "survives a crash", `scripts/durability.ts` on the sandbox |
-| A demo reset moves real sandbox money again | `server/store.ts` `payRef` | `tests/lifecycle.test.ts` "moves real money again after a demo reset" |
+| A retried step never captures or pays twice | `server/tasks.ts`, `server/paypal/types.ts` `requestId` | `tests/lifecycle.test.ts` "survives a crash between capture and payout: one capture, one payout", `scripts/durability.ts` on the live site |
+| A demo reset moves real sandbox money again | `server/store.ts` `payRef` | `tests/lifecycle.test.ts` "moves real money again after a demo reset: PayPal ids carry the reset's run tag" |
 | The agent can only choose a plan the solver returned | `server/dispatch/agent.ts` `submit_plan` | `tests/agent.test.ts`, `scripts/self-attack.ts` |
 | The solver breaks no rule | `server/dispatch/solver.ts` | `eval/` (80 scenarios against an exhaustive oracle), CI |
-| A message with a number the tools did not give is not sent | `server/ai/gemini.ts` `numbersOk` | `tests/agent.test.ts` "number check" |
-| A translated read-back that changes a number is not shown | `server/agreements.ts` `keepsNumbers` | `tests/agent.test.ts` "read-back check" |
-| An agreement below the Seattle minimum or missing an ordinance field cannot be signed | `shared/agreement.ts` `missing` | `scripts/self-attack.ts`, `tests/e2e/story.spec.ts` |
+| The board refuses a member who cannot take the visit, and says why | `server/crud.ts` `guards`, `web/src/components/BoardScheduler.tsx` | `tests/e2e/board.spec.ts` "refuses a drag to a member who cannot take the visit, says why, and the bar stays", `tests/crud-extras.test.ts` |
+| A valid drag moves the visit on the server and keeps its hold | `server/actions.ts` `move` | `tests/e2e/board.spec.ts` "a valid drag moves the visit on the server and keeps its hold" |
+| A household's yes does not double-book a member | `server/actions.ts` `answerConsent` | `tests/regressions.test.ts` "a household's yes does not double-book a member who took another visit while it was asked" |
+| A checked-in visit cannot be released | `server/actions.ts` `noCover` | `tests/regressions.test.ts` "a checked-in visit cannot be released, so the member still gets paid at check-out" |
+| A signed agreement cannot be edited | `server/api.ts` | `tests/regressions.test.ts` "a signed agreement cannot be edited back to a draft" |
+| A message with a number the tools did not give is not sent | `server/ai/gemini.ts` `numbersOk` | `tests/agent.test.ts` "accepts numbers the tools gave and rejects invented ones" |
+| A translated read-back that changes a number is not shown | `server/agreements.ts` `keepsNumbers` | `tests/agent.test.ts` "rejects the live Portuguese answer that turned the $133.00 hold into $114.00" |
+| An agreement below the Seattle minimum or missing an ordinance field cannot be signed | `shared/agreement.ts` `missing` | `tests/shared.test.ts`, `scripts/self-attack.ts` |
 | A refused hold puts the visit at risk; the household saves PayPal again and the hold is placed | `server/tasks.ts`, `server/signup.ts` `startRepair`, `finishRepair` | `tests/lifecycle.test.ts` "holds again once the household saves PayPal again" |
-| Unverified PayPal webhooks are refused | `server/api.ts`, `server/paypal/sandbox.ts` `verifyWebhook` | `tests/webhook.test.ts` |
-| A dispute is answered from the ledger | `server/evidence.ts` | `tests/lifecycle.test.ts` "answers a dispute", `tests/e2e/story.spec.ts` |
-| The landlord link is signed, expires, and hides households | `server/statements.ts` `share`, `openShare`, `landlordView` | `tests/share.test.ts`, `tests/e2e/story.spec.ts` |
+| Unverified PayPal webhooks are refused | `server/api.ts`, `server/paypal/sandbox.ts` `verifyWebhook` | `tests/webhook.test.ts` "refuses a forged delivery and records the refusal" |
+| A dispute is answered from the ledger | `server/evidence.ts` | `tests/lifecycle.test.ts` "answers a dispute from the ledger: terms, attendance and every PayPal id" |
+| The landlord link is signed, expires, and hides households | `server/statements.ts` `share`, `openShare`, `landlordView` | `tests/share.test.ts` |
+| A visitor lands on a fresh week after a quiet spell, and a reset does not refill the daily allowances | `server/core.ts` `refreshIfIdle`, `server/store.ts` `reset` | `tests/core.test.ts` |
 | Every screen of the story passes axe-core | `web/` | `tests/e2e/story.spec.ts`, `docs/axe-report.json` |
 
-## Scope
+## Limits
 
-The cooperative, its members and households are fictional. Payments run on the PayPal sandbox. The agreement is a template built on the ordinance's list of fields, not legal advice. Demo data sent to the Gemini API free tier is fictional.
+PayPal's Transaction Search lists a payout some hours after it happens on the sandbox, so a line on a fresh statement shows its payout's transaction id until then. The sandbox pays PayPal receivers only. A visit's time stays as agreed: the board moves it between members, not along the day.
 
 ## Licence
 
-Apache-2.0
+Apache-2.0 for this repository. The board depends on Bryntum's packages from npm, under Bryntum's own licence.

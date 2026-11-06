@@ -37,7 +37,7 @@ const WEEK_PRESET = {
   displayDateFormat: "ddd HH:mm",
   headers: [
     { unit: "day", dateFormat: "ddd D MMM" },
-    { unit: "hour", increment: 3, dateFormat: "HH" },
+    { unit: "hour", renderer: (start: Date) => (start.getHours() % 3 === 1 ? String(start.getHours()).padStart(2, "0") : "") },
   ],
 };
 
@@ -129,7 +129,7 @@ export function BoardScheduler(props: Props) {
     else scheduler.clearEventSelection();
   }, [selected, scheduler]);
 
-  return <div className="board-scheduler" ref={host} role="region" aria-label="The week on the board" />;
+  return <div className={`board-scheduler view-${view.mode}`} ref={host} role="region" aria-label="The week on the board" />;
 }
 
 function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
@@ -140,7 +140,7 @@ function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
     startDate: new Date(2026, 10, 19),
     endDate: new Date(2026, 10, 20),
     viewPreset: DAY_PRESET as never,
-    rowHeight: 62,
+    rowHeight: 58,
     barMargin: 5,
     resourceMargin: 6,
     eventStyle: "plain" as never,

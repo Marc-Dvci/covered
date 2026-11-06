@@ -1,125 +1,114 @@
-// Walks the demo story through the real UI in headless Chromium and saves a screenshot per step.
-//   npx tsx scripts/walk.ts [baseUrl] [outDir] [scale]
-import { chromium, type Page } from "@playwright/test";
-import { mkdirSync } from "node:fs";
+// Walks Thursday's story through the real UI in headless Chromium, on the site named by LIVE_URL, and records what
+// happened in docs/live-run.json. Every PayPal call on the live site is a real sandbox call.
+//   LIVE_URL=https://covered-coop.pages.dev npx tsx scripts/walk.ts
+import { chromium } from "@playwright/test";
+import { writeFileSync } from "node:fs";
+import { hm } from "../shared/seed.ts";
 
-const base = process.argv[2] ?? "http://localhost:8787";
-const out = process.argv[3] ?? "var/walk";
-mkdirSync(out, { recursive: true });
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: Number(process.argv[4] ?? 1) });
-const errors: string[] = [];
-page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
-page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text()}`));
-let n = 0;
-const shot = async (name: string, p: Page = page) => {
-  n += 1;
-  await p.screenshot({ path: `${out}/${String(n).padStart(2, "0")}-${name}.png`, fullPage: true });
-  console.log("shot", name);
+const base = process.env.LIVE_URL ?? "http://localhost:8787";
+const THU = 3 * 1440;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+interface BoardView {
+  mode: Record<string, unknown>;
+  visits: {
+    id: string;
+    state: string;
+    hold: { cents: number; authorizationId: string } | null;
+    capture: { cents: number; captureId: string; feeCents?: number } | null;
+    settlement: { releaseCents: number; coopCents: number } | null;
+    payout: { status: string; batchId: string; finalMs?: number; items: { memberId: string; cents: number; transactionId?: string }[] } | null;
+  }[];
+  events: { type: string; visit_id: string | null; data: { verified?: boolean; type?: string } }[];
+}
+const board = async () => (await (await fetch(`${base}/api/board`)).json()) as BoardView;
+const post = async (path: string, body: unknown = {}) => {
+  const r = await fetch(base + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`${path}: HTTP ${r.status} ${await r.text()}`);
+  return r.json();
 };
-const post = (path: string, body: unknown = {}) =>
-  page.evaluate(
-    async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(),
-    [path, body] as const,
-  );
 
-await page.goto(`${base}/`);
-await post("/api/demo/reset");
-await shot("home");
-await page.goto(`${base}/board`);
-await page.waitForSelector(".bar");
-await shot("board-0710");
-await page.getByRole("button", { name: "Send as member" }).click();
-await page.getByRole("button", { name: "Find cover" }).waitFor();
-await shot("board-message");
 const t0 = Date.now();
+const reset = (await post("/api/demo/reset")) as { holdsStarted: number };
+let b = await board();
+while (b.visits.some((v) => v.state === "holding")) {
+  await sleep(1000);
+  b = await board();
+}
+const holdsSeconds = (Date.now() - t0) / 1000;
+const held = b.visits.filter((v) => v.state === "held");
+
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
+const errors: string[] = [];
+page.on("pageerror", (e) => errors.push(e.message));
+
+await page.goto(`${base}/board`);
+await page.locator('.b-sch-event-wrap[data-event-id="v-thu-okafor"]').waitFor();
+await page.getByRole("button", { name: "Send as member" }).click();
 await page.getByRole("button", { name: "Find cover" }).click();
-await page.getByRole("button", { name: "Approve and send" }).waitFor({ timeout: 120_000 });
-console.log("proposal in", Date.now() - t0, "ms");
-await page.getByText(/messages, in each person's language/).click();
-await shot("board-proposal");
+await page.getByRole("heading", { name: /Proposal: 3 of 3 covered/ }).waitFor({ timeout: 90_000 });
+const proposed = await page.locator(".bar-proposed").count();
 await page.getByRole("button", { name: "Approve and send" }).click();
-await page.waitForTimeout(2500);
-await shot("board-approved");
+await page.locator('.b-sch-event-wrap[data-event-id="v-thu-santos"][data-resource-id="teresa"]').waitFor();
 
 await page.goto(`${base}/h/okafor`);
-await page.getByRole("button", { name: "Yes, that's fine" }).waitFor();
-await shot("okafor-ask");
 await page.getByRole("button", { name: "Yes, that's fine" }).click();
-await page.waitForTimeout(1500);
-await shot("okafor-after");
+await page.getByText("Marek Nowak").first().waitFor();
 
-const clockTo = (hhmm: string) => post("/api/clock", { at: 3 * 1440 + Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) });
-const tap = async (visit: string, label: string) => {
-  await page.locator(`[data-visit="${visit}"]`).getByRole("button", { name: label }).click();
-  await page.waitForTimeout(1500);
-};
-
-await clockTo("09:00");
+await post("/api/clock", { at: THU + hm("09:00") });
 await page.goto(`${base}/m/marek`);
-await page.waitForSelector('[data-visit="v-thu-okafor"]');
-await tap("v-thu-okafor", "Rozpocznij");
-await shot("marek-checked-in");
+await page.locator('[data-visit="v-thu-okafor"]').getByRole("button", { name: "Rozpocznij" }).click();
+await post("/api/clock", { at: THU + hm("13:05") });
+await sleep(500);
+const tCheckout = Date.now();
+await page.locator('[data-visit="v-thu-okafor"]').getByRole("button", { name: "Zakończ" }).click();
+await page.locator('[data-visit="v-thu-okafor"]').getByText("Zapłacone").waitFor({ timeout: 120_000 });
+const checkoutToPaid = (Date.now() - tCheckout) / 1000;
 
-await clockTo("11:30");
+await post("/api/clock", { at: THU + hm("13:30") });
 await page.goto(`${base}/h/lindqvist`);
 await page.locator('[data-visit="v-thu-lindqvist"]').getByRole("button", { name: "Cancel…" }).click();
-await page.getByRole("button", { name: "Cancel the visit" }).waitFor();
-await shot("lindqvist-preview");
 await page.getByRole("button", { name: "Cancel the visit" }).click();
-await page.waitForTimeout(5000);
-await shot("lindqvist-receipt");
-
-await clockTo("13:05");
-await page.goto(`${base}/m/marek`);
-await page.waitForSelector('[data-visit="v-thu-okafor"]');
-await tap("v-thu-okafor", "Zakończ");
-await page.waitForTimeout(5000);
-await shot("marek-paid");
-
-await clockTo("14:00");
-await page.goto(`${base}/m/teresa`);
-await page.waitForSelector('[data-visit="v-thu-santos"]');
-await tap("v-thu-santos", "Entrada");
-await clockTo("16:04");
-await page.waitForTimeout(2000);
-await tap("v-thu-santos", "Saída");
-await page.waitForTimeout(5000);
-await shot("teresa-paid");
-
-await page.goto(`${base}/h/okafor`);
-await page.waitForTimeout(2000);
-await shot("okafor-receipt");
-await page.goto(`${base}/board`);
-await page.waitForTimeout(2500);
-await shot("board-afternoon");
-await page.goto(`${base}/evidence/v-thu-okafor`);
-await page.getByText("Member checked in at the door").waitFor();
-await shot("evidence");
-await page.goto(`${base}/m/teresa/statement`);
-await page.waitForSelector("table");
-await page.waitForTimeout(1500);
-await page.getByRole("button", { name: "Make a link for a landlord" }).click();
-const link = await page.locator("a[href*='/s/']").getAttribute("href");
-await shot("statement");
-await page.goto(link!);
-await page.waitForSelector("table");
-await shot("landlord");
-
-await page.goto(`${base}/join`);
-await page.getByRole("button", { name: "Draft the agreement" }).click();
-await page.getByRole("heading", { name: "Draft agreement" }).waitFor({ timeout: 120_000 });
-await page.waitForTimeout(500);
-await shot("join-draft");
-const sign = page.getByRole("button", { name: "Sign and save PayPal" });
-if (await sign.isEnabled()) {
-  await sign.click();
-  await page.waitForURL(/\/h\//, { timeout: 60_000 });
-  await page.waitForTimeout(1500);
-  await shot("join-welcome");
-}
-await page.goto(`${base}/about`);
-await page.waitForTimeout(1500);
-await shot("about");
-console.log(errors.length ? errors.join("\n") : "no page errors");
+await page
+  .getByText(/late-cancel fee/)
+  .first()
+  .waitFor({ timeout: 120_000 });
 await browser.close();
+
+await sleep(20_000); // PayPal's webhook deliveries arrive on their own time
+b = await board();
+const money = (id: string) => {
+  const v = b.visits.find((x) => x.id === id)!;
+  return {
+    visit: id,
+    state: v.state,
+    heldCents: v.hold?.cents,
+    authorization: v.hold?.authorizationId,
+    capturedCents: v.capture?.cents,
+    capture: v.capture?.captureId,
+    paypalFeeCents: v.capture?.feeCents,
+    releasedCents: v.settlement?.releaseCents,
+    cooperativeCents: v.settlement?.coopCents,
+    payoutBatch: v.payout?.batchId,
+    payoutStatus: v.payout?.status,
+    payoutFinalMs: v.payout?.finalMs,
+    paidCents: v.payout?.items[0]?.cents,
+    payoutTransaction: v.payout?.items[0]?.transactionId,
+  };
+};
+const out = {
+  ranAt: new Date().toISOString(),
+  site: base,
+  mode: b.mode,
+  holds: { started: reset.holdsStarted, held: held.length, seconds: Math.round(holdsSeconds) },
+  proposedBars: proposed,
+  checkoutToPaidSeconds: Math.round(checkoutToPaid),
+  visits: [money("v-thu-okafor"), money("v-thu-lindqvist")],
+  verifiedWebhooksInTheLast40Events: b.events.filter((e) => e.type === "paypal.webhook" && e.data.verified).length,
+  refusedWebhooksInTheLast40Events: b.events.filter((e) => e.type === "paypal.webhook_rejected").length,
+  pageErrors: errors,
+};
+writeFileSync("docs/live-run.json", `${JSON.stringify(out, null, 1)}\n`);
+console.log(JSON.stringify(out, null, 1));
+process.exit(errors.length ? 1 : 0);

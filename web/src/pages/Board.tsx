@@ -466,7 +466,9 @@ function VisitPanel({
           Close
         </button>
       </div>
-      <span className={`chip s-${visit.state}`}>{STATE_LABEL[visit.state]}</span>
+      <span className={`chip s-${visit.state}`} style={{ justifySelf: "start" }}>
+        {STATE_LABEL[visit.state]}
+      </span>
       <dl className="kv">
         <dt>When</dt>
         <dd>

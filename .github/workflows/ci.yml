@@ -1,5 +1,9 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -9,14 +13,58 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
+      - run: npm run format:check
+      - run: npm run lint
       - run: npm run typecheck
-      - run: npm test
-      - name: Cover evaluation (development set) is reproduced exactly
+      - run: npm run test:coverage -- --reporter=default --reporter=json --outputFile.json=test-results.json
+      - name: Cover evaluation is reproduced exactly on both sets
         run: |
-          cp eval/disruptions/results.json /tmp/before.json
+          for set in disruptions heldout; do cp eval/$set/results.json /tmp/$set-before.json; done
           npx tsx eval/run.ts
-          node -e "const a=require('/tmp/before.json'),b=require('./eval/disruptions/results.json');for(const k of Object.keys(a))if(!k.startsWith('solverMs')&&a[k]!==b[k]){console.error(k,a[k],b[k]);process.exit(1)}"
+          npx tsx eval/run.ts --heldout
+          for set in disruptions heldout; do
+            node -e "const a=require('/tmp/$set-before.json'),b=require('./eval/$set/results.json');for(const k of Object.keys(a))if(!k.startsWith('solverMs')&&JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error('$set',k,a[k],b[k]);process.exit(1)}"
+          done
+      - run: npx tsx scripts/check-links.ts
+      - run: pipx run codespell README.md docs/EVIDENCE.md docs/SYSTEM_CARD.md SECURITY.md server shared web/src worker tests
+      - name: Summary
+        if: always()
+        run: npx tsx scripts/ci-summary.ts >> "$GITHUB_STEP_SUMMARY"
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
+  worker:
+    # the deployed shape: Worker, Durable Object ledger and Workflows, run locally in Cloudflare's own runtime
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx tsx scripts/worker-smoke.ts
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t covered .
+      - name: The image starts and answers
+        run: |
+          docker run -d --name covered -p 127.0.0.1:8787:8787 covered
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8787/api/health && break || sleep 2; done
+          curl -fsS http://127.0.0.1:8787/api/board | grep -q '"visits"'
+          curl -fsS http://127.0.0.1:8787/ | grep -q 'Covered'
+          test "$(docker exec covered id -un)" = "node"
+          docker exec covered sh -c 'test ! -e /app/.env'
+          docker stop covered

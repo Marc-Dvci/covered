@@ -1,0 +1,27 @@
+# A smoke test of the live demo during judging, with its own badge. It only reads the live site, and it writes
+# nothing to the repository. After the results date the job ends at once, so stopping the demo later never turns
+# the badge red.
+name: live
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"
+permissions:
+  contents: read
+env:
+  LIVE_URL: https://covered-coop.pages.dev
+  RESULTS_DATE: "2026-12-21"
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: The live demo answers
+        run: |
+          if [ "$(date -u +%F)" \> "$RESULTS_DATE" ]; then echo "Past the results date."; exit 0; fi
+          curl -fsS --retry 3 --retry-delay 20 --max-time 60 "$LIVE_URL/api/health" | tee /tmp/health.json
+          grep -q '"paypal":"sandbox"' /tmp/health.json
+          grep -q '"runner":"cloudflare"' /tmp/health.json
+          curl -fsS --max-time 60 "$LIVE_URL/" | grep -q '<title>Covered'
+          curl -fsS --max-time 60 "$LIVE_URL/board" | grep -q '<title>Covered'
+          curl -fsS --max-time 60 "$LIVE_URL/api/board" | grep -q '"resources"'
+          curl -fsS --max-time 60 "$LIVE_URL/api/board/guards?day=3" | grep -q '"ok"'

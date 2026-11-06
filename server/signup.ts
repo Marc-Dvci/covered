@@ -1,6 +1,7 @@
 // Signing an agreement: the household saves its PayPal once (Vault), becomes a client of the
 // cooperative, and its first visit lands on the board with the member the solver finds for it.
 import { randomUUID } from "node:crypto";
+import { ActionError } from "./actions.ts";
 import { missing, type Agreement } from "../shared/agreement.ts";
 import { DEFAULT_TERMS, type Household, type Visit } from "../shared/domain.ts";
 import { hm } from "../shared/seed.ts";
@@ -20,8 +21,8 @@ export const SIGNUP_AREAS = Object.keys(AREA_POINTS);
 export async function startSigning(store: Store, paypal: PayPal, agreementId: string, publicUrl: string): Promise<{ approveUrl: string; householdId: string }> {
   const r = await store.db.query<{ data: Agreement; status: string }>("select data, status from agreements where id = $1", [agreementId]);
   const a = r[0]?.data;
-  if (!a) throw new Error("no such agreement");
-  if (missing(a).length) throw new Error("the agreement is not complete");
+  if (!a) throw new ActionError("no such agreement", 404);
+  if (missing(a).length) throw new ActionError("the agreement is not complete");
   const base = a.householdName.toLowerCase().replace(/^the\s+/, "").replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "") || "household";
   let householdId = base;
   for (let i = 2; await store.household(householdId); i++) householdId = `${base}-${i}`;
@@ -41,9 +42,9 @@ export async function startSigning(store: Store, paypal: PayPal, agreementId: st
 export async function finishSigning(store: Store, paypal: PayPal, agreementId: string, setupTokenId: string): Promise<{ householdId: string; visitId: string | null; memberId: string | null }> {
   const r = await store.db.query<{ data: Agreement; household_id: string; status: string }>("select data, household_id, status from agreements where id = $1", [agreementId]);
   const row = r[0];
-  if (!row) throw new Error("no such agreement");
+  if (!row) throw new ActionError("no such agreement", 404);
   const expected = await store.kvGet<string>(`setup:${agreementId}`);
-  if (expected && expected !== setupTokenId) throw new Error("this approval belongs to another agreement");
+  if (expected && expected !== setupTokenId) throw new ActionError("this approval belongs to another agreement", 403);
   if (row.status === "signed") {
     const v = (await store.visits()).find((x) => x.householdId === row.household_id);
     return { householdId: row.household_id, visitId: v?.id ?? null, memberId: v?.memberIds[0] ?? null };

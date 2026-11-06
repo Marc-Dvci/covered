@@ -1,0 +1,16 @@
+# docker compose up demo             no keys: the deterministic demo on http://127.0.0.1:8787
+# docker compose --profile app up    your keys from .env
+services:
+  demo:
+    build: { context: ., target: demo }
+    ports: ["127.0.0.1:8787:8787"]
+    volumes: ["covered-demo:/app/var"]
+  app:
+    profiles: [app]
+    build: { context: ., target: app }
+    env_file: .env
+    ports: ["127.0.0.1:8788:8787"]
+    volumes: ["covered-app:/app/var"]
+volumes:
+  covered-demo:
+  covered-app:

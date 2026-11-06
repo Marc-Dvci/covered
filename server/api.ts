@@ -241,8 +241,9 @@ export function routes(server: Hono, app: App, ai: Gemini) {
 
   server.post("/api/agreements/:id/update", wrap(async (c) => {
     const agreementId = id(c);
-    const r = (await app.store.db.query<{ data: Agreement & { _draft?: { transcript: string | null; notes: string[]; source: string; memberLanguage: Lang } } }>("select data from agreements where id = $1", [agreementId]))[0];
+    const r = (await app.store.db.query<{ status: string; data: Agreement & { _draft?: { transcript: string | null; notes: string[]; source: string; memberLanguage: Lang } } }>("select data, status from agreements where id = $1", [agreementId]))[0];
     if (!r) return c.json({ error: "no such agreement" }, 404);
+    if (r.status === "signing" || r.status === "signed") return c.json({ error: "a signed agreement changes only through a new agreement" }, 409);
     const patch = z.record(z.string(), z.unknown()).parse(await json(c));
     const { _draft, ...current } = r.data;
     const allowed = ["scope", "location", "schedule", "rateCentsPerHour", "cancellation", "needs", "sameCleaner", "area"];

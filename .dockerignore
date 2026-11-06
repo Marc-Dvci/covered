@@ -1,6 +1,11 @@
-node_modules
-dist
-var
-.env
-probe/.env
-.git
+# Allowlist: ignore everything, then name what the image needs.
+*
+!package.json
+!package-lock.json
+!tsconfig.json
+!vite.config.ts
+!web
+!shared
+!eval
+!server
+!data

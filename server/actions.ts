@@ -92,7 +92,8 @@ export async function lockout(c: Ctx, id: string, memberId: string): Promise<Vis
 
 export async function noCover(c: Ctx, id: string, actor: string): Promise<VisitRow> {
   const v = await need(c.store, id);
-  if (["settling", "captured", "paid_out", "cancelled", "voided", "late_cancel"].includes(v.state)) throw new ActionError(`visit is ${v.state}`);
+  // only before the work starts: a checked-in member gets paid at check-out, never released
+  if (!["scheduled", "held", "at_risk"].includes(v.state)) throw new ActionError(`cannot release a visit that is ${v.state.replace("_", " ")}`);
   const out = await c.store.updateVisit(id, { state: "settling", outcome: { type: "member_absent" } });
   await c.store.event("visit.no_cover", id, actor);
   await c.runner.start("settleVisit", id);
@@ -103,8 +104,8 @@ export async function noCover(c: Ctx, id: string, actor: string): Promise<VisitR
 export async function canMove(c: Ctx, id: string, memberId: string, start?: number): Promise<{ ok: boolean; reasons: string[]; consent: boolean; hold: string }> {
   const v = await need(c.store, id);
   const [members, households, visits] = await Promise.all([c.store.members(), c.store.households(), c.store.visits()]);
-  if (["settling", "captured", "paid_out", "cancelled", "voided", "late_cancel", "in_progress"].includes(v.state)) {
-    return { ok: false, reasons: [`the visit is ${v.state.replace("_", " ")}`], consent: false, hold: holdText(v) };
+  if (["done", "settling", "captured", "paid_out", "cancelled", "voided", "late_cancel", "in_progress"].includes(v.state)) {
+    return { ok: false, reasons: [`the visit is ${v.state === "done" ? "over" : v.state.replace("_", " ")}`], consent: false, hold: holdText(v) };
   }
   const moved = visits.map((x) => (x.id === id ? { ...x, memberIds: [], start: start ?? x.start } : x));
   const absences = (await activeAbsences(c.store)).map((a) => ({ memberId: a.memberId, from: a.from, to: a.to }));
@@ -149,6 +150,12 @@ export async function answerConsent(c: Ctx, id: string, householdId: string, app
     const out = await c.store.updateVisit(id, { pendingMember: null });
     await c.store.event("visit.consent_declined", id, householdId, { memberId: v.pendingMember });
     return out;
+  }
+  const check = await canMove(c, id, v.pendingMember);
+  if (!check.ok) {
+    await c.store.updateVisit(id, { pendingMember: null });
+    await c.store.event("visit.consent_stale", id, householdId, { memberId: v.pendingMember, reasons: check.reasons });
+    throw new ActionError(`this member can no longer take the visit: ${check.reasons.join("; ")}`);
   }
   const out = await c.store.updateVisit(id, { memberIds: [v.pendingMember], pendingMember: null });
   await c.store.event("visit.consent_given", id, householdId, { memberId: v.pendingMember });

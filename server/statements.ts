@@ -2,6 +2,7 @@
 // through PayPal, matched against PayPal's Transaction Search by transaction id. The landlord view shows
 // months, visit counts, hours and totals, never household names or addresses.
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { ActionError } from "./actions.ts";
 import { dollars, WEEK_DAYS } from "../shared/domain.ts";
 import { WEEK_START_ISO } from "../shared/seed.ts";
 import { AIUnavailable, numbersOk, type Gemini } from "./ai/gemini.ts";
@@ -42,7 +43,7 @@ export function boardDate(t: number): string {
 export async function statement(store: Store, paypal: PayPal, memberId: string): Promise<Statement> {
   const [members, households, visits] = await Promise.all([store.members(), store.households(), store.visits()]);
   const m = members.find((x) => x.id === memberId);
-  if (!m) throw new Error("no such member");
+  if (!m) throw new ActionError("no such member", 404);
   // fill transaction ids PayPal had not assigned when the payout task finished
   for (const v of visits) {
     if (!v.payout?.batchId || !v.payout.items.some((i) => !i.transactionId)) continue;

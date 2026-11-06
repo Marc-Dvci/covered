@@ -1,0 +1,11 @@
+* text=auto
+*.sh text eol=lf
+*.png binary
+*.gif binary
+*.jpg binary
+*.mp3 binary
+data/ai-recordings.json linguist-generated
+docs/*.json linguist-generated
+eval/disruptions/*.json linguist-generated
+eval/heldout/*.json linguist-generated
+shared/rules/cases.json linguist-documentation

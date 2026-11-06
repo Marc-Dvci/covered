@@ -29,14 +29,18 @@ import {
 } from "./types.ts";
 
 const BASE = "https://api-m.sandbox.paypal.com";
+const REQUEST_TIMEOUT_MS = 30_000;
+
+/** The SDK controllers for one call. */
+interface Api {
+  orders: OrdersController;
+  payments: PaymentsController;
+  vault: VaultController;
+  search: TransactionSearchController;
+}
 
 export class SandboxPayPal implements PayPal {
   readonly live = true;
-  private client: Client;
-  private orders: OrdersController;
-  private payments: PaymentsController;
-  private vault: VaultController;
-  private search: TransactionSearchController;
   private token?: { value: string; until: number };
 
   constructor(
@@ -44,27 +48,46 @@ export class SandboxPayPal implements PayPal {
     private secret: string,
     readonly currency = "USD",
     private brand = "Covered cooperative",
-  ) {
-    this.client = new Client({
-      clientCredentialsAuthCredentials: { oAuthClientId: clientId, oAuthClientSecret: secret },
+    /** An axios adapter in place of the network, for tests (the SDK's own seam). */
+    private transport?: { adapter: unknown },
+  ) {}
+
+  /**
+   * A new SDK client per call, seeded with a token kept here as a plain value. The SDK keeps one shared token
+   * promise per client, so a long-lived client would stay broken after one failed token request, and on
+   * Cloudflare Workers that promise would also cross from one request to another.
+   */
+  private async api(): Promise<Api> {
+    const accessToken = await this.bearer();
+    const client = new Client({
+      clientCredentialsAuthCredentials: {
+        oAuthClientId: this.clientId,
+        oAuthClientSecret: this.secret,
+        oAuthToken: { accessToken, tokenType: "Bearer", expiry: BigInt(Math.floor(this.token!.until / 1000)) },
+      },
       environment: Environment.Sandbox,
-      // the generated default is 0, which means no timeout at all. SDK retries stay at their generated
-      // default (off): the workflow retries the whole task, and the request ids make that safe
-      timeout: 30_000,
+      // the generated default is 0, which means no timeout at all. SDK retries stay off: the workflow
+      // retries the whole step, retry layers multiply, and the request ids make the retry safe
+      timeout: REQUEST_TIMEOUT_MS,
+      httpClientOptions: { retryConfig: { maxNumberOfRetries: 0 } },
+      ...(this.transport ? { unstable_httpClientOptions: this.transport } : {}),
     });
-    this.orders = new OrdersController(this.client);
-    this.payments = new PaymentsController(this.client);
-    this.vault = new VaultController(this.client);
-    this.search = new TransactionSearchController(this.client);
+    return {
+      orders: new OrdersController(client),
+      payments: new PaymentsController(client),
+      vault: new VaultController(client),
+      search: new TransactionSearchController(client),
+    };
   }
 
   private money(cents: number) {
     return { currencyCode: this.currency, value: toAmount(cents) };
   }
 
-  private async sdk<T>(op: string, fn: () => Promise<{ result: T }>): Promise<T> {
+  private async sdk<T>(op: string, fn: (api: Api) => Promise<{ result: T }>): Promise<T> {
+    const api = await this.api();
     try {
-      return (await fn()).result;
+      return (await fn(api)).result;
     } catch (e) {
       if (e instanceof ApiError) {
         let issue = "UNKNOWN";
@@ -102,15 +125,15 @@ export class SandboxPayPal implements PayPal {
         },
       },
     } as unknown as SetupTokenRequest;
-    const r = await this.sdk("vault setup", () => this.vault.createSetupToken({ body, paypalRequestId: requestId("setup", ref) }));
+    const r = await this.sdk("vault setup", (api) => api.vault.createSetupToken({ body, paypalRequestId: requestId("setup", ref) }));
     const approve = r.links?.find((l) => l.rel === "approve")?.href;
     if (!r.id || !approve) throw new PayPalError("vault setup", 500, "NO_APPROVE_LINK");
     return { setupTokenId: r.id, approveUrl: approve };
   }
 
   async vaultFinalize(setupTokenId: string, ref: string): Promise<VaultToken> {
-    const r = await this.sdk("vault token", () =>
-      this.vault.createPaymentToken({
+    const r = await this.sdk("vault token", (api) =>
+      api.vault.createPaymentToken({
         body: { paymentSource: { token: { id: setupTokenId, type: "SETUP_TOKEN" as never } } },
         paypalRequestId: requestId("token", ref),
       }),
@@ -138,8 +161,8 @@ export class SandboxPayPal implements PayPal {
         },
       },
     } as unknown as OrderRequest;
-    const order = await this.sdk("authorize", () =>
-      this.orders.createOrder({ body, paypalRequestId: requestId("hold", ref), prefer: "return=representation" }),
+    const order = await this.sdk("authorize", (api) =>
+      api.orders.createOrder({ body, paypalRequestId: requestId("hold", ref), prefer: "return=representation" }),
     );
     const auth = order.purchaseUnits?.[0]?.payments?.authorizations?.[0];
     if (!order.id || !auth?.id) throw new PayPalError("authorize", 422, `ORDER_${order.status ?? "UNKNOWN"}`);
@@ -147,8 +170,8 @@ export class SandboxPayPal implements PayPal {
   }
 
   async capture(authorizationId: string, cents: number, ref: string, invoiceId: string, final: boolean): Promise<Capture> {
-    const r = await this.sdk("capture", () =>
-      this.payments.captureAuthorizedPayment({
+    const r = await this.sdk("capture", (api) =>
+      api.payments.captureAuthorizedPayment({
         authorizationId,
         paypalRequestId: requestId("capture", ref),
         prefer: "return=representation",
@@ -166,8 +189,8 @@ export class SandboxPayPal implements PayPal {
   }
 
   async void(authorizationId: string, ref: string): Promise<{ status: string }> {
-    const r = await this.sdk("void", () =>
-      this.payments.voidPayment({ authorizationId, paypalRequestId: requestId("void", ref), prefer: "return=representation" }),
+    const r = await this.sdk("void", (api) =>
+      api.payments.voidPayment({ authorizationId, paypalRequestId: requestId("void", ref), prefer: "return=representation" }),
     );
     return { status: String((r as { status?: string } | undefined)?.status ?? "VOIDED") };
   }
@@ -183,6 +206,7 @@ export class SandboxPayPal implements PayPal {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "grant_type=client_credentials",
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     if (!res.ok) throw new PayPalError("oauth", res.status, "TOKEN");
     const j = (await res.json()) as { access_token: string; expires_in: number };
@@ -196,7 +220,12 @@ export class SandboxPayPal implements PayPal {
       "Content-Type": "application/json",
     };
     if (rid) headers["PayPal-Request-Id"] = rid;
-    const res = await fetch(`${BASE}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    const res = await fetch(`${BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
     const text = await res.text();
     const j = text ? (JSON.parse(text) as Record<string, unknown>) : {};
     if (!res.ok) {
@@ -248,8 +277,8 @@ export class SandboxPayPal implements PayPal {
   async transactions(startIso: string, endIso: string): Promise<TxnRecord[]> {
     const out: TxnRecord[] = [];
     for (let page = 1; page <= 20; page++) {
-      const r = await this.sdk("transaction search", () =>
-        this.search.searchTransactions({ startDate: startIso, endDate: endIso, fields: "transaction_info", pageSize: 500, page }),
+      const r = await this.sdk("transaction search", (api) =>
+        api.search.searchTransactions({ startDate: startIso, endDate: endIso, fields: "transaction_info", pageSize: 500, page }),
       );
       for (const d of r.transactionDetails ?? []) {
         const t = d.transactionInfo;

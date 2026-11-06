@@ -73,13 +73,20 @@ export function label(world: World, s: Scenario): Labels {
   const feasible: Record<string, string[]> = {};
   for (const v of affected) {
     feasible[v.id] = world.members
-      .filter((m) => violations(world, base.map((x) => (x.id === v.id ? { ...x, memberIds: [m.id] } : x)), s.absent).length === 0)
+      .filter(
+        (m) =>
+          violations(
+            world,
+            base.map((x) => (x.id === v.id ? { ...x, memberIds: [m.id] } : x)),
+            s.absent,
+          ).length === 0,
+      )
       .map((m) => m.id);
   }
   let maxCovered = 0;
   let minConsent = Infinity;
   let optimalPlans = 0;
-  const choice: (string | null)[] = new Array(affected.length).fill(null);
+  const choice: (string | null)[] = Array.from({ length: affected.length }, () => null);
   const options = [null, ...world.members.map((m) => m.id)];
   const walk = (i: number) => {
     if (i === affected.length) {

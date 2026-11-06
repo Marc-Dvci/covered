@@ -40,7 +40,21 @@ function consentBroken(as: Assignment[], s: Scenario): number {
 }
 
 const rows: string[] = [];
-const tot = { affected: 0, oracle: 0, solver: 0, solverAtMax: 0, solverViol: 0, solverConsentAsked: 0, minConsent: 0, base: 0, baseViolVisits: 0, baseConsentUnasked: 0, healthyProposals: 0, ms: 0, explored: 0 };
+const tot = {
+  affected: 0,
+  oracle: 0,
+  solver: 0,
+  solverAtMax: 0,
+  solverViol: 0,
+  solverConsentAsked: 0,
+  minConsent: 0,
+  base: 0,
+  baseViolVisits: 0,
+  baseConsentUnasked: 0,
+  healthyProposals: 0,
+  ms: 0,
+  explored: 0,
+};
 for (const raw of stored) {
   const s = rebuild(raw);
   const l = labels.get(s.id)!;
@@ -53,7 +67,13 @@ for (const raw of stored) {
   const sv = violations(world, apply(s, plan), s.absent);
   const base = firstFree(input);
   const bv = violations(world, apply(s, base), s.absent);
-  const baseBadVisits = new Set(bv.map((x) => x.split(":")[0]!.split("+")).flat().filter((id) => s.affected.includes(id))).size + consentBroken(base, s);
+  const baseBadVisits =
+    new Set(
+      bv
+        .map((x) => x.split(":")[0]!.split("+"))
+        .flat()
+        .filter((id) => s.affected.includes(id)),
+    ).size + consentBroken(base, s);
   const covered = plan.filter((a) => a.memberId).length;
   tot.affected += s.affected.length;
   tot.oracle += l.maxCovered;
@@ -68,7 +88,9 @@ for (const raw of stored) {
   if (s.kind === "healthy") tot.healthyProposals += plan.length;
   tot.ms += ms;
   tot.explored += r.explored;
-  rows.push(`| ${s.id} | ${s.kind} | ${s.affected.length} | ${l.maxCovered} | ${covered} | ${sv.length} | ${best?.consent ?? 0}/${l.minConsent} | ${base.filter((a) => a.memberId).length} | ${baseBadVisits} | ${ms.toFixed(1)} |`);
+  rows.push(
+    `| ${s.id} | ${s.kind} | ${s.affected.length} | ${l.maxCovered} | ${covered} | ${sv.length} | ${best?.consent ?? 0}/${l.minConsent} | ${base.filter((a) => a.memberId).length} | ${baseBadVisits} | ${ms.toFixed(1)} |`,
+  );
 }
 
 const n = stored.length;

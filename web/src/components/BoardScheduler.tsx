@@ -24,12 +24,21 @@ const atDay = (weekStart: string, day: number, hour: number) => {
 };
 
 const DAY_PRESET = {
-  id: "covered-day", base: "hourAndDay", tickWidth: 70, displayDateFormat: "HH:mm",
+  id: "covered-day",
+  base: "hourAndDay",
+  tickWidth: 70,
+  displayDateFormat: "HH:mm",
   headers: [{ unit: "hour", dateFormat: "HH:mm" }],
 };
 const WEEK_PRESET = {
-  id: "covered-week", base: "hourAndDay", tickWidth: 18, displayDateFormat: "ddd HH:mm",
-  headers: [{ unit: "day", dateFormat: "ddd D MMM" }, { unit: "hour", increment: 3, dateFormat: "HH" }],
+  id: "covered-week",
+  base: "hourAndDay",
+  tickWidth: 18,
+  displayDateFormat: "ddd HH:mm",
+  headers: [
+    { unit: "day", dateFormat: "ddd D MMM" },
+    { unit: "hour", increment: 3, dateFormat: "HH" },
+  ],
 };
 
 /** Nights are not part of a cooperative's day: the axis shows only 07:00 to 19:00, on the day and on the week. */
@@ -100,18 +109,18 @@ export function BoardScheduler(props: Props) {
     };
   }, [dataKey, guardDay]);
 
-  const viewKey = view.mode === "day" ? `day-${view.day}` : "week";
+  const spanDay = view.mode === "day" ? view.day : null;
   useEffect(() => {
     if (!scheduler) return;
-    if (view.mode === "day") {
+    if (spanDay !== null) {
       scheduler.viewPreset = DAY_PRESET as never;
-      scheduler.setTimeSpan(atDay(board.weekStart, view.day, 0), atDay(board.weekStart, view.day + 1, 0));
+      scheduler.setTimeSpan(atDay(board.weekStart, spanDay, 0), atDay(board.weekStart, spanDay + 1, 0));
     } else {
       scheduler.viewPreset = WEEK_PRESET as never;
       scheduler.setTimeSpan(atDay(board.weekStart, 0, 0), atDay(board.weekStart, 6, 0));
     }
     scheduler.refreshRows();
-  }, [viewKey, board.weekStart, scheduler]);
+  }, [spanDay, board.weekStart, scheduler]);
 
   useEffect(() => {
     if (!scheduler) return;
@@ -155,7 +164,13 @@ function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
       } as never,
     ],
 
-    eventRenderer: ({ eventRecord, renderData }: { eventRecord: EventModel; renderData: { iconCls: unknown; wrapperCls: unknown; role?: string; ariaLabel?: string } }) => {
+    eventRenderer: ({
+      eventRecord,
+      renderData,
+    }: {
+      eventRecord: EventModel;
+      renderData: { iconCls: unknown; wrapperCls: unknown; role?: string; ariaLabel?: string };
+    }) => {
       renderData.iconCls = "";
       // a grid's row group may hold rows only: the bars are the cells of the canvas's row (see below)
       renderData.role = "gridcell";
@@ -195,11 +210,21 @@ function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
           const visitId = visitIdOf(eventRecords[0]!);
           const to = String(newResource.id);
           if (to === NEEDS_COVER) return { valid: false, message: "Release the hold from the visit's panel instead" };
-          if (now().board.visits.find((x) => x.id === visitId)?.memberIds.includes(to)) return { valid: true, message: "" };
+          if (
+            now()
+              .board.visits.find((x) => x.id === visitId)
+              ?.memberIds.includes(to)
+          )
+            return { valid: true, message: "" };
           const g = verdicts(visitId)[to];
           if (!g) return { valid: false, message: "Checking…" };
           if (!g.ok) return { valid: false, message: `${memberName(to)}: ${g.reasons.join("; ")}` };
-          return { valid: true, message: g.consent ? `${memberName(to)} fits. The household asked for the same cleaner, so they are asked first.` : `${memberName(to)} fits. The hold stays with the visit.` };
+          return {
+            valid: true,
+            message: g.consent
+              ? `${memberName(to)} fits. The household asked for the same cleaner, so they are asked first.`
+              : `${memberName(to)} fits. The hold stays with the visit.`,
+          };
         },
       },
       eventTooltip: {
@@ -236,7 +261,11 @@ function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
       },
       beforeEventDrag: ({ eventRecord }: { eventRecord: EventModel }) => eventRecord.get("kind") === "visit" && eventRecord.get("draggable") !== false,
       // the server has the last word: it checks again, then moves the visit or refuses
-      beforeEventDropFinalize: ({ context }: { context: { async: boolean; finalize: (ok: boolean) => void; eventRecord: EventModel; newResource: ResourceModel; resourceRecord?: ResourceModel } }) => {
+      beforeEventDropFinalize: ({
+        context,
+      }: {
+        context: { async: boolean; finalize: (ok: boolean) => void; eventRecord: EventModel; newResource: ResourceModel; resourceRecord?: ResourceModel };
+      }) => {
         const to = String(context.newResource.id);
         if (to === String(context.resourceRecord?.id ?? "")) return;
         context.async = true;
@@ -244,7 +273,11 @@ function schedulerConfig(now: () => Live): Partial<SchedulerConfig> {
           try {
             const r = await api<{ pendingConsent: boolean }>(`/api/visits/${visitIdOf(context.eventRecord)}/move`, { memberId: to });
             context.finalize(!r.pendingConsent);
-            now().onMoved(r.pendingConsent ? `${memberName(to)} is proposed, and the household is asked first. The hold stays with the visit.` : `Moved to ${memberName(to)}. The hold stays with the visit.`);
+            now().onMoved(
+              r.pendingConsent
+                ? `${memberName(to)} is proposed, and the household is asked first. The hold stays with the visit.`
+                : `Moved to ${memberName(to)}. The hold stays with the visit.`,
+            );
           } catch (e) {
             context.finalize(false);
             now().onRefused((e as Error).message);
@@ -259,7 +292,13 @@ function memberCell(record: ResourceModel, board: Board, view: BoardView) {
   const id = String(record.id);
   if (id === NEEDS_COVER) {
     const n = board.visits.filter((v) => v.memberIds.length === 0 && !["cancelled", "late_cancel", "voided"].includes(v.state)).length;
-    return { className: "member-cell uncovered", children: [{ tag: "b", text: "Needs cover" }, { tag: "small", text: `${n} visit${n === 1 ? "" : "s"}` }] };
+    return {
+      className: "member-cell uncovered",
+      children: [
+        { tag: "b", text: "Needs cover" },
+        { tag: "small", text: `${n} visit${n === 1 ? "" : "s"}` },
+      ],
+    };
   }
   const m = board.members.find((x) => x.id === id);
   if (!m) return record.name;
@@ -273,7 +312,10 @@ function memberCell(record: ResourceModel, board: Board, view: BoardView) {
     dataset: { member: id },
     children: [
       { tag: "b", text: m.name },
-      { tag: "small", text: out ? "out today" : works ? `${clock(works.from)}–${clock(works.to)} · ${m.languages.join(", ")}` : `not working · ${m.languages.join(", ")}` },
+      {
+        tag: "small",
+        text: out ? "out today" : works ? `${clock(works.from)}–${clock(works.to)} · ${m.languages.join(", ")}` : `not working · ${m.languages.join(", ")}`,
+      },
       {
         className: "hours",
         children: [
@@ -289,7 +331,9 @@ function visitTip(e: EventModel, board: Board) {
   const v = board.visits.find((x) => x.id === visitIdOf(e));
   const h = v && board.households.find((x) => x.id === v.householdId);
   if (!v || !h) return e.name ?? "";
-  const needs = [...h.needs.map((n) => (n === "pets" ? "pets" : n === "eco" ? "fragrance-free" : "deep clean")), h.sameCleaner ? "same cleaner" : ""].filter(Boolean).join(", ");
+  const needs = [...h.needs.map((n) => (n === "pets" ? "pets" : n === "eco" ? "fragrance-free" : "deep clean")), h.sameCleaner ? "same cleaner" : ""]
+    .filter(Boolean)
+    .join(", ");
   return {
     className: "visit-tip",
     children: [

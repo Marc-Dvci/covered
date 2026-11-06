@@ -11,6 +11,13 @@ export default defineConfig({
     url: "http://localhost:8788/api/health",
     reuseExistingServer: false,
     timeout: 60_000,
-    env: { PORT: "8788", COVERED_DB_FILE: "memory", GEMINI_API_KEY: "", PAYPAL_CLIENT_ID: "", PAYPAL_CLIENT_SECRET: "", COVERED_PUBLIC_URL: "http://localhost:8788" },
+    env: {
+      PORT: "8788",
+      COVERED_DB_FILE: "memory",
+      GEMINI_API_KEY: "",
+      PAYPAL_CLIENT_ID: "",
+      PAYPAL_CLIENT_SECRET: "",
+      COVERED_PUBLIC_URL: "http://localhost:8788",
+    },
   },
 });

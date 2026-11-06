@@ -34,7 +34,7 @@ export type Env = Record<string, string | undefined>;
 
 export function config(env: Env): Config {
   return {
-    dbFile: env.COVERED_DB_FILE === "memory" ? null : (env.COVERED_DB_FILE || "var/covered.db"),
+    dbFile: env.COVERED_DB_FILE === "memory" ? null : env.COVERED_DB_FILE || "var/covered.db",
     paypalClientId: env.PAYPAL_CLIENT_ID || undefined,
     paypalSecret: env.PAYPAL_CLIENT_SECRET || undefined,
     currency: env.PAYPAL_CURRENCY || "USD",
@@ -49,7 +49,10 @@ export function config(env: Env): Config {
     geminiKey: env.GEMINI_API_KEY || undefined,
     modelMain: env.COVERED_MODEL_MAIN || "gemini-3.6-flash",
     modelLight: env.COVERED_MODEL_LIGHT || "gemini-3.5-flash-lite",
-    modelFallbacks: (env.COVERED_MODEL_FALLBACKS ?? "gemini-3.5-flash,gemini-3-flash-preview").split(",").map((s) => s.trim()).filter(Boolean),
+    modelFallbacks: (env.COVERED_MODEL_FALLBACKS ?? "gemini-3.5-flash,gemini-3-flash-preview")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
     modelTimeoutS: Number(env.COVERED_MODEL_TIMEOUT_S || 20),
     aiUntil: env.COVERED_AI_UNTIL || "2026-12-21",
     aiDailyCalls: Number(env.COVERED_AI_DAILY_CALLS || 600),

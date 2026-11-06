@@ -61,7 +61,12 @@ describe("visit money lifecycle", () => {
     await idle();
     const v = (await app.store.visit("v-thu-weber"))!;
     const e = (await evidence(app.store, "v-thu-weber"))!;
-    expect(e.attendance).toMatchObject({ checkIn: expect.stringContaining("10:02"), checkOut: expect.stringContaining("13:01"), minutesOnSite: 179, extraApproved: false });
+    expect(e.attendance).toMatchObject({
+      checkIn: expect.stringContaining("10:02"),
+      checkOut: expect.stringContaining("13:01"),
+      minutesOnSite: 179,
+      extraApproved: false,
+    });
     expect(e.money.map((m) => m.step)).toEqual(["hold", "capture", "payout to Lena Petrova"]);
     expect(e.money.find((m) => m.step === "capture")?.paypalId).toBe(v.capture!.captureId);
     expect(e.money.find((m) => m.step === "hold")?.paypalId).toBe(v.hold!.authorizationId);

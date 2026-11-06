@@ -64,11 +64,20 @@ const webhookDelivery = async () => ({
 });
 
 const draftComplete = async (): Promise<string> => {
-  const d = await read<{ id: string }>(await send("/api/agreements/draft", "POST", {
-    householdName: "The Test Family", area: "Ballard", language: "en", jobText: "Kitchen and bathrooms", memberLanguage: "en",
-  }));
+  const d = await read<{ id: string }>(
+    await send("/api/agreements/draft", "POST", {
+      householdName: "The Test Family",
+      area: "Ballard",
+      language: "en",
+      jobText: "Kitchen and bathrooms",
+      memberLanguage: "en",
+    }),
+  );
   const r = await send(`/api/agreements/${d.id}/update`, "POST", {
-    scope: ["Kitchen", "Bathrooms"], location: "12 Pine Street", schedule: { weekday: 4, start: "10:00", minutes: 180, frequency: "weekly" }, rateCentsPerHour: 2500,
+    scope: ["Kitchen", "Bathrooms"],
+    location: "12 Pine Street",
+    schedule: { weekday: 4, start: "10:00", minutes: 180, frequency: "weekly" },
+    rateCentsPerHour: 2500,
   });
   expect(await read<{ missing: unknown[] }>(r)).toMatchObject({ missing: [] });
   return d.id;
@@ -92,14 +101,19 @@ describe("health and the board", () => {
     expect(body.households[0]).not.toHaveProperty("vaultId");
     expect(body.households[0]).toHaveProperty("paypalSaved", true);
     const lena = body.members.find((m) => m.id === "lena");
-    expect(lena?.bookedMinutes).toBe(seedVisits().filter((v) => v.memberIds.includes("lena")).reduce((a, v) => a + v.minutes, 0));
+    expect(lena?.bookedMinutes).toBe(
+      seedVisits()
+        .filter((v) => v.memberIds.includes("lena"))
+        .reduce((a, v) => a + v.minutes, 0),
+    );
     expect(body.visits.find((v) => v.id === "v-thu-weber")?.payment).toBe("not held yet");
-    expect(body.crud).toEqual(toCrud(
-      await app.store.members(),
-      await app.store.households(),
-      await app.store.visits(),
-      { proposal: activeProposal((await listDisruptions(app.store)).slice(0, 5)), now: await app.store.now(), absences: await activeAbsences(app.store) },
-    ));
+    expect(body.crud).toEqual(
+      toCrud(await app.store.members(), await app.store.households(), await app.store.visits(), {
+        proposal: activeProposal((await listDisruptions(app.store)).slice(0, 5)),
+        now: await app.store.now(),
+        absences: await activeAbsences(app.store),
+      }),
+    );
   });
 
   it("returns the drag guard's verdicts for one day", async () => {
@@ -332,7 +346,9 @@ describe("check-in, check-out and the money", () => {
     expect(await read(r)).toMatchObject({ state: "settling" });
     await app.runner.idle();
     expect((await app.store.visit("v-thu-weber"))!.state).toBe("paid_out");
-    const st = await read<{ lines: { transactionId: string | null; reconciled: string }[]; totalCents: number }>(await send("/api/members/lena/statement", "GET"));
+    const st = await read<{ lines: { transactionId: string | null; reconciled: string }[]; totalCents: number }>(
+      await send("/api/members/lena/statement", "GET"),
+    );
     expect(st.totalCents).toBe(9975);
     expect(st.lines).toHaveLength(1);
     expect(st.lines[0]?.transactionId).toBeTruthy();
@@ -344,7 +360,15 @@ describe("check-in, check-out and the money", () => {
     await app.store.setClock(at("08:30"));
     const r = await send("/api/visits/v-thu-weber/cancel-preview", "GET");
     expect(r.status).toBe(200);
-    expect(await read(r)).toMatchObject({ late: true, minutesBefore: 90, feeCents: 5250, releaseCents: 7000, heldCents: 12250, lateFeeCents: 5250, closed: false });
+    expect(await read(r)).toMatchObject({
+      late: true,
+      minutesBefore: 90,
+      feeCents: 5250,
+      releaseCents: 7000,
+      heldCents: 12250,
+      lateFeeCents: 5250,
+      closed: false,
+    });
   });
 
   it("cancel-preview is closed once the visit has started", async () => {
@@ -509,7 +533,11 @@ describe("signing up", () => {
 
   it("a draft written by hand, with no model, names what is missing", async () => {
     const r = await send("/api/agreements/draft", "POST", {
-      householdName: "The Test Family", area: "Ballard", language: "en", jobText: "Kitchen and bathrooms", memberLanguage: "en",
+      householdName: "The Test Family",
+      area: "Ballard",
+      language: "en",
+      jobText: "Kitchen and bathrooms",
+      memberLanguage: "en",
     });
     expect(r.status).toBe(200);
     const d = await read<{ id: string; source: string; notes: string[]; missing: { field: string }[] }>(r);
@@ -527,11 +555,21 @@ describe("signing up", () => {
   });
 
   it("an update changes the fields it is allowed to and ignores the rest", async () => {
-    const d = await read<{ id: string }>(await send("/api/agreements/draft", "POST", {
-      householdName: "The Test Family", area: "Ballard", language: "en", jobText: "Kitchen", memberLanguage: "en",
-    }));
+    const d = await read<{ id: string }>(
+      await send("/api/agreements/draft", "POST", {
+        householdName: "The Test Family",
+        area: "Ballard",
+        language: "en",
+        jobText: "Kitchen",
+        memberLanguage: "en",
+      }),
+    );
     const r = await send(`/api/agreements/${d.id}/update`, "POST", {
-      householdName: "Changed Name", language: "pt", contact: "someone@example.com", scope: ["Kitchen"], rateCentsPerHour: 2500,
+      householdName: "Changed Name",
+      language: "pt",
+      contact: "someone@example.com",
+      scope: ["Kitchen"],
+      rateCentsPerHour: 2500,
     });
     expect(r.status).toBe(200);
     const body = await read<{ agreement: Record<string, unknown> }>(r);
@@ -608,7 +646,12 @@ describe("plumbing", () => {
     await holdAll();
     const r = await send("/api/about", "GET");
     expect(r.status).toBe(200);
-    const body = await read<{ mode: { paypal: string }; ai: { live: boolean; dailyCap: number }; taskRuns: { status: string }[]; money: { kind: string; n: number }[] }>(r);
+    const body = await read<{
+      mode: { paypal: string };
+      ai: { live: boolean; dailyCap: number };
+      taskRuns: { status: string }[];
+      money: { kind: string; n: number }[];
+    }>(r);
     expect(body.mode.paypal).toBe("stand-in");
     expect(body.ai).toMatchObject({ live: false, dailyCap: 600 });
     expect(body.taskRuns).toEqual(expect.arrayContaining([expect.objectContaining({ status: "succeeded" })]));

@@ -1,17 +1,7 @@
 // A deterministic stand-in for the PayPal sandbox, used by the no-credentials quickstart and the tests.
 // It keeps the rules the sandbox enforces: one hold per request id, a final capture closes the
 // authorization, a voided hold cannot be captured, a sender batch id pays once.
-import {
-  PayPalError,
-  type Capture,
-  type Hold,
-  type PayPal,
-  type Payout,
-  type PayoutItem,
-  type TxnRecord,
-  type VaultSetup,
-  type VaultToken,
-} from "./types.ts";
+import { PayPalError, type Capture, type Hold, type PayPal, type Payout, type PayoutItem, type TxnRecord, type VaultSetup, type VaultToken } from "./types.ts";
 
 export class FakePayPal implements PayPal {
   readonly live = false;
@@ -46,7 +36,12 @@ export class FakePayPal implements PayPal {
     if (known) return known;
     if (this.refuse.has(vaultId)) throw new PayPalError("authorize", 422, "INSTRUMENT_DECLINED", "fake");
     const authId = this.id("AUTH");
-    const hold: Hold = { orderId: this.id("ORDER"), authorizationId: authId, status: "CREATED", expiresAt: new Date(Date.now() + 29 * 86400_000).toISOString() };
+    const hold: Hold = {
+      orderId: this.id("ORDER"),
+      authorizationId: authId,
+      status: "CREATED",
+      expiresAt: new Date(Date.now() + 29 * 86400_000).toISOString(),
+    };
     this.holds.set(authId, { id: authId, cents, state: "CREATED", byRef: ref });
     this.holdByRef.set(ref, hold);
     this.txns.push({ transactionId: authId, eventCode: "T1105", status: "P", cents, at: new Date().toISOString(), invoiceId });
@@ -80,11 +75,23 @@ export class FakePayPal implements PayPal {
   async payout(senderBatchId: string, items: PayoutItem[]): Promise<Payout> {
     if (this.payouts.has(senderBatchId)) throw new PayPalError("payout", 400, "DUPLICATE_SENDER_BATCH_ID");
     const p = {
-      batchId: this.id("BATCH"), senderBatchId, status: "PENDING", created: Date.now(),
+      batchId: this.id("BATCH"),
+      senderBatchId,
+      status: "PENDING",
+      created: Date.now(),
       items: items.map((i) => ({ itemId: i.itemId, payoutItemId: this.id("ITEM"), transactionId: this.id("TXN"), status: "PENDING" })),
     };
     this.payouts.set(senderBatchId, p);
-    items.forEach((it, k) => this.txns.push({ transactionId: p.items[k]!.transactionId!, eventCode: "T0000", status: "S", cents: -it.cents, at: new Date().toISOString(), note: it.note }));
+    items.forEach((it, k) =>
+      this.txns.push({
+        transactionId: p.items[k]!.transactionId!,
+        eventCode: "T0000",
+        status: "S",
+        cents: -it.cents,
+        at: new Date().toISOString(),
+        note: it.note,
+      }),
+    );
     return { batchId: p.batchId, senderBatchId, status: p.status, items: p.items };
   }
 

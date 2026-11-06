@@ -36,12 +36,21 @@ const SCHEMA = {
     weekday: { type: "INTEGER", nullable: true, description: "0 = Monday ... 6 = Sunday." },
     start: { type: "STRING", nullable: true, description: "HH:MM 24-hour." },
     minutes: { type: "INTEGER", nullable: true },
-    frequency: { type: "STRING", nullable: true, enum: ["weekly", "every_two_weeks", "once"], description: "weekly when a day recurs (\"Fridays\", \"every Monday\"); once for a single date; null if not said." },
+    frequency: {
+      type: "STRING",
+      nullable: true,
+      enum: ["weekly", "every_two_weeks", "once"],
+      description: 'weekly when a day recurs ("Fridays", "every Monday"); once for a single date; null if not said.',
+    },
     pets: { type: "BOOLEAN" },
     fragrance_free: { type: "BOOLEAN" },
     deep_clean: { type: "BOOLEAN" },
     same_cleaner: { type: "BOOLEAN", description: "The household wants the same person every time." },
-    member_transcript: { type: "STRING", nullable: true, description: "Verbatim transcript of the member's voice note, in its language, with every number written in digits." },
+    member_transcript: {
+      type: "STRING",
+      nullable: true,
+      description: "Verbatim transcript of the member's voice note, in its language, with every number written in digits.",
+    },
     member_rate_per_hour: { type: "NUMBER", nullable: true, description: "Hourly rate the member asks for, in dollars, only if stated by the member." },
     member_notice_hours: { type: "INTEGER", nullable: true },
     member_late_fee_percent: { type: "INTEGER", nullable: true },
@@ -63,7 +72,11 @@ export async function draft(store: Store, ai: Gemini | null, input: DraftInput, 
   let source = "form";
   if (ai) {
     try {
-      const parts = [{ text: `Household (${LANG_NAMES[input.language]}): ${input.householdName}, ${input.area}.\nHousehold's description:\n"""${input.jobText}"""\n\nMember's terms (${LANG_NAMES[input.memberLanguage]}):` }] as { text?: string; inlineData?: { mimeType: string; data: string } }[];
+      const parts = [
+        {
+          text: `Household (${LANG_NAMES[input.language]}): ${input.householdName}, ${input.area}.\nHousehold's description:\n"""${input.jobText}"""\n\nMember's terms (${LANG_NAMES[input.memberLanguage]}):`,
+        },
+      ] as { text?: string; inlineData?: { mimeType: string; data: string } }[];
       if (input.memberAudio) parts.push({ inlineData: input.memberAudio });
       else parts.push({ text: `"""${input.memberText ?? ""}"""` });
       const r = await ai.json<Record<string, unknown>>("agreement-draft", "main", SYSTEM, parts, SCHEMA, visitor);
@@ -94,7 +107,8 @@ export async function draft(store: Store, ai: Gemini | null, input: DraftInput, 
       const notice = r.member_notice_hours as number | null;
       if (notice !== null && notice !== undefined && numbersOk(String(notice), numbersIn(said))) a.cancellation.noticeHours = notice;
       const fee = r.member_late_fee_percent as number | null;
-      if (fee !== null && fee !== undefined && (numbersOk(String(fee), numbersIn(said)) || /half|meio|metade|połow|mitad|moitié/i.test(said) && fee === 50)) a.cancellation.lateCancelPct = fee;
+      if (fee !== null && fee !== undefined && (numbersOk(String(fee), numbersIn(said)) || (/half|meio|metade|połow|mitad|moitié/i.test(said) && fee === 50)))
+        a.cancellation.lateCancelPct = fee;
     } catch (e) {
       if (!(e instanceof AIUnavailable)) throw e;
       notes.push("The assistant is unavailable; fill the fields by hand.");
@@ -112,18 +126,29 @@ export async function finish(store: Store, ai: Gemini | null, d: Draft, memberLa
   for (const lang of [...new Set([d.agreement.language, memberLanguage])].filter((l) => l !== "en")) {
     if (!ai || d.missing.length) continue;
     try {
-      const r = await ai.json<{ text: string }>("agreement-readback", "light",
+      const r = await ai.json<{ text: string }>(
+        "agreement-readback",
+        "light",
         "Translate this cleaning agreement summary faithfully. Keep every number, time and amount exactly as written. Keep the names of people, households and places as written, untranslated. Do not add or remove terms.",
         [{ text: `Target language: ${LANG_NAMES[lang]} (${lang}).\n\n${en}` }],
-        { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] }, visitor);
+        { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] },
+        visitor,
+      );
       if (keepsNumbers(en, r.text)) d.readback.push({ language: lang, text: r.text, source: ai.last?.source ?? "live" });
       else d.notes.push(`The ${LANG_NAMES[lang]} read-back changed a number, so it is not shown.`);
     } catch (e) {
       if (!(e instanceof AIUnavailable)) throw e;
     }
   }
-  await store.db.query("insert into agreements(id, data, status, readback) values ($1,$2,$3,$4) on conflict (id) do update set data = excluded.data, readback = excluded.readback, status = excluded.status",
-    [d.id, JSON.stringify({ ...d.agreement, _draft: { transcript: d.transcript, notes: d.notes, source: d.source, memberLanguage } }), d.missing.length ? "draft" : "ready", JSON.stringify(d.readback)]);
+  await store.db.query(
+    "insert into agreements(id, data, status, readback) values ($1,$2,$3,$4) on conflict (id) do update set data = excluded.data, readback = excluded.readback, status = excluded.status",
+    [
+      d.id,
+      JSON.stringify({ ...d.agreement, _draft: { transcript: d.transcript, notes: d.notes, source: d.source, memberLanguage } }),
+      d.missing.length ? "draft" : "ready",
+      JSON.stringify(d.readback),
+    ],
+  );
   return d;
 }
 
@@ -143,11 +168,17 @@ export function readback(a: Agreement): string {
   const fee = price !== null && a.cancellation.lateCancelPct !== null ? Math.round((price * a.cancellation.lateCancelPct) / 100) : null;
   const lines = [
     `${a.householdName} and the cooperative agree on home cleaning at ${a.location || a.area}.`,
-    s.weekday !== null && s.start && hours ? `${s.frequency === "every_two_weeks" ? "Every other" : s.frequency === "once" ? "One visit on" : "Every"} ${WEEK_DAYS[s.weekday]} at ${s.start}, for ${hours} hours.` : "Day and time: to be agreed.",
+    s.weekday !== null && s.start && hours
+      ? `${s.frequency === "every_two_weeks" ? "Every other" : s.frequency === "once" ? "One visit on" : "Every"} ${WEEK_DAYS[s.weekday]} at ${s.start}, for ${hours} hours.`
+      : "Day and time: to be agreed.",
     a.scope.length ? `Each visit: ${a.scope.join("; ")}.` : "",
     a.rateCentsPerHour && price !== null ? `Rate ${dollars(a.rateCentsPerHour)} an hour, so ${dollars(price)} a visit.` : "",
-    hold !== null ? `24 hours before each visit, ${dollars(hold)} is held on your PayPal (the visit plus up to ${a.extraAllowanceMinutes} extra minutes, which you approve at the end). The visit is paid when it ends and the rest is released.` : "",
-    fee !== null ? `Cancel more than ${a.cancellation.noticeHours} hours ahead: nothing to pay. Cancel later: ${dollars(fee)} (${a.cancellation.lateCancelPct}%). If nobody can let the cleaner in: ${a.cancellation.lockoutPct}% of the visit.` : "",
+    hold !== null
+      ? `24 hours before each visit, ${dollars(hold)} is held on your PayPal (the visit plus up to ${a.extraAllowanceMinutes} extra minutes, which you approve at the end). The visit is paid when it ends and the rest is released.`
+      : "",
+    fee !== null
+      ? `Cancel more than ${a.cancellation.noticeHours} hours ahead: nothing to pay. Cancel later: ${dollars(fee)} (${a.cancellation.lateCancelPct}%). If nobody can let the cleaner in: ${a.cancellation.lockoutPct}% of the visit.`
+      : "",
     a.sameCleaner ? "You asked for the same cleaner every time. If that person is out, you will be asked before anyone else comes." : "",
     "You can stop the arrangement at any time from your page; holds stop at once.",
   ];

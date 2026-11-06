@@ -12,7 +12,12 @@ const server = () => {
   routes(s, app, new Gemini({ ...app.cfg, geminiKey: undefined }, app.store));
   return s;
 };
-const post = (sig: string) => server().request("/api/paypal/webhook", { method: "POST", body: JSON.stringify(delivery), headers: { "content-type": "application/json", "paypal-transmission-sig": sig } });
+const post = (sig: string) =>
+  server().request("/api/paypal/webhook", {
+    method: "POST",
+    body: JSON.stringify(delivery),
+    headers: { "content-type": "application/json", "paypal-transmission-sig": sig },
+  });
 let delivery: { id: string; event_type: string; resource: { id: string; invoice_id: string } };
 
 beforeEach(async () => {

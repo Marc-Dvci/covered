@@ -19,7 +19,10 @@ export class LocalRunner implements Runner {
   readonly kind = "local";
   private running = new Set<Promise<unknown>>();
   private seq = 0;
-  constructor(private deps: TaskDeps, private waitMs = RETRY.waitDurationMs) {}
+  constructor(
+    private deps: TaskDeps,
+    private waitMs = RETRY.waitDurationMs,
+  ) {}
 
   async start(task: TaskName, visitId: string): Promise<string> {
     const id = `local-${++this.seq}`;
@@ -48,10 +51,19 @@ export class LocalRunner implements Runner {
   }
 
   async idle(): Promise<void> {
-    while (this.running.size) await Promise.all([...this.running]);
+    while (this.running.size) await Promise.all(this.running);
   }
 }
 
-export async function logRun(store: Store, task: string, runId: string, visitId: string, attempt: number, status: string, detail: string, runner: string): Promise<void> {
+export async function logRun(
+  store: Store,
+  task: string,
+  runId: string,
+  visitId: string,
+  attempt: number,
+  status: string,
+  detail: string,
+  runner: string,
+): Promise<void> {
   await store.event("task.run", visitId, "workflow", { task, runId, attempt, status, detail, runner });
 }

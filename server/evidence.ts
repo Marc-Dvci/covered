@@ -47,11 +47,15 @@ export async function evidence(store: Store, visitId: string): Promise<Evidence 
   const v = await store.visit(visitId);
   if (!v) return null;
   const [h, members, money, events, agreement] = await Promise.all([
-    store.household(v.householdId), store.members(), store.moneyRows(visitId), store.events(200, visitId),
+    store.household(v.householdId),
+    store.members(),
+    store.moneyRows(visitId),
+    store.events(200, visitId),
     store.db.query<{ agreement_id: string | null }>("select agreement_id from households where id = $1", [v.householdId]),
   ]);
   const name = (id: string) => members.find((m) => m.id === id)?.name ?? id;
-  const actor = (id: string) => id === "workflow" ? "cooperative system" : id === "dana" ? "Dana (coordinator)" : id === v.householdId ? (h?.name ?? id) : name(id);
+  const actor = (id: string) =>
+    id === "workflow" ? "cooperative system" : id === "dana" ? "Dana (coordinator)" : id === v.householdId ? (h?.name ?? id) : name(id);
   const t = v.terms;
   const onSite = v.checkinAt !== null && v.checkoutAt !== null ? v.checkoutAt - v.checkinAt : null;
   const extra = v.outcome?.type === "checkout" ? v.outcome.extraApproved : null;
@@ -64,21 +68,30 @@ export async function evidence(store: Store, visitId: string): Promise<Evidence 
     step: m.kind === "payout" ? `payout to ${name(String((m.detail as { memberId?: string } | null)?.memberId ?? ""))}` : m.kind,
     amount: dollars(m.cents),
     // a payout line names the member's PayPal transaction once PayPal has given one, else the batch
-    paypalId: m.kind === "payout" ? (v.payout?.items.find((i) => i.memberId === (m.detail as { memberId?: string } | null)?.memberId)?.transactionId ?? m.paypal_id) : m.paypal_id,
+    paypalId:
+      m.kind === "payout"
+        ? (v.payout?.items.find((i) => i.memberId === (m.detail as { memberId?: string } | null)?.memberId)?.transactionId ?? m.paypal_id)
+        : m.paypal_id,
     status: m.status,
     at: at(m.board_at),
   }));
 
-  const timeline = events.slice().reverse()
+  const timeline = events
+    .slice()
+    .reverse()
     .filter((e) => WHAT[e.type])
     .map((e) => ({ at: at(e.board_at), what: WHAT[e.type]!(e.data, name), by: actor(e.actor) }));
 
   const capture = v.capture ? `${dollars(v.capture.cents)} was captured (PayPal capture ${v.capture.captureId})` : "nothing was captured";
   const summary = [
     `${h?.name ?? v.householdId} booked ${t.bookedMinutes / 60} hours at ${dollars(t.rateCentsPerHour)} an hour for ${boardDate(v.start)} ${clock(v.start)}.`,
-    v.checkinAt !== null ? `${v.memberIds.map(name).join(" and ")} checked in at ${clock(v.checkinAt)}${v.checkoutAt !== null ? ` and out at ${clock(v.checkoutAt)} (${onSite} minutes)` : ""}.` : "",
+    v.checkinAt !== null
+      ? `${v.memberIds.map(name).join(" and ")} checked in at ${clock(v.checkinAt)}${v.checkoutAt !== null ? ` and out at ${clock(v.checkoutAt)} (${onSite} minutes)` : ""}.`
+      : "",
     `${outcome[0]!.toUpperCase()}${outcome.slice(1)}: ${capture}${v.settlement?.releaseCents ? `, and ${dollars(v.settlement.releaseCents)} of the hold was released` : ""}.`,
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return {
     visitId: v.id,
@@ -86,11 +99,21 @@ export async function evidence(store: Store, visitId: string): Promise<Evidence 
     members: v.memberIds.map(name),
     scheduled: { date: boardDate(v.start), start: clock(v.start), end: clock(v.start + v.minutes), timeZone: TIME_ZONE },
     terms: {
-      rate: dollars(t.rateCentsPerHour), price: dollars(priceCents(t)), hold: dollars(holdCents(t)),
-      noticeHours: t.noticeHours, lateCancelPct: t.lateCancelPct, lockoutPct: t.lockoutPct, extraAllowanceMinutes: t.extraAllowanceMinutes,
+      rate: dollars(t.rateCentsPerHour),
+      price: dollars(priceCents(t)),
+      hold: dollars(holdCents(t)),
+      noticeHours: t.noticeHours,
+      lateCancelPct: t.lateCancelPct,
+      lockoutPct: t.lockoutPct,
+      extraAllowanceMinutes: t.extraAllowanceMinutes,
     },
     agreementId: agreement[0]?.agreement_id ?? null,
-    attendance: { checkIn: v.checkinAt !== null ? at(v.checkinAt) : null, checkOut: v.checkoutAt !== null ? at(v.checkoutAt) : null, minutesOnSite: onSite, extraApproved: extra },
+    attendance: {
+      checkIn: v.checkinAt !== null ? at(v.checkinAt) : null,
+      checkOut: v.checkoutAt !== null ? at(v.checkoutAt) : null,
+      minutesOnSite: onSite,
+      extraApproved: extra,
+    },
     outcome,
     money: steps,
     timeline,

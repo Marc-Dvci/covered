@@ -28,7 +28,10 @@ const POLL_SECONDS = 5;
 
 class WorkflowRunner implements Runner {
   readonly kind = "cloudflare";
-  constructor(private env: Env, private store: Store) {}
+  constructor(
+    private env: Env,
+    private store: Store,
+  ) {}
 
   private params(task: TaskName, visitId: string) {
     return { id: `${task}-${visitId}-${crypto.randomUUID().slice(0, 8)}`, params: { task, visitId } };

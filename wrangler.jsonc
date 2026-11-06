@@ -19,6 +19,6 @@
     "COVERED_AI_UNTIL": "2026-12-21",
     "COVERED_MODEL_MAIN": "gemini-3.6-flash",
     "COVERED_MODEL_LIGHT": "gemini-3.5-flash-lite",
-    "COVERED_MODEL_FALLBACKS": "gemini-3.5-flash,gemini-3-flash-preview"
-  }
+    "COVERED_MODEL_FALLBACKS": "gemini-3.5-flash,gemini-3-flash-preview",
+  },
 }

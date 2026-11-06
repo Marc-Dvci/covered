@@ -7,3 +7,6 @@ probe/.env
 coverage/
 test-results/
 playwright-report/
+.wrangler/
+.dev.vars
+test-results.json

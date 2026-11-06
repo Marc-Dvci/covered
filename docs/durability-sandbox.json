@@ -1,48 +1,50 @@
 {
- "ranAt": "2026-10-21T05:56:44.499Z",
- "currency": "EUR",
- "runner": "local (same retry policy as the Render workflow)",
+ "ranAt": "2026-11-06T09:42:50.196Z",
+ "site": "https://covered-coop.pages.dev",
+ "currency": "USD",
+ "runner": "Cloudflare Workflows",
  "visit": "v-thu-weber",
  "state": "paid_out",
- "taskRuns": [
+ "crashes": 1,
+ "workflowRuns": [
   {
    "task": "placeHold",
-   "attempt": 0,
+   "instance": "placeHold-v-thu-weber-32c6eb66",
    "status": "succeeded",
    "detail": "held $122.50"
   },
   {
    "task": "settleVisit",
-   "attempt": 0,
+   "instance": "settleVisit-v-thu-weber-f802a8b8",
+   "status": "started",
+   "detail": ""
+  },
+  {
+   "task": "settleVisit",
+   "instance": "settleVisit-v-thu-weber-f802a8b8",
    "status": "retrying",
    "detail": "injected crash after capture"
   },
   {
    "task": "settleVisit",
-   "attempt": 1,
+   "instance": "settleVisit-v-thu-weber-f802a8b8",
    "status": "succeeded",
-   "detail": "paid_out: captured $105.00, released $17.50"
+   "detail": "money moved: captured $105.00, released $17.50"
   }
  ],
- "authorization": "38J4925185108004N",
+ "authorization": "64Y94247S4828780J",
  "capture": {
-  "at": 5100,
+  "captureId": "71Y796623D5550038",
   "cents": 10500,
-  "feeCents": 382,
-  "captureId": "98F41007M7301961K"
+  "feeCents": 415,
+  "at": 5100
  },
+ "releasedCents": 1750,
  "payout": {
-  "batchId": "9KR5TTRAMHEW8",
-  "senderBatchId": "covered-c997cf-v-thu-weber",
+  "batchId": "RMRFQCYF8QCBC",
   "status": "SUCCESS",
-  "items": [
-   {
-    "itemId": "v-thu-weber-lena",
-    "payoutItemId": "M9CCV3R8DNYUJ",
-    "transactionId": "8YV16471BU867844W",
-    "status": "SUCCESS"
-   }
-  ]
+  "finalMs": 24124,
+  "transactionId": "89J04982F26397314"
  },
  "moneyRows": {
   "captures": 1,
@@ -50,5 +52,5 @@
  },
  "paypalRefusesSecondCapture": "422 AUTHORIZATION_ALREADY_CAPTURED",
  "paypalRefusesSecondPayoutBatch": "400 Batch with given sender_batch_id already exists",
- "seconds": 34
+ "seconds": 48
 }

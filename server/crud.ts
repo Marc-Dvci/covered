@@ -42,7 +42,9 @@ export function toCrud(members: Member[], households: Household[], visits: Visit
     if (!m || GONE.has(v.state)) return 0;
     const end = v.start + v.minutes;
     const next = visits
-      .filter((x) => x.id !== v.id && x.memberIds.includes(m) && !GONE.has(x.state) && x.start >= end && Math.floor(x.start / 1440) === Math.floor(v.start / 1440))
+      .filter(
+        (x) => x.id !== v.id && x.memberIds.includes(m) && !GONE.has(x.state) && x.start >= end && Math.floor(x.start / 1440) === Math.floor(v.start / 1440),
+      )
       .sort((a, b) => a.start - b.start)[0];
     return next ? travelMinutes(home(v).at, home(next).at) : 0;
   };
@@ -100,23 +102,49 @@ export function toCrud(members: Member[], households: Household[], visits: Visit
     resources: {
       rows: [
         ...(uncovered.length ? [{ id: NEEDS_COVER, name: "Needs cover", languages: [] as string[], skills: [] as string[], weeklyHoursCap: 0, area: "" }] : []),
-        ...members.map((m) => ({ id: m.id, name: m.name, calendar: `cal-${m.id}`, languages: m.languages as string[], skills: m.skills as string[], weeklyHoursCap: m.weeklyHoursCap, area: m.area })),
+        ...members.map((m) => ({
+          id: m.id,
+          name: m.name,
+          calendar: `cal-${m.id}`,
+          languages: m.languages as string[],
+          skills: m.skills as string[],
+          weeklyHoursCap: m.weeklyHoursCap,
+          area: m.area,
+        })),
       ],
     },
     events: {
       rows: [
         ...visits.map(event),
-        ...ghosts.map(({ v, memberId, asked }) => ({ ...event(v), id: ghostId(v.id, memberId), postamble: "0 minutes", cls: "proposed", draggable: false, kind: "proposed", visitId: v.id, asked })),
+        ...ghosts.map(({ v, memberId, asked }) => ({
+          ...event(v),
+          id: ghostId(v.id, memberId),
+          postamble: "0 minutes",
+          cls: "proposed",
+          draggable: false,
+          kind: "proposed",
+          visitId: v.id,
+          asked,
+        })),
       ],
     },
     assignments: {
       rows: [
-        ...visits.flatMap((v) => (v.memberIds.length ? v.memberIds : uncovered.includes(v) ? [NEEDS_COVER] : []).map((m) => ({ id: `${v.id}:${m}`, event: v.id, resource: m }))),
+        ...visits.flatMap((v) =>
+          (v.memberIds.length ? v.memberIds : uncovered.includes(v) ? [NEEDS_COVER] : []).map((m) => ({ id: `${v.id}:${m}`, event: v.id, resource: m })),
+        ),
         ...ghosts.map(({ v, memberId }) => ({ id: `${ghostId(v.id, memberId)}:${memberId}`, event: ghostId(v.id, memberId), resource: memberId })),
       ],
     },
     resourceTimeRanges: {
-      rows: absences.map((a, i) => ({ id: `out-${i}-${a.memberId}`, resourceId: a.memberId, startDate: localIso(a.from), endDate: localIso(a.to), name: "Out today", cls: "out-of-office" })),
+      rows: absences.map((a, i) => ({
+        id: `out-${i}-${a.memberId}`,
+        resourceId: a.memberId,
+        startDate: localIso(a.from),
+        endDate: localIso(a.to),
+        name: "Out today",
+        cls: "out-of-office",
+      })),
     },
     timeRanges: {
       rows: now === undefined ? [] : [{ id: "now", name: `now ${clock(now)}`, startDate: localIso(now), cls: "now-line" }],
@@ -137,7 +165,13 @@ export interface Guard {
  * verdict from the same solver the agent uses. The board reads them while the bar is in the air; the
  * server checks again on the drop.
  */
-export function guards(members: Member[], households: Household[], visits: VisitRow[], absences: Absence[], day: number): Record<string, Record<string, Guard>> {
+export function guards(
+  members: Member[],
+  households: Household[],
+  visits: VisitRow[],
+  absences: Absence[],
+  day: number,
+): Record<string, Record<string, Guard>> {
   const out: Record<string, Record<string, Guard>> = {};
   for (const v of visits) {
     if (Math.floor(v.start / 1440) !== day || LOCKED.has(v.state)) continue;

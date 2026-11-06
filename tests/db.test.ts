@@ -10,7 +10,11 @@ vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }));
 describe("decoding rows", () => {
   it("decodes the JSON columns and leaves the text columns as text", () => {
     expect(decodeRow({ id: "x", name: '{"b":2}', data: '{"a":1}', member_ids: '["lena"]', value: "[1]" })).toEqual({
-      id: "x", name: '{"b":2}', data: { a: 1 }, member_ids: ["lena"], value: [1],
+      id: "x",
+      name: '{"b":2}',
+      data: { a: 1 },
+      member_ids: ["lena"],
+      value: [1],
     });
   });
 
@@ -64,10 +68,12 @@ describe("the SQLite database", () => {
   it("a transaction that throws rolls back every write in it and rethrows", async () => {
     const db = openSqlite(null);
     await db.query("create table t (x integer)");
-    await expect(db.tx(async (q) => {
-      await q("insert into t (x) values ($1)", [1]);
-      throw new Error("boom");
-    })).rejects.toThrow("boom");
+    await expect(
+      db.tx(async (q) => {
+        await q("insert into t (x) values ($1)", [1]);
+        throw new Error("boom");
+      }),
+    ).rejects.toThrow("boom");
     expect(await db.query("select count(*) as n from t")).toEqual([{ n: 0 }]);
   });
 
@@ -137,7 +143,10 @@ describe("the ledger's query batching", () => {
     const db = ledgerDb(() => f.stub);
     await db.query("select 1 as a");
     await db.query("select 2 as b");
-    expect(f.calls).toEqual([{ size: 1, atomic: false }, { size: 1, atomic: false }]);
+    expect(f.calls).toEqual([
+      { size: 1, atomic: false },
+      { size: 1, atomic: false },
+    ]);
   });
 
   it("asks for a fresh stub for each call", async () => {
@@ -187,7 +196,9 @@ describe("the schema", () => {
     const store = new Store(db);
     await store.migrate();
     const tables = (await db.query<{ name: string }>("select name from sqlite_master where type = 'table'")).map((t) => t.name);
-    expect(tables).toEqual(expect.arrayContaining(["kv", "members", "households", "agreements", "visits", "money", "events", "disruptions", "ai_cache", "shares"]));
+    expect(tables).toEqual(
+      expect.arrayContaining(["kv", "members", "households", "agreements", "visits", "money", "events", "disruptions", "ai_cache", "shares"]),
+    );
   });
 
   it("a second migrate only checks for the schema and leaves the data alone", async () => {

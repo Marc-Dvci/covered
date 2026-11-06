@@ -20,10 +20,20 @@ export function DemoGuide({ board, reload }: { board: Board; reload: () => Promi
   };
   return (
     <div className="guide" role="status" aria-label="What to do next">
-      <span className="guide-n">Step {step.n} of {STEP_COUNT}</span>
+      <span className="guide-n">
+        Step {step.n} of {STEP_COUNT}
+      </span>
       <span className="guide-text">{step.text}</span>
-      {step.clockTo !== undefined && <button className="btn small" disabled={busy} onClick={() => void move(step.clockTo!)}>Move the clock to {clock(step.clockTo)}</button>}
-      {step.link && <Link className="guide-link" to={step.link.to}>{step.link.label}</Link>}
+      {step.clockTo !== undefined && (
+        <button className="btn small" disabled={busy} onClick={() => void move(step.clockTo!)}>
+          Move the clock to {clock(step.clockTo)}
+        </button>
+      )}
+      {step.link && (
+        <Link className="guide-link" to={step.link.to}>
+          {step.link.label}
+        </Link>
+      )}
     </div>
   );
 }

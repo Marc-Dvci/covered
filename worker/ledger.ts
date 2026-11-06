@@ -30,13 +30,18 @@ export function ledgerDb(ledger: () => LedgerStub): Db {
   const flush = () => {
     const batch = waiting;
     waiting = [];
-    ledger().run(batch.map((w) => w.statement), false).then(
-      (results) => batch.forEach((w, i) => w.resolve(results[i] ?? [])),
-      (e) => batch.forEach((w) => w.reject(e)),
-    );
+    ledger()
+      .run(
+        batch.map((w) => w.statement),
+        false,
+      )
+      .then(
+        (results) => batch.forEach((w, i) => w.resolve(results[i] ?? [])),
+        (e) => batch.forEach((w) => w.reject(e)),
+      );
   };
 
-  const query: Query = async <T,>(sql: string, params?: unknown[]) => {
+  const query: Query = async <T>(sql: string, params?: unknown[]) => {
     const rows = await new Promise<Record<string, unknown>[]>((resolve, reject) => {
       if (!waiting.length) queueMicrotask(flush);
       waiting.push({ statement: prepared(sql, params), resolve, reject });

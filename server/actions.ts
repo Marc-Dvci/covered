@@ -7,7 +7,10 @@ import type { Runner } from "./runner.ts";
 import type { Store, VisitRow } from "./store.ts";
 
 export class ActionError extends Error {
-  constructor(message: string, public status = 409) {
+  constructor(
+    message: string,
+    public status = 409,
+  ) {
     super(message);
   }
 }
@@ -52,7 +55,16 @@ export async function cancelPreview(c: Ctx, id: string) {
   const now = await c.store.now();
   const minutesBefore = v.start - now;
   if (minutesBefore <= 0 || !["scheduled", "holding", "held", "at_risk"].includes(v.state)) {
-    return { minutesBefore, late: false, feeCents: 0, releaseCents: 0, heldCents: v.hold?.cents ?? 0, lateFeeCents: 0, noticeHours: v.terms.noticeHours, closed: true };
+    return {
+      minutesBefore,
+      late: false,
+      feeCents: 0,
+      releaseCents: 0,
+      heldCents: v.hold?.cents ?? 0,
+      lateFeeCents: 0,
+      noticeHours: v.terms.noticeHours,
+      closed: true,
+    };
   }
   const s = settle(v.terms, { type: "cancel", by: "household", minutesBefore, assigned: v.memberIds }, v.hold ? "placed" : "failed");
   const lateFee = Math.round((priceCents(v.terms) * v.terms.lateCancelPct) / 100);
@@ -101,7 +113,12 @@ export async function noCover(c: Ctx, id: string, actor: string): Promise<VisitR
 }
 
 /** The drag guard: may this visit go to this member? Same checks as the solver, one visit at a time. */
-export async function canMove(c: Ctx, id: string, memberId: string, start?: number): Promise<{ ok: boolean; reasons: string[]; consent: boolean; hold: string }> {
+export async function canMove(
+  c: Ctx,
+  id: string,
+  memberId: string,
+  start?: number,
+): Promise<{ ok: boolean; reasons: string[]; consent: boolean; hold: string }> {
   const v = await need(c.store, id);
   const [members, households, visits] = await Promise.all([c.store.members(), c.store.households(), c.store.visits()]);
   if (["done", "settling", "captured", "paid_out", "cancelled", "voided", "late_cancel", "in_progress"].includes(v.state)) {
@@ -172,7 +189,8 @@ export interface Absence {
 
 export async function activeAbsences(store: Store): Promise<Absence[]> {
   const rows = await store.db.query<{ id: string; member_id: string; day: number; from_min: number | null; kind: string }>(
-    "select id, member_id, day, from_min, kind from disruptions where status <> 'dismissed'");
+    "select id, member_id, day, from_min, kind from disruptions where status <> 'dismissed'",
+  );
   return rows.map((r) => ({ memberId: r.member_id, from: r.day * 1440 + (r.from_min ?? 0), to: r.day * 1440 + 1440, disruptionId: r.id }));
 }
 

@@ -56,9 +56,13 @@ export function HouseholdPage() {
         <div className="phone-bar">
           <div className="row" style={{ justifyContent: "space-between" }}>
             <b>{h.name}</b>
-            <span className="mono">{WEEK_DAYS[Math.floor(data.now / 1440)]} {clock(data.now)}</span>
+            <span className="mono">
+              {WEEK_DAYS[Math.floor(data.now / 1440)]} {clock(data.now)}
+            </span>
           </div>
-          <small>{h.area} · PayPal {h.paypalSaved ? "saved" : "not saved"}</small>
+          <small>
+            {h.area} · PayPal {h.paypalSaved ? "saved" : "not saved"}
+          </small>
         </div>
         <div className="phone-body">
           {q.get("welcome") && <p className="why">Agreement signed and PayPal saved. Your first visit is on the board.</p>}
@@ -67,23 +71,51 @@ export function HouseholdPage() {
             <section className="stack" aria-label="Payment problem">
               <h2>PayPal refused the hold</h2>
               <p>We could not hold the pay for your next visit. Save your PayPal again so the visit can go ahead; nothing is charged now.</p>
-              <button className="btn" style={{ justifySelf: "start" }} disabled={busy} onClick={() => act(async () => { window.location.href = (await api<{ approveUrl: string }>(`/api/households/${h.id}/repair`, {})).approveUrl; })}>Save PayPal again</button>
+              <button
+                className="btn"
+                style={{ justifySelf: "start" }}
+                disabled={busy}
+                onClick={() =>
+                  act(async () => {
+                    window.location.href = (await api<{ approveUrl: string }>(`/api/households/${h.id}/repair`, {})).approveUrl;
+                  })
+                }
+              >
+                Save PayPal again
+              </button>
             </section>
           )}
           {asks.map((v) => (
             <section className="stack" key={`ask-${v.id}`} aria-label="Request">
               <h2>{name(v.memberIds[0]!)} is out</h2>
-              <p>{name(v.pendingMember!)} can come on {WEEK_DAYS[Math.floor(v.start / 1440)]} at {clock(v.start)} instead. You asked for the same cleaner, so we are checking with you first.</p>
+              <p>
+                {name(v.pendingMember!)} can come on {WEEK_DAYS[Math.floor(v.start / 1440)]} at {clock(v.start)} instead. You asked for the same cleaner, so we
+                are checking with you first.
+              </p>
               <div className="row">
-                <button className="btn" disabled={busy} onClick={() => act(() => api(`/api/visits/${v.id}/consent`, { householdId: h.id, approve: true }))}>Yes, that's fine</button>
-                <button className="btn secondary" disabled={busy} onClick={() => act(() => api(`/api/visits/${v.id}/consent`, { householdId: h.id, approve: false }))}>No thanks</button>
+                <button className="btn" disabled={busy} onClick={() => act(() => api(`/api/visits/${v.id}/consent`, { householdId: h.id, approve: true }))}>
+                  Yes, that's fine
+                </button>
+                <button
+                  className="btn secondary"
+                  disabled={busy}
+                  onClick={() => act(() => api(`/api/visits/${v.id}/consent`, { householdId: h.id, approve: false }))}
+                >
+                  No thanks
+                </button>
               </div>
             </section>
           ))}
           {data.messages.length > 0 && (
             <section className="stack" aria-label="Messages">
               <h2>Messages</h2>
-              {data.messages.slice(0, 2).map((m, i) => <div className="msg" key={i}><span className="who">Cooperative · {clock(m.at)}</span><span lang={m.language}>{m.text}</span>{m.english && m.language !== "en" && <span className="en">{m.english}</span>}</div>)}
+              {data.messages.slice(0, 2).map((m, i) => (
+                <div className="msg" key={i}>
+                  <span className="who">Cooperative · {clock(m.at)}</span>
+                  <span lang={m.language}>{m.text}</span>
+                  {m.english && m.language !== "en" && <span className="en">{m.english}</span>}
+                </div>
+              ))}
             </section>
           )}
           <section className="stack" aria-label="Visits">
@@ -92,8 +124,12 @@ export function HouseholdPage() {
             {upcoming.map((v) => (
               <div className="visit" key={v.id} data-visit={v.id}>
                 <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b>{WEEK_DAYS[Math.floor(v.start / 1440)]} {clock(v.start)}–{clock(v.start + v.minutes)}</b>
-                  <span className={`chip s-${v.state}`}>{v.hold ? `${dollars(v.hold.cents)} held` : v.state === "at_risk" ? "PayPal refused" : "not held yet"}</span>
+                  <b>
+                    {WEEK_DAYS[Math.floor(v.start / 1440)]} {clock(v.start)}–{clock(v.start + v.minutes)}
+                  </b>
+                  <span className={`chip s-${v.state}`}>
+                    {v.hold ? `${dollars(v.hold.cents)} held` : v.state === "at_risk" ? "PayPal refused" : "not held yet"}
+                  </span>
                 </div>
                 <span>{v.memberIds.map(name).join(", ") || "Member to be confirmed"}</span>
                 <small>
@@ -103,16 +139,46 @@ export function HouseholdPage() {
                 </small>
                 {preview?.id === v.id ? (
                   <div className="stack">
-                    <p>{preview.p.late
-                      ? <>Cancelling now is inside the {preview.p.noticeHours}-hour notice: <b>{dollars(preview.p.feeCents)}</b> goes to {v.memberIds.map(name).join(", ")}{preview.p.releaseCents ? <>, and {dollars(preview.p.releaseCents)} is released.</> : "."}</>
-                      : <>Cancelling now is free. {preview.p.heldCents ? `${dollars(preview.p.heldCents)} will be released.` : "Nothing is held yet."}</>}</p>
+                    <p>
+                      {preview.p.late ? (
+                        <>
+                          Cancelling now is inside the {preview.p.noticeHours}-hour notice: <b>{dollars(preview.p.feeCents)}</b> goes to{" "}
+                          {v.memberIds.map(name).join(", ")}
+                          {preview.p.releaseCents ? <>, and {dollars(preview.p.releaseCents)} is released.</> : "."}
+                        </>
+                      ) : (
+                        <>Cancelling now is free. {preview.p.heldCents ? `${dollars(preview.p.heldCents)} will be released.` : "Nothing is held yet."}</>
+                      )}
+                    </p>
                     <div className="row">
-                      <button className="btn danger" disabled={busy} onClick={() => act(async () => { await api(`/api/visits/${v.id}/cancel`, { by: "household", actor: h.id }); setPreview(null); })}>Cancel the visit</button>
-                      <button className="btn secondary" onClick={() => setPreview(null)}>Keep it</button>
+                      <button
+                        className="btn danger"
+                        disabled={busy}
+                        onClick={() =>
+                          act(async () => {
+                            await api(`/api/visits/${v.id}/cancel`, { by: "household", actor: h.id });
+                            setPreview(null);
+                          })
+                        }
+                      >
+                        Cancel the visit
+                      </button>
+                      <button className="btn secondary" onClick={() => setPreview(null)}>
+                        Keep it
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  v.start > data.now && ["scheduled", "held", "at_risk"].includes(v.state) && <button className="btn quiet small" style={{ justifySelf: "start" }} onClick={() => act(async () => setPreview({ id: v.id, p: await api<Preview>(`/api/visits/${v.id}/cancel-preview`) }))}>Cancel…</button>
+                  v.start > data.now &&
+                  ["scheduled", "held", "at_risk"].includes(v.state) && (
+                    <button
+                      className="btn quiet small"
+                      style={{ justifySelf: "start" }}
+                      onClick={() => act(async () => setPreview({ id: v.id, p: await api<Preview>(`/api/visits/${v.id}/cancel-preview`) }))}
+                    >
+                      Cancel…
+                    </button>
+                  )
                 )}
               </div>
             ))}
@@ -122,18 +188,36 @@ export function HouseholdPage() {
               <h2>Receipts</h2>
               {done.map((v) => (
                 <div className="visit" key={v.id} data-visit={v.id}>
-                  <b>{WEEK_DAYS[Math.floor(v.start / 1440)]} {clock(v.start)}</b>
-                  {v.capture ? <span>Paid {dollars(v.capture.cents)}{v.settlement?.releaseCents ? `, ${dollars(v.settlement.releaseCents)} released` : ""}{v.state === "late_cancel" ? " (late-cancel fee)" : ""}</span> : <span>Nothing charged{v.hold ? `; ${dollars(v.hold.cents)} released` : ""}</span>}
+                  <b>
+                    {WEEK_DAYS[Math.floor(v.start / 1440)]} {clock(v.start)}
+                  </b>
+                  {v.capture ? (
+                    <span>
+                      Paid {dollars(v.capture.cents)}
+                      {v.settlement?.releaseCents ? `, ${dollars(v.settlement.releaseCents)} released` : ""}
+                      {v.state === "late_cancel" ? " (late-cancel fee)" : ""}
+                    </span>
+                  ) : (
+                    <span>Nothing charged{v.hold ? `; ${dollars(v.hold.cents)} released` : ""}</span>
+                  )}
                   {v.capture && <small className="mono">PayPal capture {v.capture.captureId}</small>}
                 </div>
               ))}
             </section>
           )}
-          {error && <p className="reason" role="alert">{error}</p>}
+          {error && (
+            <p className="reason" role="alert">
+              {error}
+            </p>
+          )}
           {data.agreement && (
             <details>
               <summary>Your agreement</summary>
-              {data.agreement.readback.map((r) => <p key={r.language} lang={r.language} style={{ marginTop: "0.5rem" }}>{r.text}</p>)}
+              {data.agreement.readback.map((r) => (
+                <p key={r.language} lang={r.language} style={{ marginTop: "0.5rem" }}>
+                  {r.text}
+                </p>
+              ))}
             </details>
           )}
         </div>
@@ -151,9 +235,13 @@ function HouseholdSwitch({ current }: { current: string }) {
   return (
     <nav aria-label="Households" className="stack" style={{ alignContent: "start", minWidth: 200 }}>
       <h2>Households with a visit today</h2>
-      {data.households.filter((h) => today.has(h.id) || h.id === current).map((h) => (
-        <Link key={h.id} to={`/h/${h.id}`} aria-current={h.id === current ? "page" : undefined} style={{ fontWeight: h.id === current ? 700 : 400 }}>{h.name}</Link>
-      ))}
+      {data.households
+        .filter((h) => today.has(h.id) || h.id === current)
+        .map((h) => (
+          <Link key={h.id} to={`/h/${h.id}`} aria-current={h.id === current ? "page" : undefined} style={{ fontWeight: h.id === current ? 700 : 400 }}>
+            {h.name}
+          </Link>
+        ))}
       <p className="fictional">Fictional households.</p>
     </nav>
   );

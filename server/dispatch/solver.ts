@@ -106,7 +106,8 @@ export function solve(input: SolveInput): SolveResult {
       reasons.push(any ? `works ${clock(any.from)} to ${clock(any.to)} that day` : "does not work that day");
     }
     const missingSkills = h.needs.filter((n) => !m.skills.includes(n));
-    if (missingSkills.length) reasons.push(`no ${missingSkills.map((s) => (s === "pets" ? "pets" : s === "eco" ? "fragrance-free kit" : "deep-clean training")).join(", ")}`);
+    if (missingSkills.length)
+      reasons.push(`no ${missingSkills.map((s) => (s === "pets" ? "pets" : s === "eco" ? "fragrance-free kit" : "deep-clean training")).join(", ")}`);
     if (load.get(m.id)! + extraMinutes + v.minutes > m.weeklyHoursCap * 60) {
       reasons.push(`would pass ${m.weeklyHoursCap} h this week`);
     }
@@ -208,9 +209,11 @@ export function firstFree(input: SolveInput): Assignment[] {
   const taken = input.visits.filter((v) => !input.affected.includes(v.id)).map((v) => ({ ...v }));
   const out: Assignment[] = [];
   for (const v of affected) {
-    const m = input.members.find((m) =>
-      !input.absences.some((a) => a.memberId === m.id && v.start < a.to && v.start + v.minutes > a.from)
-      && !taken.some((t) => t.memberIds.includes(m.id) && t.start < v.start + v.minutes && v.start < t.start + t.minutes));
+    const m = input.members.find(
+      (m) =>
+        !input.absences.some((a) => a.memberId === m.id && v.start < a.to && v.start + v.minutes > a.from) &&
+        !taken.some((t) => t.memberIds.includes(m.id) && t.start < v.start + v.minutes && v.start < t.start + t.minutes),
+    );
     out.push({ visitId: v.id, memberId: m?.id ?? null, consent: false, language: false, familiar: false, travelIn: 0 });
     if (m) taken.push({ ...v, memberIds: [m.id] });
   }

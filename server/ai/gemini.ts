@@ -29,14 +29,20 @@ export class Gemini {
   last: CallMeta | null = null;
   record = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.COVERED_RECORD === "1";
 
-  constructor(private cfg: Config, private store: Store) {}
+  constructor(
+    private cfg: Config,
+    private store: Store,
+  ) {}
 
   get live(): boolean {
     return Boolean(this.cfg.geminiKey);
   }
 
   private key(task: string, payload: unknown): string {
-    return createHash("sha256").update(task + JSON.stringify(payload)).digest("hex").slice(0, 32);
+    return createHash("sha256")
+      .update(task + JSON.stringify(payload))
+      .digest("hex")
+      .slice(0, 32);
   }
 
   private async lookup(task: string, key: string): Promise<{ output: unknown; model: string } | null> {
@@ -54,8 +60,14 @@ export class Gemini {
   }
 
   private async keep(task: string, key: string, model: string, output: unknown, usage: unknown, ms: number) {
-    await this.store.db.query("insert into ai_cache(key, task, model, output, usage, ms) values ($1,$2,$3,$4,$5,$6) on conflict (key) do nothing",
-      [key, task, model, JSON.stringify(output), JSON.stringify(usage ?? null), ms]);
+    await this.store.db.query("insert into ai_cache(key, task, model, output, usage, ms) values ($1,$2,$3,$4,$5,$6) on conflict (key) do nothing", [
+      key,
+      task,
+      model,
+      JSON.stringify(output),
+      JSON.stringify(usage ?? null),
+      ms,
+    ]);
     if (this.record) {
       // recording the demo path's answers is a local step (COVERED_RECORD=1), never run on the deployed service
       RECORDINGS[`${task}/${key}`] = { task, model, ms, usage, output } as (typeof RECORDINGS)[string];
@@ -83,7 +95,9 @@ export class Gemini {
 
   private async post(tier: Tier, body: unknown): Promise<{ res: Record<string, unknown>; model: string; ms: number }> {
     // free-tier quotas are per model: a busy main model falls back through the others, then to the light one
-    const chain = [...new Set(tier === "main" ? [this.cfg.modelMain, ...this.cfg.modelFallbacks, this.cfg.modelLight] : [this.cfg.modelLight, ...this.cfg.modelFallbacks])];
+    const chain = [
+      ...new Set(tier === "main" ? [this.cfg.modelMain, ...this.cfg.modelFallbacks, this.cfg.modelLight] : [this.cfg.modelLight, ...this.cfg.modelFallbacks]),
+    ];
     let why = "no model";
     for (const model of chain) {
       const t0 = performance.now();
@@ -117,14 +131,27 @@ export class Gemini {
     const hit = await this.lookup(task, key);
     if (hit) return hit.output as T;
     await this.allow(visitor);
-    const { res, model: used, ms } = await this.post(tier, {
+    const {
+      res,
+      model: used,
+      ms,
+    } = await this.post(tier, {
       systemInstruction: { parts: [{ text: system }] },
       contents: [{ role: "user", parts }],
-      generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.2, maxOutputTokens: 8192, thinkingConfig: { thinkingLevel: "LOW" } },
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: schema,
+        temperature: 0.2,
+        maxOutputTokens: 8192,
+        thinkingConfig: { thinkingLevel: "LOW" },
+      },
     });
     const cand = (res.candidates as { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[] | undefined)?.[0];
     if (cand?.finishReason === "MAX_TOKENS") throw new AIUnavailable("answer cut off");
-    const text = (cand?.content?.parts ?? []).filter((p) => !p.thought).map((p) => p.text ?? "").join("");
+    const text = (cand?.content?.parts ?? [])
+      .filter((p) => !p.thought)
+      .map((p) => p.text ?? "")
+      .join("");
     let out: T;
     try {
       out = JSON.parse(text) as T;
@@ -137,7 +164,13 @@ export class Gemini {
   }
 
   /** One function-calling turn; returns the model's content unchanged so thought signatures go back. */
-  async turn(task: string, system: string, contents: unknown[], tools: object[], visitor?: string): Promise<{ role: string; parts: Record<string, unknown>[] }> {
+  async turn(
+    task: string,
+    system: string,
+    contents: unknown[],
+    tools: object[],
+    visitor?: string,
+  ): Promise<{ role: string; parts: Record<string, unknown>[] }> {
     const key = this.key(task, { system, contents, tools, model: this.cfg.modelMain });
     const hit = await this.lookup(task, key);
     if (hit) return hit.output as { role: string; parts: Record<string, unknown>[] };
@@ -158,8 +191,15 @@ export class Gemini {
   async usage() {
     const today = new Date().toISOString().slice(0, 10);
     const rows = await this.store.db.query<{ task: string; model: string; n: string; ms: string }>(
-      "select task, model, count(*) as n, avg(ms) as ms from ai_cache group by task, model order by task");
-    return { live: this.live, until: this.cfg.aiUntil, callsToday: (await this.store.kvGet<number>(`ai_calls:${today}`)) ?? 0, dailyCap: this.cfg.aiDailyCalls, byTask: rows };
+      "select task, model, count(*) as n, avg(ms) as ms from ai_cache group by task, model order by task",
+    );
+    return {
+      live: this.live,
+      until: this.cfg.aiUntil,
+      callsToday: (await this.store.kvGet<number>(`ai_calls:${today}`)) ?? 0,
+      dailyCap: this.cfg.aiDailyCalls,
+      byTask: rows,
+    };
   }
 }
 

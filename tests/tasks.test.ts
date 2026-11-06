@@ -247,22 +247,42 @@ describe("finishing a visit", () => {
   });
 
   it.each<[string, VisitState, () => Promise<void>]>([
-    ["a late cancellation that kept a fee", "late_cancel", async () => {
-      await readyToSettle("v-thu-weber", { type: "cancel", by: "household", minutesBefore: 60, assigned: ["lena"] });
-    }],
-    ["a visit that was checked out and paid", "paid_out", async () => {
-      await readyToSettle("v-thu-weber", checkoutOutcome());
-    }],
-    ["a cancellation with notice", "cancelled", async () => {
-      await readyToSettle("v-thu-weber", { type: "cancel", by: "household", minutesBefore: 2000, assigned: ["lena"] });
-    }],
-    ["an absence that nobody covered", "voided", async () => {
-      await readyToSettle("v-thu-weber", { type: "member_absent" });
-    }],
-    ["a capture the cooperative keeps whole, with no payout", "captured", async () => {
-      await readyToSettle("v-thu-weber", checkoutOutcome());
-      await app.store.updateVisit("v-thu-weber", { terms: { ...(await app.store.visit("v-thu-weber"))!.terms, coopShareBps: 10_000 } });
-    }],
+    [
+      "a late cancellation that kept a fee",
+      "late_cancel",
+      async () => {
+        await readyToSettle("v-thu-weber", { type: "cancel", by: "household", minutesBefore: 60, assigned: ["lena"] });
+      },
+    ],
+    [
+      "a visit that was checked out and paid",
+      "paid_out",
+      async () => {
+        await readyToSettle("v-thu-weber", checkoutOutcome());
+      },
+    ],
+    [
+      "a cancellation with notice",
+      "cancelled",
+      async () => {
+        await readyToSettle("v-thu-weber", { type: "cancel", by: "household", minutesBefore: 2000, assigned: ["lena"] });
+      },
+    ],
+    [
+      "an absence that nobody covered",
+      "voided",
+      async () => {
+        await readyToSettle("v-thu-weber", { type: "member_absent" });
+      },
+    ],
+    [
+      "a capture the cooperative keeps whole, with no payout",
+      "captured",
+      async () => {
+        await readyToSettle("v-thu-weber", checkoutOutcome());
+        await app.store.updateVisit("v-thu-weber", { terms: { ...(await app.store.visit("v-thu-weber"))!.terms, coopShareBps: 10_000 } });
+      },
+    ],
   ])("%s finishes as %s", async (_label, state, setup) => {
     await setup();
     expect(await settleAndFinish("v-thu-weber")).toBe(state);

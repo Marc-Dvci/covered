@@ -6,8 +6,17 @@ export type Skill = "pets" | "deep_clean" | "eco";
 export type Wallet = "PAYPAL" | "VENMO";
 
 export const LANG_NAMES: Record<Lang, string> = {
-  en: "English", pt: "Português", pl: "Polski", es: "Español", fr: "Français", zh: "中文",
-  ko: "한국어", vi: "Tiếng Việt", ru: "Русский", so: "Soomaali", it: "Italiano",
+  en: "English",
+  pt: "Português",
+  pl: "Polski",
+  es: "Español",
+  fr: "Français",
+  zh: "中文",
+  ko: "한국어",
+  vi: "Tiếng Việt",
+  ru: "Русский",
+  so: "Soomaali",
+  it: "Italiano",
 };
 
 export interface Point {

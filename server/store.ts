@@ -9,7 +9,16 @@ export interface VisitRow extends Visit {
   hold: { orderId: string; authorizationId: string; cents: number; placedAt: number; status: string } | null;
   capture: { captureId: string; cents: number; feeCents?: number; at: number } | null;
   void: { at: number; status: string } | null;
-  payout: { batchId: string; senderBatchId: string; status: string; items: { memberId: string; cents: number; wallet: string; transactionId?: string; status?: string }[]; sentAt: number; sentMs?: number; finalAt?: number; finalMs?: number } | null;
+  payout: {
+    batchId: string;
+    senderBatchId: string;
+    status: string;
+    items: { memberId: string; cents: number; wallet: string; transactionId?: string; status?: string }[];
+    sentAt: number;
+    sentMs?: number;
+    finalAt?: number;
+    finalMs?: number;
+  } | null;
   outcome: Outcome | null;
   settlement: Settlement | null;
   checkinAt: number | null;
@@ -41,9 +50,20 @@ function toVisit(r: Row): VisitRow {
 }
 
 const VISIT_COLS: Record<string, string> = {
-  memberIds: "member_ids", state: "state", hold: "hold", capture: "capture", void: "void", payout: "payout",
-  outcome: "outcome", settlement: "settlement", checkinAt: "checkin_at", checkoutAt: "checkout_at",
-  pendingMember: "pending_member", start: "start", minutes: "minutes", terms: "terms",
+  memberIds: "member_ids",
+  state: "state",
+  hold: "hold",
+  capture: "capture",
+  void: "void",
+  payout: "payout",
+  outcome: "outcome",
+  settlement: "settlement",
+  checkinAt: "checkin_at",
+  checkoutAt: "checkout_at",
+  pendingMember: "pending_member",
+  start: "start",
+  minutes: "minutes",
+  terms: "terms",
 };
 const JSON_COLS = new Set(["member_ids", "hold", "capture", "void", "payout", "outcome", "settlement", "terms"]);
 
@@ -52,19 +72,28 @@ export class Store {
 
   async migrate(): Promise<void> {
     if ((await this.db.query("select 1 from sqlite_master where type = 'table' and name = 'shares'")).length) return;
-    for (const stmt of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) await this.db.query(stmt);
+    for (const stmt of SCHEMA.split(";")
+      .map((s) => s.trim())
+      .filter(Boolean))
+      await this.db.query(stmt);
   }
 
   /**
    * Wipe and load the demo cooperative; the demo clock goes to Thursday 07:10. `payouts` routes the
-   * fictional members' pay to real sandbox receivers: "*=PAYPAL:a@b.com;teresa=VENMO:+12065550123".
+   * fictional members' pay to real sandbox receivers: "*=PAYPAL:a@b.com".
    */
   async reset(vaultId = "DEMO-VAULT", payouts = ""): Promise<void> {
-    const route = new Map(payouts.split(";").map((x) => x.trim()).filter(Boolean).map((x) => {
-      const [who, rest = ""] = x.split("=");
-      const [wallet, receiver] = rest.split(":");
-      return [who!.trim(), { wallet: (wallet === "VENMO" ? "VENMO" : "PAYPAL") as "PAYPAL" | "VENMO", receiver: receiver!.trim() }];
-    }));
+    const route = new Map(
+      payouts
+        .split(";")
+        .map((x) => x.trim())
+        .filter(Boolean)
+        .map((x) => {
+          const [who, rest = ""] = x.split("=");
+          const [wallet, receiver] = rest.split(":");
+          return [who!.trim(), { wallet: (wallet === "VENMO" ? "VENMO" : "PAYPAL") as "PAYPAL" | "VENMO", receiver: receiver!.trim() }];
+        }),
+    );
     await this.db.tx(async (q) => {
       // the daily model and reset allowances survive a reset: resetting must not refill them
       await q("delete from kv where key not like 'ai_calls:%' and key not like 'demo_resets:%'");
@@ -74,11 +103,23 @@ export class Store {
         await q("insert into members(id, data) values ($1, $2)", [m.id, JSON.stringify({ ...m, payout })]);
       }
       for (const h of seedHouseholds) {
-        await q("insert into households(id, data, vault_id, vault_email) values ($1, $2, $3, $4)", [h.id, JSON.stringify(h), vaultId, `${h.id}@households.example`]);
+        await q("insert into households(id, data, vault_id, vault_email) values ($1, $2, $3, $4)", [
+          h.id,
+          JSON.stringify(h),
+          vaultId,
+          `${h.id}@households.example`,
+        ]);
       }
       for (const v of seedVisits()) {
-        await q("insert into visits(id, household_id, member_ids, start, minutes, terms, state) values ($1,$2,$3,$4,$5,$6,$7)",
-          [v.id, v.householdId, JSON.stringify(v.memberIds), v.start, v.minutes, JSON.stringify(v.terms), v.state]);
+        await q("insert into visits(id, household_id, member_ids, start, minutes, terms, state) values ($1,$2,$3,$4,$5,$6,$7)", [
+          v.id,
+          v.householdId,
+          JSON.stringify(v.memberIds),
+          v.start,
+          v.minutes,
+          JSON.stringify(v.terms),
+          v.state,
+        ]);
       }
     });
     const start = STORY.messageAt;
@@ -130,13 +171,15 @@ export class Store {
   // ---- people
 
   async members(): Promise<Member[]> {
-    return (await this.db.query<{ data: Member }>("select data from members order by id")).map((r) => r.data)
-      .sort((a, b) => seedOrder(a.id) - seedOrder(b.id));
+    return (await this.db.query<{ data: Member }>("select data from members order by id")).map((r) => r.data).sort((a, b) => seedOrder(a.id) - seedOrder(b.id));
   }
 
   async households(): Promise<(Household & { vaultId: string | null; vaultEmail: string | null })[]> {
-    return (await this.db.query<{ data: Household; vault_id: string | null; vault_email: string | null }>("select data, vault_id, vault_email from households order by id"))
-      .map((r) => ({ ...r.data, vaultId: r.vault_id, vaultEmail: r.vault_email }));
+    return (
+      await this.db.query<{ data: Household; vault_id: string | null; vault_email: string | null }>(
+        "select data, vault_id, vault_email from households order by id",
+      )
+    ).map((r) => ({ ...r.data, vaultId: r.vault_id, vaultEmail: r.vault_email }));
   }
 
   async household(id: string) {
@@ -175,8 +218,15 @@ export class Store {
   }
 
   async insertVisit(v: Visit): Promise<void> {
-    await this.db.query("insert into visits(id, household_id, member_ids, start, minutes, terms, state) values ($1,$2,$3,$4,$5,$6,$7)",
-      [v.id, v.householdId, JSON.stringify(v.memberIds), v.start, v.minutes, JSON.stringify(v.terms), v.state]);
+    await this.db.query("insert into visits(id, household_id, member_ids, start, minutes, terms, state) values ($1,$2,$3,$4,$5,$6,$7)", [
+      v.id,
+      v.householdId,
+      JSON.stringify(v.memberIds),
+      v.start,
+      v.minutes,
+      JSON.stringify(v.terms),
+      v.state,
+    ]);
   }
 
   // ---- money and events
@@ -191,18 +241,34 @@ export class Store {
   }
 
   async moneyRows(visitId?: string) {
-    return this.db.query<{ visit_id: string; kind: string; cents: number; paypal_id: string | null; status: string; ref: string; at: string; board_at: number; detail: unknown }>(
-      visitId ? "select * from money where visit_id = $1 order by id" : "select * from money order by id", visitId ? [visitId] : []);
+    return this.db.query<{
+      visit_id: string;
+      kind: string;
+      cents: number;
+      paypal_id: string | null;
+      status: string;
+      ref: string;
+      at: string;
+      board_at: number;
+      detail: unknown;
+    }>(visitId ? "select * from money where visit_id = $1 order by id" : "select * from money order by id", visitId ? [visitId] : []);
   }
 
   async event(type: string, visitId: string | null, actor: string, data: unknown = {}): Promise<void> {
-    await this.db.query("insert into events(type, visit_id, actor, data, board_at) values ($1,$2,$3,$4,$5)", [type, visitId, actor, JSON.stringify(data), await this.now()]);
+    await this.db.query("insert into events(type, visit_id, actor, data, board_at) values ($1,$2,$3,$4,$5)", [
+      type,
+      visitId,
+      actor,
+      JSON.stringify(data),
+      await this.now(),
+    ]);
   }
 
   async events(limit = 50, visitId?: string) {
     return this.db.query<{ id: number; at: string; board_at: number; type: string; visit_id: string | null; actor: string; data: Record<string, unknown> }>(
       visitId ? "select * from events where visit_id = $2 order by id desc limit $1" : "select * from events order by id desc limit $1",
-      visitId ? [limit, visitId] : [limit]);
+      visitId ? [limit, visitId] : [limit],
+    );
   }
 }
 

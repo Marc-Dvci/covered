@@ -8,7 +8,7 @@ import { bindable, decodeRow, numbered, type Db, type Query } from "./db.ts";
 export function openSqlite(file: string | null): Db {
   if (file) mkdirSync(dirname(file), { recursive: true });
   const db = new DatabaseSync(file ?? ":memory:");
-  const query: Query = async <T,>(sql: string, params?: unknown[]) =>
+  const query: Query = async <T>(sql: string, params?: unknown[]) =>
     (db.prepare(numbered(sql)).all(...(bindable(params) as never[])) as Record<string, unknown>[]).map((r) => decodeRow<T>(r));
   return {
     query,

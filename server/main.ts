@@ -28,5 +28,7 @@ if (existsSync(dist)) {
 setInterval(() => void sweep(app).catch((e) => console.error(e)), 30_000).unref();
 
 serve({ fetch: server.fetch, port: cfg.port, hostname: "0.0.0.0" }, () => {
-  console.log(`Covered on ${cfg.publicUrl}: PayPal ${app.paypal.live ? "sandbox" : "stand-in"}, tasks in process, model ${ai.live ? "Gemini" : "recorded only"}`);
+  console.log(
+    `Covered on ${cfg.publicUrl}: PayPal ${app.paypal.live ? "sandbox" : "stand-in"}, tasks in process, model ${ai.live ? "Gemini" : "recorded only"}`,
+  );
 });

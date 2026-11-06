@@ -11,10 +11,18 @@ import type { PayPal } from "./paypal/types.ts";
 import type { Store } from "./store.ts";
 
 const AREA_POINTS: Record<string, { lat: number; lon: number }> = {
-  "Capitol Hill": { lat: 47.6253, lon: -122.3222 }, "Ballard": { lat: 47.6687, lon: -122.3847 }, "Fremont": { lat: 47.6505, lon: -122.3509 },
-  "Queen Anne": { lat: 47.6374, lon: -122.357 }, "Beacon Hill": { lat: 47.579, lon: -122.3115 }, "Columbia City": { lat: 47.5598, lon: -122.2866 },
-  "West Seattle": { lat: 47.5667, lon: -122.3868 }, "University District": { lat: 47.6615, lon: -122.3138 }, "Wallingford": { lat: 47.6615, lon: -122.3346 },
-  "Greenwood": { lat: 47.6907, lon: -122.355 }, "Madison Park": { lat: 47.634, lon: -122.2785 }, "Georgetown": { lat: 47.5469, lon: -122.322 },
+  "Capitol Hill": { lat: 47.6253, lon: -122.3222 },
+  Ballard: { lat: 47.6687, lon: -122.3847 },
+  Fremont: { lat: 47.6505, lon: -122.3509 },
+  "Queen Anne": { lat: 47.6374, lon: -122.357 },
+  "Beacon Hill": { lat: 47.579, lon: -122.3115 },
+  "Columbia City": { lat: 47.5598, lon: -122.2866 },
+  "West Seattle": { lat: 47.5667, lon: -122.3868 },
+  "University District": { lat: 47.6615, lon: -122.3138 },
+  Wallingford: { lat: 47.6615, lon: -122.3346 },
+  Greenwood: { lat: 47.6907, lon: -122.355 },
+  "Madison Park": { lat: 47.634, lon: -122.2785 },
+  Georgetown: { lat: 47.5469, lon: -122.322 },
 };
 export const SIGNUP_AREAS = Object.keys(AREA_POINTS);
 
@@ -23,12 +31,23 @@ export async function startSigning(store: Store, paypal: PayPal, agreementId: st
   const a = r[0]?.data;
   if (!a) throw new ActionError("no such agreement", 404);
   if (missing(a).length) throw new ActionError("the agreement is not complete");
-  const base = a.householdName.toLowerCase().replace(/^the\s+/, "").replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "") || "household";
+  const base =
+    a.householdName
+      .toLowerCase()
+      .replace(/^the\s+/, "")
+      .replace(/[^a-z]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "household";
   let householdId = base;
   for (let i = 2; await store.household(householdId); i++) householdId = `${base}-${i}`;
   const h: Household = {
-    id: householdId, name: a.householdName, area: a.area, at: AREA_POINTS[a.area] ?? AREA_POINTS["Capitol Hill"]!, language: a.language,
-    needs: a.needs, sameCleaner: a.sameCleaner, contact: `${householdId}@households.example`,
+    id: householdId,
+    name: a.householdName,
+    area: a.area,
+    at: AREA_POINTS[a.area] ?? AREA_POINTS["Capitol Hill"]!,
+    language: a.language,
+    needs: a.needs,
+    sameCleaner: a.sameCleaner,
+    contact: `${householdId}@households.example`,
   };
   await store.db.query("insert into households(id, data, agreement_id) values ($1,$2,$3)", [h.id, JSON.stringify(h), agreementId]);
   await store.db.query("update agreements set household_id = $2, status = 'signing' where id = $1", [agreementId, h.id]);
@@ -39,8 +58,15 @@ export async function startSigning(store: Store, paypal: PayPal, agreementId: st
   return { approveUrl: v.approveUrl, householdId: h.id };
 }
 
-export async function finishSigning(store: Store, paypal: PayPal, agreementId: string, setupTokenId: string): Promise<{ householdId: string; visitId: string | null; memberId: string | null }> {
-  const r = await store.db.query<{ data: Agreement; household_id: string; status: string }>("select data, household_id, status from agreements where id = $1", [agreementId]);
+export async function finishSigning(
+  store: Store,
+  paypal: PayPal,
+  agreementId: string,
+  setupTokenId: string,
+): Promise<{ householdId: string; visitId: string | null; memberId: string | null }> {
+  const r = await store.db.query<{ data: Agreement; household_id: string; status: string }>("select data, household_id, status from agreements where id = $1", [
+    agreementId,
+  ]);
   const row = r[0];
   if (!row) throw new ActionError("no such agreement", 404);
   const expected = await store.kvGet<string>(`setup:${agreementId}`);
@@ -50,7 +76,11 @@ export async function finishSigning(store: Store, paypal: PayPal, agreementId: s
     return { householdId: row.household_id, visitId: v?.id ?? null, memberId: v?.memberIds[0] ?? null };
   }
   const token = await paypal.vaultFinalize(setupTokenId, agreementId);
-  await store.db.query("update households set vault_id = $2, vault_email = $3 where id = $1", [row.household_id, token.paymentTokenId, token.payerEmail ?? null]);
+  await store.db.query("update households set vault_id = $2, vault_email = $3 where id = $1", [
+    row.household_id,
+    token.paymentTokenId,
+    token.payerEmail ?? null,
+  ]);
   await store.db.query("update agreements set status = 'signed', signed_at = datetime('now') where id = $1", [agreementId]);
   await store.event("agreement.signed", null, row.household_id, { agreementId, vault: "saved" });
 
@@ -60,10 +90,20 @@ export async function finishSigning(store: Store, paypal: PayPal, agreementId: s
   let start = a.schedule.weekday * 1440 + hm(a.schedule.start);
   if (start <= now) start += 7 * 1440;
   const visit: Visit = {
-    id: `v-${row.household_id}-1`, householdId: row.household_id, memberIds: [], start, minutes: a.schedule.minutes,
-    terms: { ...DEFAULT_TERMS, rateCentsPerHour: a.rateCentsPerHour ?? DEFAULT_TERMS.rateCentsPerHour, bookedMinutes: a.schedule.minutes,
-      noticeHours: a.cancellation.noticeHours ?? 24, lateCancelPct: a.cancellation.lateCancelPct ?? 50, lockoutPct: a.cancellation.lockoutPct ?? 100,
-      extraAllowanceMinutes: a.extraAllowanceMinutes },
+    id: `v-${row.household_id}-1`,
+    householdId: row.household_id,
+    memberIds: [],
+    start,
+    minutes: a.schedule.minutes,
+    terms: {
+      ...DEFAULT_TERMS,
+      rateCentsPerHour: a.rateCentsPerHour ?? DEFAULT_TERMS.rateCentsPerHour,
+      bookedMinutes: a.schedule.minutes,
+      noticeHours: a.cancellation.noticeHours ?? 24,
+      lateCancelPct: a.cancellation.lateCancelPct ?? 50,
+      lockoutPct: a.cancellation.lockoutPct ?? 100,
+      extraAllowanceMinutes: a.extraAllowanceMinutes,
+    },
     state: "scheduled",
   };
   const [members, households, visits] = await Promise.all([store.members(), store.households(), store.visits()]);
@@ -79,7 +119,12 @@ export async function finishSigning(store: Store, paypal: PayPal, agreementId: s
 export async function startRepair(store: Store, paypal: PayPal, householdId: string, publicUrl: string): Promise<{ approveUrl: string }> {
   if (!(await store.household(householdId))) throw new Error("no such household");
   const back = `${publicUrl}/api/vault/return?household=${encodeURIComponent(householdId)}`;
-  const v = await paypal.vaultSetup(back, `${publicUrl}/h/${householdId}`, "Cleaning visits with the cooperative, held 24 hours ahead", `repair-${householdId}-${randomUUID().slice(0, 8)}`);
+  const v = await paypal.vaultSetup(
+    back,
+    `${publicUrl}/h/${householdId}`,
+    "Cleaning visits with the cooperative, held 24 hours ahead",
+    `repair-${householdId}-${randomUUID().slice(0, 8)}`,
+  );
   await store.kvSet(`repair:${householdId}`, v.setupTokenId);
   await store.event("vault.repair_started", null, householdId);
   return { approveUrl: v.approveUrl };

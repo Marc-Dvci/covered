@@ -14,7 +14,14 @@ export interface PublicVisit {
   hold: { authorizationId: string; cents: number; placedAt: number; status: string } | null;
   capture: { captureId: string; cents: number; feeCents?: number; at: number } | null;
   void: { at: number; status: string } | null;
-  payout: { status: string; batchId: string; items: { memberId: string; cents: number; wallet: string; status?: string; transactionId?: string }[]; sentAt: number; finalAt?: number; finalMs?: number } | null;
+  payout: {
+    status: string;
+    batchId: string;
+    items: { memberId: string; cents: number; wallet: string; status?: string; transactionId?: string }[];
+    sentAt: number;
+    finalAt?: number;
+    finalMs?: number;
+  } | null;
   settlement: { captureCents: number; releaseCents: number; coopCents: number; members: Record<string, number>; dueCents: number; reason: string } | null;
   outcome: { type: string } | null;
   checkinAt: number | null;
@@ -152,6 +159,16 @@ export function usePoll<T>(path: string | null, ms = 2000): { data: T | null; er
 }
 
 export const STATE_LABEL: Record<VisitState, string> = {
-  done: "Before the demo", scheduled: "Scheduled", holding: "Placing hold", held: "Pay held", at_risk: "Hold refused", in_progress: "In progress",
-  settling: "Settling", captured: "Captured", paid_out: "Paid", late_cancel: "Late-cancel fee", cancelled: "Cancelled", voided: "Released",
+  done: "Before the demo",
+  scheduled: "Scheduled",
+  holding: "Placing hold",
+  held: "Pay held",
+  at_risk: "Hold refused",
+  in_progress: "In progress",
+  settling: "Settling",
+  captured: "Captured",
+  paid_out: "Paid",
+  late_cancel: "Late-cancel fee",
+  cancelled: "Cancelled",
+  voided: "Released",
 };

@@ -27,7 +27,10 @@ beforeEach(async () => {
 const runnerWith = (pp: FakePayPal) => new LocalRunner({ store: app.store, paypal: pp, payoutPollMs: 1 }, 1);
 
 const runLog = async (visitId: string) =>
-  (await app.store.events(100, visitId)).filter((e) => e.type === "task.run").reverse().map((e) => e.data);
+  (await app.store.events(100, visitId))
+    .filter((e) => e.type === "task.run")
+    .reverse()
+    .map((e) => e.data);
 
 describe("retrying a failing task", () => {
   it("retries exactly RETRY.maxRetries times, then logs the run as failed", async () => {
@@ -51,7 +54,11 @@ describe("retrying a failing task", () => {
     await runner.start("placeHold", "v-thu-weber");
     await runner.idle();
     expect(pp.attempts).toBe(3);
-    expect((await runLog("v-thu-weber")).map((e) => [e.attempt, e.status])).toEqual([[0, "retrying"], [1, "retrying"], [2, "succeeded"]]);
+    expect((await runLog("v-thu-weber")).map((e) => [e.attempt, e.status])).toEqual([
+      [0, "retrying"],
+      [1, "retrying"],
+      [2, "succeeded"],
+    ]);
     expect((await app.store.visit("v-thu-weber"))!.state).toBe("held");
   });
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { blank, missing, SEATTLE_MIN_RATE_CENTS, type Agreement } from "../shared/agreement.ts";
 import { chipText, type ChipVisit } from "../shared/chip.ts";
 import { clock, dayOf, dollars, when, type VisitState } from "../shared/domain.ts";
-import { nextStep, type GuideState, type Step } from "../shared/guide.ts";
+import { nextStep, type GuideState } from "../shared/guide.ts";
 import { hm, households } from "../shared/seed.ts";
 import { km, travelMinutes } from "../shared/travel.ts";
 
@@ -35,15 +35,35 @@ describe("the next step in Thursday's story", () => {
     ["Sam's message is open for the agent", { sam: "open" }, { n: 2 }],
     ["the agent's plan is waiting for approval", { sam: "proposed" }, { n: 3 }],
     ["the Okafors are asked about the same cleaner", { sam: "approved", okafor: { pendingMember: "marek" } }, { n: 4, link: { to: "/h/okafor" } }],
-    ["Marek is on his way, before 09:00", { sam: "approved", okafor: { state: "held" }, now: at("07:10") }, { n: 5, clockTo: at("09:00"), link: { to: "/m/marek" } }],
+    [
+      "Marek is on his way, before 09:00",
+      { sam: "approved", okafor: { state: "held" }, now: at("07:10") },
+      { n: 5, clockTo: at("09:00"), link: { to: "/m/marek" } },
+    ],
     ["Marek is at the door, from 09:00", { sam: "approved", okafor: { state: "held" }, now: at("09:00") }, { n: 5, link: { to: "/m/marek" } }],
-    ["Marek is working, before 13:05", { sam: "approved", okafor: { state: "in_progress" }, now: at("10:00") }, { n: 5, clockTo: at("13:05"), link: { to: "/m/marek" } }],
+    [
+      "Marek is working, before 13:05",
+      { sam: "approved", okafor: { state: "in_progress" }, now: at("10:00") },
+      { n: 5, clockTo: at("13:05"), link: { to: "/m/marek" } },
+    ],
     ["Marek is done, from 13:05", { sam: "approved", okafor: { state: "in_progress" }, now: at("13:05") }, { n: 5, link: { to: "/m/marek" } }],
     ["the Okafor visit is capturing on PayPal", { sam: "approved", okafor: { state: "settling" } }, { n: 5 }],
-    ["Mr. Lindqvist's cancellation comes before 13:30", { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "scheduled" }, now: at("13:00") }, { n: 6, clockTo: at("13:30"), link: { to: "/h/lindqvist" } }],
-    ["Mr. Lindqvist cancels from 13:30", { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "held" }, now: at("13:30") }, { n: 6, link: { to: "/h/lindqvist" } }],
+    [
+      "Mr. Lindqvist's cancellation comes before 13:30",
+      { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "scheduled" }, now: at("13:00") },
+      { n: 6, clockTo: at("13:30"), link: { to: "/h/lindqvist" } },
+    ],
+    [
+      "Mr. Lindqvist cancels from 13:30",
+      { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "held" }, now: at("13:30") },
+      { n: 6, link: { to: "/h/lindqvist" } },
+    ],
     ["the Lindqvist cancellation is capturing", { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "settling" } }, { n: 6 }],
-    ["the story is over: the statement", { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "late_cancel" } }, { n: 7, link: { to: "/m/marek/statement" } }],
+    [
+      "the story is over: the statement",
+      { sam: "approved", okafor: { state: "paid_out" }, lindqvist: { state: "late_cancel" } },
+      { n: 7, link: { to: "/m/marek/statement" } },
+    ],
   ])("%s", (_label, input, expected) => {
     const step = nextStep(story(input));
     expect(step).toMatchObject(expected);
@@ -62,7 +82,14 @@ describe("the next step in Thursday's story", () => {
 
 describe("the chip on a visit's bar", () => {
   const hold = { cents: 12250, placedAt: THU + hm("09:00") };
-  const base = (state: VisitState, extra: Partial<ChipVisit> = {}): ChipVisit => ({ state, priceCents: 10500, hold: null, capture: null, payout: null, ...extra });
+  const base = (state: VisitState, extra: Partial<ChipVisit> = {}): ChipVisit => ({
+    state,
+    priceCents: 10500,
+    hold: null,
+    capture: null,
+    payout: null,
+    ...extra,
+  });
 
   it.each<[string, ChipVisit, string]>([
     ["done", base("done"), "before the demo week"],
@@ -119,7 +146,12 @@ describe("the display helpers", () => {
 });
 
 describe("travel between homes", () => {
-  const pairs: [number, number][] = [[0, 1], [3, 9], [12, 20], [25, 4]];
+  const pairs: [number, number][] = [
+    [0, 1],
+    [3, 9],
+    [12, 20],
+    [25, 4],
+  ];
 
   it.each(pairs)("the trip from home %i to home %i takes as long as the way back", (a, b) => {
     const pa = households[a]!.at;
@@ -158,24 +190,132 @@ describe("the agreement checklist", () => {
   });
 
   it.each<[string, (a: Agreement) => void, string[]]>([
-    ["scope", (a) => { a.scope = []; }, ["scope"]],
-    ["scope made of blank lines", (a) => { a.scope = ["  "]; }, ["scope"]],
-    ["location", (a) => { a.location = " "; }, ["location"]],
-    ["day of the week", (a) => { a.schedule.weekday = null; }, ["schedule"]],
-    ["start time", (a) => { a.schedule.start = null; }, ["schedule"]],
-    ["visit shorter than an hour", (a) => { a.schedule.minutes = 59; }, ["schedule"]],
-    ["visit longer than ten hours", (a) => { a.schedule.minutes = 601; }, ["schedule"]],
-    ["frequency", (a) => { a.schedule.frequency = null; }, ["schedule"]],
-    ["rate", (a) => { a.rateCentsPerHour = null; }, ["rate"]],
-    ["rate of zero", (a) => { a.rateCentsPerHour = 0; }, ["rate"]],
-    ["payment schedule", (a) => { a.paymentSchedule = ""; }, ["payment_schedule"]],
-    ["notice for cancellation", (a) => { a.cancellation.noticeHours = null; }, ["cancellation"]],
-    ["late fee above 100%", (a) => { a.cancellation.lateCancelPct = 101; }, ["cancellation"]],
-    ["lock-out fee below 0%", (a) => { a.cancellation.lockoutPct = -1; }, ["cancellation"]],
-    ["expenses", (a) => { a.expenses = null; }, ["expenses"]],
-    ["classification", (a) => { a.classification = " "; }, ["classification"]],
-    ["benefits", (a) => { a.benefits = null; }, ["benefits"]],
-    ["leave", (a) => { a.leave = ""; }, ["leave"]],
+    [
+      "scope",
+      (a) => {
+        a.scope = [];
+      },
+      ["scope"],
+    ],
+    [
+      "scope made of blank lines",
+      (a) => {
+        a.scope = ["  "];
+      },
+      ["scope"],
+    ],
+    [
+      "location",
+      (a) => {
+        a.location = " ";
+      },
+      ["location"],
+    ],
+    [
+      "day of the week",
+      (a) => {
+        a.schedule.weekday = null;
+      },
+      ["schedule"],
+    ],
+    [
+      "start time",
+      (a) => {
+        a.schedule.start = null;
+      },
+      ["schedule"],
+    ],
+    [
+      "visit shorter than an hour",
+      (a) => {
+        a.schedule.minutes = 59;
+      },
+      ["schedule"],
+    ],
+    [
+      "visit longer than ten hours",
+      (a) => {
+        a.schedule.minutes = 601;
+      },
+      ["schedule"],
+    ],
+    [
+      "frequency",
+      (a) => {
+        a.schedule.frequency = null;
+      },
+      ["schedule"],
+    ],
+    [
+      "rate",
+      (a) => {
+        a.rateCentsPerHour = null;
+      },
+      ["rate"],
+    ],
+    [
+      "rate of zero",
+      (a) => {
+        a.rateCentsPerHour = 0;
+      },
+      ["rate"],
+    ],
+    [
+      "payment schedule",
+      (a) => {
+        a.paymentSchedule = "";
+      },
+      ["payment_schedule"],
+    ],
+    [
+      "notice for cancellation",
+      (a) => {
+        a.cancellation.noticeHours = null;
+      },
+      ["cancellation"],
+    ],
+    [
+      "late fee above 100%",
+      (a) => {
+        a.cancellation.lateCancelPct = 101;
+      },
+      ["cancellation"],
+    ],
+    [
+      "lock-out fee below 0%",
+      (a) => {
+        a.cancellation.lockoutPct = -1;
+      },
+      ["cancellation"],
+    ],
+    [
+      "expenses",
+      (a) => {
+        a.expenses = null;
+      },
+      ["expenses"],
+    ],
+    [
+      "classification",
+      (a) => {
+        a.classification = " ";
+      },
+      ["classification"],
+    ],
+    [
+      "benefits",
+      (a) => {
+        a.benefits = null;
+      },
+      ["benefits"],
+    ],
+    [
+      "leave",
+      (a) => {
+        a.leave = "";
+      },
+      ["leave"],
+    ],
   ])("a missing %s is reported", (_label, change, expected) => {
     const a = complete();
     change(a);

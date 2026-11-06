@@ -1,0 +1,16 @@
+dist
+coverage
+var
+test-results
+playwright-report
+.wrangler
+node_modules
+package-lock.json
+data/ai-recordings.json
+docs/*.json
+docs/*.svg
+eval/**/*.json
+shared/rules/cases.json
+tests/fixtures
+web/public/_routes.json
+*.md

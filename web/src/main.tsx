@@ -33,7 +33,14 @@ function WithTop() {
       <main id="main">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/board" element={<Suspense fallback={<p className="page">Loading the board…</p>}><BoardPage /></Suspense>} />
+          <Route
+            path="/board"
+            element={
+              <Suspense fallback={<p className="page">Loading the board…</p>}>
+                <BoardPage />
+              </Suspense>
+            }
+          />
           <Route path="/m/:id" element={<MemberPage />} />
           <Route path="/m/:id/statement" element={<StatementPage />} />
           <Route path="/h/:id" element={<HouseholdPage />} />

@@ -4,7 +4,21 @@ import type { VisitRow } from "../server/store.ts";
 import { households, members, seedVisits } from "../shared/seed.ts";
 import { travelMinutes } from "../shared/travel.ts";
 
-const visits = seedVisits().map((v) => ({ ...v, hold: null, capture: null, void: null, payout: null, outcome: null, settlement: null, checkinAt: null, checkoutAt: null, pendingMember: null }) as VisitRow);
+const visits = seedVisits().map(
+  (v) =>
+    ({
+      ...v,
+      hold: null,
+      capture: null,
+      void: null,
+      payout: null,
+      outcome: null,
+      settlement: null,
+      checkinAt: null,
+      checkoutAt: null,
+      pendingMember: null,
+    }) as VisitRow,
+);
 const crud = toCrud(members, households, visits);
 
 describe("board data in CrudManager format", () => {
@@ -33,7 +47,9 @@ describe("board data in CrudManager format", () => {
     let checked = 0;
     for (const v of visits) {
       const m = v.memberIds[0];
-      const next = visits.filter((x) => x.memberIds.includes(m!) && x.start >= v.start + v.minutes && Math.floor(x.start / 1440) === Math.floor(v.start / 1440)).sort((a, b) => a.start - b.start)[0];
+      const next = visits
+        .filter((x) => x.memberIds.includes(m!) && x.start >= v.start + v.minutes && Math.floor(x.start / 1440) === Math.floor(v.start / 1440))
+        .sort((a, b) => a.start - b.start)[0];
       const e = crud.events.rows.find((x) => x.id === v.id)!;
       expect(e.postamble).toBe(`${next ? travelMinutes(at(v.householdId), at(next.householdId)) : 0} minutes`);
       if (next) checked++;

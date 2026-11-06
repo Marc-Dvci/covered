@@ -8,14 +8,34 @@ const report: { page: string; violations: { id: string; impact: string | null; n
 
 async function axe(page: Page, name: string) {
   await page.addScriptTag({ content: axeSource });
-  const r = await page.evaluate(async () => (await (window as unknown as { axe: { run: (o: unknown) => Promise<{ violations: { id: string; impact: string | null; nodes: { target: string[]; failureSummary?: string }[] }[] }> } }).axe.run({ runOnly: ["wcag2a", "wcag2aa", "wcag21aa"] })));
-  const violations = r.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, targets: v.nodes.map((n) => `${n.target.join(" ")} ${n.failureSummary ?? ""}`.slice(0, 300)) }));
+  const r = await page.evaluate(
+    async () =>
+      await (
+        window as unknown as {
+          axe: {
+            run: (o: unknown) => Promise<{ violations: { id: string; impact: string | null; nodes: { target: string[]; failureSummary?: string }[] }[] }>;
+          };
+        }
+      ).axe.run({ runOnly: ["wcag2a", "wcag2aa", "wcag21aa"] }),
+  );
+  const violations = r.violations.map((v) => ({
+    id: v.id,
+    impact: v.impact,
+    nodes: v.nodes.length,
+    targets: v.nodes.map((n) => `${n.target.join(" ")} ${n.failureSummary ?? ""}`.slice(0, 300)),
+  }));
   report.push({ page: name, violations });
-  expect(violations.filter((v) => v.impact === "serious" || v.impact === "critical"), `${name}: ${JSON.stringify(violations)}`).toEqual([]);
+  expect(
+    violations.filter((v) => v.impact === "serious" || v.impact === "critical"),
+    `${name}: ${JSON.stringify(violations)}`,
+  ).toEqual([]);
 }
 
 const api = (page: Page, path: string, body: unknown = {}) =>
-  page.evaluate(async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(), [path, body] as const);
+  page.evaluate(
+    async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(),
+    [path, body] as const,
+  );
 const bar = (page: Page, visit: string) => page.locator(`.b-sch-event-wrap[data-event-id="${visit}"]`);
 const clock = (page: Page, hhmm: string) => api(page, "/api/clock", { at: 3 * 1440 + Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) });
 

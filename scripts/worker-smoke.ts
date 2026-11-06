@@ -1,12 +1,21 @@
 // Runs the deployed shape locally in Cloudflare's own runtime (workerd, through wrangler dev), with no account and
 // no keys: the Worker, the Durable Object ledger and the Workflows. It resets the demo, waits for the holds placed by
 // Workflows on the PayPal stand-in, then settles one visit and waits for its payout.
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 const PORT = 8789;
 const BASE = `http://127.0.0.1:${PORT}`;
 const THU = 3 * 1440;
-const wrangler = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1", "--var", "COVERED_PUBLIC_URL:" + BASE], { shell: true, stdio: "inherit", env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "1" } });
+const wrangler = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1", "--var", "COVERED_PUBLIC_URL:" + BASE], {
+  shell: true,
+  stdio: "inherit",
+  detached: process.platform !== "win32",
+  env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "1" },
+});
+const stopWrangler = () => {
+  if (process.platform === "win32") spawnSync("taskkill", ["/PID", String(wrangler.pid), "/T", "/F"]);
+  else process.kill(-wrangler.pid!, "SIGTERM");
+};
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const post = async (path: string, body: unknown = {}) => {
@@ -61,6 +70,6 @@ try {
 } catch (e) {
   console.error(`FAIL: ${String(e)}`);
 } finally {
-  wrangler.kill();
+  stopWrangler();
   process.exit(code);
 }

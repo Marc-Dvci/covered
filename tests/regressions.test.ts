@@ -17,7 +17,8 @@ const server = () => {
   routes(s, app, new Gemini({ ...app.cfg, geminiKey: undefined }, app.store));
   return s;
 };
-const post = (path: string, body: unknown = {}) => server().request(path, { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" } });
+const post = (path: string, body: unknown = {}) =>
+  server().request(path, { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" } });
 
 beforeEach(async () => {
   const pp = new FakePayPal();
@@ -52,13 +53,30 @@ describe("found while testing, kept fixed", () => {
   });
 
   it("a signed agreement cannot be edited back to a draft", async () => {
-    const draft = (await (await post("/api/agreements/draft", { householdName: "The Abernathys", area: "Capitol Hill", language: "en", jobText: "A small flat", memberLanguage: "en", memberText: "$25 an hour, 24 hours notice, half the visit if late" })).json()) as { id: string };
-    await post(`/api/agreements/${draft.id}/update`, { scope: ["floors"], location: "Capitol Hill", rateCentsPerHour: 2500, schedule: { weekday: 5, start: "10:00", minutes: 180, frequency: "weekly" }, cancellation: { noticeHours: 24, lateCancelPct: 50, lockoutPct: 100 } });
+    const draft = (await (
+      await post("/api/agreements/draft", {
+        householdName: "The Abernathys",
+        area: "Capitol Hill",
+        language: "en",
+        jobText: "A small flat",
+        memberLanguage: "en",
+        memberText: "$25 an hour, 24 hours notice, half the visit if late",
+      })
+    ).json()) as { id: string };
+    await post(`/api/agreements/${draft.id}/update`, {
+      scope: ["floors"],
+      location: "Capitol Hill",
+      rateCentsPerHour: 2500,
+      schedule: { weekday: 5, start: "10:00", minutes: 180, frequency: "weekly" },
+      cancellation: { noticeHours: 24, lateCancelPct: 50, lockoutPct: 100 },
+    });
     const signing = await post(`/api/agreements/${draft.id}/sign`);
     expect(signing.status).toBe(200);
     const edit = await post(`/api/agreements/${draft.id}/update`, { rateCentsPerHour: 2000 });
     expect(edit.status).toBe(409);
-    const rows = await app.store.db.query<{ data: { rateCentsPerHour: number }; status: string }>("select data, status from agreements where id = $1", [draft.id]);
+    const rows = await app.store.db.query<{ data: { rateCentsPerHour: number }; status: string }>("select data, status from agreements where id = $1", [
+      draft.id,
+    ]);
     expect(rows[0]).toMatchObject({ status: "signing", data: { rateCentsPerHour: 2500 } });
   });
 
@@ -73,10 +91,15 @@ describe("found while testing, kept fixed", () => {
   });
 
   it.each([
-    ["approving a disruption with no proposal yet", "POST", async () => {
-      const d = (await (await post("/api/messages", { memberId: "sam", text: "my son has a fever, I can't come in" })).json()) as { id: string };
-      return `/api/disruptions/${d.id}/approve`;
-    }, 409],
+    [
+      "approving a disruption with no proposal yet",
+      "POST",
+      async () => {
+        const d = (await (await post("/api/messages", { memberId: "sam", text: "my son has a fever, I can't come in" })).json()) as { id: string };
+        return `/api/disruptions/${d.id}/approve`;
+      },
+      409,
+    ],
     ["a statement for an unknown member", "GET", async () => "/api/members/nobody/statement", 404],
     ["signing an agreement that does not exist", "POST", async () => "/api/agreements/nothing/sign", 404],
   ])("a client error is not a server error: %s", async (_name, method, path, status) => {
@@ -86,7 +109,15 @@ describe("found while testing, kept fixed", () => {
   });
 
   it("signing an incomplete agreement is refused as the client's error", async () => {
-    const draft = (await (await post("/api/agreements/draft", { householdName: "The Abernathys", area: "Capitol Hill", language: "en", jobText: "A small flat", memberLanguage: "en" })).json()) as { id: string };
+    const draft = (await (
+      await post("/api/agreements/draft", {
+        householdName: "The Abernathys",
+        area: "Capitol Hill",
+        language: "en",
+        jobText: "A small flat",
+        memberLanguage: "en",
+      })
+    ).json()) as { id: string };
     expect((await post(`/api/agreements/${draft.id}/sign`)).status).toBe(409);
   });
 });

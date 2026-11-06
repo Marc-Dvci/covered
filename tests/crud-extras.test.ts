@@ -12,16 +12,40 @@ import type { VisitState } from "../shared/domain.ts";
 
 const THU = 3 * 1440;
 
-const rows = (): VisitRow[] => seedVisits().map((v) => ({
-  ...v, hold: null, capture: null, void: null, payout: null, outcome: null, settlement: null, checkinAt: null, checkoutAt: null, pendingMember: null,
-}) as VisitRow);
+const rows = (): VisitRow[] =>
+  seedVisits().map(
+    (v) =>
+      ({
+        ...v,
+        hold: null,
+        capture: null,
+        void: null,
+        payout: null,
+        outcome: null,
+        settlement: null,
+        checkinAt: null,
+        checkoutAt: null,
+        pendingMember: null,
+      }) as VisitRow,
+  );
 
 const assign = (visitId: string, memberId: string | null, consent = false): Plan["assignments"][number] => ({
-  visitId, memberId, consent, language: true, familiar: false, travelIn: 0,
+  visitId,
+  memberId,
+  consent,
+  language: true,
+  familiar: false,
+  travelIn: 0,
 });
 
 const planOf = (assignments: Plan["assignments"]): Plan => ({
-  rank: 1, assignments, covered: assignments.filter((a) => a.memberId).length, consent: 0, language: 0, familiar: 0, addedTravel: 0,
+  rank: 1,
+  assignments,
+  covered: assignments.filter((a) => a.memberId).length,
+  consent: 0,
+  language: 0,
+  familiar: 0,
+  addedTravel: 0,
 });
 
 describe("proposals and pending covers on the board", () => {
@@ -30,7 +54,12 @@ describe("proposals and pending covers on the board", () => {
       proposal: planOf([assign("v-thu-weber", "marek"), assign("v-thu-okafor", "marek", true), assign("v-thu-santos", null)]),
     });
     expect(crud.events.rows.find((e) => e.id === "proposed-v-thu-weber-marek")).toMatchObject({
-      kind: "proposed", cls: "proposed", draggable: false, visitId: "v-thu-weber", asked: false, postamble: "0 minutes",
+      kind: "proposed",
+      cls: "proposed",
+      draggable: false,
+      visitId: "v-thu-weber",
+      asked: false,
+      postamble: "0 minutes",
     });
     expect(crud.assignments.rows).toContainEqual({ id: "proposed-v-thu-weber-marek:marek", event: "proposed-v-thu-weber-marek", resource: "marek" });
     expect(crud.events.rows.find((e) => e.id === "proposed-v-thu-okafor-marek")).toMatchObject({ asked: true });
@@ -55,11 +84,14 @@ describe("proposals and pending covers on the board", () => {
 
   it.each<[string, (visits: VisitRow[]) => void]>([
     ["every visit has a member", () => {}],
-    ["the only visit with no member is cancelled", (visits) => {
-      const v = visits.find((x) => x.id === "v-thu-weber")!;
-      v.memberIds = [];
-      v.state = "cancelled";
-    }],
+    [
+      "the only visit with no member is cancelled",
+      (visits) => {
+        const v = visits.find((x) => x.id === "v-thu-weber")!;
+        v.memberIds = [];
+        v.state = "cancelled";
+      },
+    ],
   ])("the needs-cover row is left out when %s", (_label, change) => {
     const visits = rows();
     change(visits);
@@ -70,9 +102,16 @@ describe("proposals and pending covers on the board", () => {
 
   it("an absence becomes a resource time range for that member", () => {
     const crud = toCrud(members, households, rows(), { absences: [{ memberId: "sam", from: THU + hm("09:00"), to: 5760 }] });
-    expect(crud.resourceTimeRanges.rows).toEqual([{
-      id: "out-0-sam", resourceId: "sam", startDate: "2026-11-19T09:00:00", endDate: "2026-11-20T00:00:00", name: "Out today", cls: "out-of-office",
-    }]);
+    expect(crud.resourceTimeRanges.rows).toEqual([
+      {
+        id: "out-0-sam",
+        resourceId: "sam",
+        startDate: "2026-11-19T09:00:00",
+        endDate: "2026-11-20T00:00:00",
+        name: "Out today",
+        cls: "out-of-office",
+      },
+    ]);
   });
 
   it("the demo clock becomes one now line, and there is none without a clock", () => {
@@ -122,7 +161,10 @@ describe("the drag guard for one day", () => {
     await app.store.updateVisit("v-thu-osei", { state: "settling" });
     const visits = await app.store.visits();
     const g = guards(await app.store.members(), await app.store.households(), visits, await activeAbsences(app.store), day);
-    const expected = visits.filter((v) => Math.floor(v.start / 1440) === day && v.state === "scheduled").map((v) => v.id).sort();
+    const expected = visits
+      .filter((v) => Math.floor(v.start / 1440) === day && v.state === "scheduled")
+      .map((v) => v.id)
+      .sort();
     expect(Object.keys(g).sort()).toEqual(expected);
   });
 

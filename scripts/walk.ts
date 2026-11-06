@@ -17,7 +17,11 @@ const shot = async (name: string, p: Page = page) => {
   await p.screenshot({ path: `${out}/${String(n).padStart(2, "0")}-${name}.png`, fullPage: true });
   console.log("shot", name);
 };
-const post = (path: string, body: unknown = {}) => page.evaluate(async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(), [path, body] as const);
+const post = (path: string, body: unknown = {}) =>
+  page.evaluate(
+    async ([p, b]) => (await fetch(p as string, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) })).json(),
+    [path, body] as const,
+  );
 
 await page.goto(`${base}/`);
 await post("/api/demo/reset");

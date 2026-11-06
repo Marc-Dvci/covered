@@ -1,44 +1,58 @@
-// Durability check against the PayPal sandbox: the settlement task crashes once after the capture and
-// before the payout, the runner retries it, and PayPal itself is then asked to repeat each money step.
-// Writes docs/durability-sandbox.json.
-//   PAYPAL_CLIENT_ID=… PAYPAL_CLIENT_SECRET=… COVERED_DEMO_VAULT_ID=… COVERED_SANDBOX_PAYOUTS="*=PAYPAL:receiver@example.com" npx tsx scripts/durability.ts
+// Durability check on the deployed service: the settlement crashes once after the capture and before the payout,
+// Cloudflare Workflows retries the step, and PayPal itself is then asked to repeat each money step. It uses the demo
+// on the live site, so it resets the week first. Writes docs/durability-sandbox.json.
+//   LIVE_URL=https://covered-coop.pages.dev PAYPAL_CLIENT_ID=… PAYPAL_CLIENT_SECRET=… npx tsx scripts/durability.ts
 import { writeFileSync } from "node:fs";
-import { checkIn, checkOut } from "../server/actions.ts";
-import { config, loadEnv, makeApp } from "../server/context.ts";
 import { SandboxPayPal } from "../server/paypal/sandbox.ts";
 import { PayPalError } from "../server/paypal/types.ts";
-import { LocalRunner } from "../server/runner.ts";
+import { hm } from "../shared/seed.ts";
 
-loadEnv();
-const cfg = { ...config(), dbFile: null };
-if (!cfg.paypalClientId || !cfg.paypalSecret || !cfg.demoVaultId || !cfg.sandboxPayouts) {
-  console.error("needs PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, COVERED_DEMO_VAULT_ID and COVERED_SANDBOX_PAYOUTS");
+const { LIVE_URL, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_CURRENCY = "USD" } = process.env;
+if (!LIVE_URL || !PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+  console.error("needs LIVE_URL, PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET");
   process.exit(2);
 }
-const pp = new SandboxPayPal(cfg.paypalClientId, cfg.paypalSecret, cfg.currency);
-const app = await makeApp(cfg, pp);
-app.runner = new LocalRunner({ store: app.store, paypal: pp, payoutPollMs: 3000 }, 2000);
-await app.store.reset(cfg.demoVaultId, cfg.sandboxPayouts);
-const ctx = { store: app.store, runner: app.runner };
-
+const THU = 3 * 1440;
 const id = "v-thu-weber";
-const v0 = (await app.store.visit(id))!;
-const member = v0.memberIds[0]!;
+const member = "lena";
+const post = async (path: string, body: unknown = {}) => {
+  const r = await fetch(LIVE_URL + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`${path}: HTTP ${r.status} ${await r.text()}`);
+  return r.json();
+};
+interface VisitView {
+  visit: {
+    state: string;
+    capture: { captureId: string; cents: number } | null;
+    hold: { authorizationId: string; cents: number } | null;
+    settlement: { releaseCents: number } | null;
+    payout: { status: string; batchId: string; finalMs?: number; items: { transactionId?: string }[] } | null;
+  };
+  money: { kind: string; paypal_id: string | null }[];
+  events: { type: string; data: Record<string, unknown> }[];
+}
+const view = async () => (await (await fetch(`${LIVE_URL}/api/visits/${id}`)).json()) as VisitView;
+const until = async (what: string, ok: (v: VisitView) => boolean) => {
+  const end = Date.now() + 180_000;
+  while (Date.now() < end) {
+    const v = await view();
+    if (ok(v)) return v;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  throw new Error(`timed out waiting for ${what}`);
+};
+
 const t0 = Date.now();
-await app.runner.start("placeHold", id);
-await app.runner.idle();
-await app.store.setClock(v0.start);
-await checkIn(ctx, id, member);
-await app.store.kvSet(`crash-after-capture:${id}`, true);
-await app.store.setClock(v0.start + v0.minutes);
-await checkOut(ctx, id, member, false);
-await app.runner.idle();
+await post("/api/demo/reset");
+await until("the hold", (v) => v.visit.state === "held");
+await post("/api/clock", { at: THU + hm("10:00") });
+await post(`/api/visits/${id}/checkin`, { memberId: member });
+await post("/api/demo/crash-next-settle", { visitId: id });
+await post("/api/clock", { at: THU + hm("13:00") });
+await post(`/api/visits/${id}/checkout`, { memberId: member });
+const v = await until("the settlement", (x) => x.visit.state === "paid_out" && x.visit.payout?.status === "SUCCESS");
 
-const v = (await app.store.visit(id))!;
-const money = await app.store.moneyRows(id);
-const runs = (await app.store.events(50, id)).filter((e) => e.type === "task.run").reverse().map((e) => ({ task: e.data.task, attempt: e.data.attempt, status: e.data.status, detail: e.data.detail }));
-
-// ask PayPal to repeat each step with fresh request ids: it must refuse both
+const pp = new SandboxPayPal(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_CURRENCY);
 const tryAgain = async (fn: () => Promise<unknown>) => {
   try {
     await fn();
@@ -47,27 +61,48 @@ const tryAgain = async (fn: () => Promise<unknown>) => {
     return e instanceof PayPalError ? `${e.status} ${e.issue}` : String(e);
   }
 };
-const secondCapture = await tryAgain(() => pp.capture(v.hold!.authorizationId, 100, `durability-${Date.now()}`, `durability-${Date.now()}`, true));
-const secondPayout = await tryAgain(() => pp.payout(v.payout!.senderBatchId, [{ itemId: `${id}-${member}`, receiver: "nobody@example.com", wallet: "PAYPAL", cents: 100, note: "should be refused" }], "should be refused"));
-const batch = await pp.getPayout(v.payout!.batchId);
+const fresh = `durability-${Date.now()}`;
+const secondCapture = await tryAgain(() => pp.capture(v.visit.hold!.authorizationId, 100, fresh, fresh, true));
+const batch = await pp.getPayout(v.visit.payout!.batchId);
+const secondPayout = await tryAgain(() =>
+  pp.payout(
+    batch.senderBatchId,
+    [{ itemId: `${id}-${member}`, receiver: "nobody@example.com", wallet: "PAYPAL", cents: 100, note: "should be refused" }],
+    "should be refused",
+  ),
+);
 
+const runs = v.events.filter((e) => e.type === "task.run").reverse();
 const out = {
   ranAt: new Date().toISOString(),
-  currency: cfg.currency,
-  runner: "local (same retry policy as the Render workflow)",
+  site: LIVE_URL,
+  currency: PAYPAL_CURRENCY,
+  runner: "Cloudflare Workflows",
   visit: id,
-  state: v.state,
-  taskRuns: runs,
-  authorization: v.hold?.authorizationId,
-  capture: v.capture,
-  payout: { batchId: v.payout?.batchId, senderBatchId: v.payout?.senderBatchId, status: batch.status, items: batch.items },
-  moneyRows: { captures: money.filter((m) => m.kind === "capture").length, payoutBatches: new Set(money.filter((m) => m.kind === "payout").map((m) => m.paypal_id)).size },
+  state: v.visit.state,
+  crashes: v.events.filter((e) => e.type === "task.crashed").length,
+  workflowRuns: runs.map((r) => ({ task: r.data.task, instance: r.data.runId, status: r.data.status, detail: r.data.detail })),
+  authorization: v.visit.hold?.authorizationId,
+  capture: v.visit.capture,
+  releasedCents: v.visit.settlement?.releaseCents,
+  payout: { batchId: batch.batchId, status: batch.status, finalMs: v.visit.payout?.finalMs, transactionId: v.visit.payout?.items[0]?.transactionId },
+  moneyRows: {
+    captures: v.money.filter((m) => m.kind === "capture").length,
+    payoutBatches: new Set(v.money.filter((m) => m.kind === "payout").map((m) => m.paypal_id)).size,
+  },
   paypalRefusesSecondCapture: secondCapture,
   paypalRefusesSecondPayoutBatch: secondPayout,
   seconds: Math.round((Date.now() - t0) / 1000),
 };
-writeFileSync("docs/durability-sandbox.json", JSON.stringify(out, null, 1));
+writeFileSync("docs/durability-sandbox.json", `${JSON.stringify(out, null, 1)}\n`);
 console.log(JSON.stringify(out, null, 1));
-const ok = out.moneyRows.captures === 1 && out.moneyRows.payoutBatches === 1 && runs.some((r) => r.status === "retrying") && secondCapture !== "ACCEPTED" && secondPayout !== "ACCEPTED" && batch.status === "SUCCESS";
-console.log(ok ? "PASS" : "FAIL");
-process.exit(ok ? 0 : 1);
+const pass =
+  out.crashes === 1 &&
+  out.moneyRows.captures === 1 &&
+  out.moneyRows.payoutBatches === 1 &&
+  runs.some((r) => r.data.status === "retrying") &&
+  secondCapture !== "ACCEPTED" &&
+  secondPayout !== "ACCEPTED" &&
+  batch.status === "SUCCESS";
+console.log(pass ? "PASS" : "FAIL");
+process.exit(pass ? 0 : 1);

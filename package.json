@@ -1,24 +1,27 @@
 {
   "name": "covered",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "scripts": {
     "dev": "concurrently -k \"tsx watch server/main.ts\" \"vite\"",
     "start": "node --no-warnings --import tsx server/main.ts",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings --react-plugin --ignore-pattern \"dist/**\" --ignore-pattern \"web/public/_worker.js\" server shared web/src worker tests scripts eval probe",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "eval": "tsx eval/run.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "deploy": "wrangler deploy && npm run build && cd deploy/pages && wrangler pages deploy"
   },
   "dependencies": {
-    "@bryntum/core-enterprise": "8.0.0",
-    "@bryntum/scheduler-enterprise": "8.0.0",
     "@hono/node-server": "^2.1.6",
     "@paypal/paypal-server-sdk": "^2.5.0",
     "hono": "^4.13.16",
@@ -26,6 +29,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@bryntum/core-enterprise": "8.0.0",
+    "@bryntum/scheduler-enterprise": "8.0.0",
     "@cloudflare/workers-types": "^5.20261106.1",
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
     "@playwright/test": "^1.64.1",
@@ -37,6 +42,8 @@
     "axe-core": "^4.14.0",
     "concurrently": "^10.0.6",
     "fast-check": "^4.10.2",
+    "oxlint": "^1.91.0",
+    "prettier": "^3.9.10",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.4",
@@ -44,5 +51,6 @@
     "vite": "^8.3.4",
     "vitest": "^5.0.5",
     "wrangler": "^4.158.0"
-  }
+  },
+  "description": "A cleaning cooperative's week on one board: PayPal holds each visit's pay a day ahead, and whoever does the visit is paid at check-out."
 }

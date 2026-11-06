@@ -12,8 +12,24 @@ export interface Db {
 }
 
 const JSON_COLUMNS = new Set([
-  "value", "data", "member_ids", "terms", "hold", "capture", "void", "payout", "outcome", "settlement",
-  "readback", "output", "usage", "months", "affected", "proposal", "agent", "detail",
+  "value",
+  "data",
+  "member_ids",
+  "terms",
+  "hold",
+  "capture",
+  "void",
+  "payout",
+  "outcome",
+  "settlement",
+  "readback",
+  "output",
+  "usage",
+  "months",
+  "affected",
+  "proposal",
+  "agent",
+  "detail",
 ]);
 
 export function decodeRow<T>(row: Record<string, unknown>): T {

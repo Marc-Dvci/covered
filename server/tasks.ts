@@ -36,7 +36,10 @@ export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
     const hold = await d.paypal.authorize(h.vaultId, cents, ref, `Home cleaning, ${h.name}`, `covered-${ref}`);
     // placed when it fell due on the board's clock (the demo clock can jump past that moment)
     const placedAt = Math.min(await d.store.now(), v.start - holdAtMinutesBefore(v.terms));
-    await d.store.updateVisit(v.id, { state: "held", hold: { orderId: hold.orderId, authorizationId: hold.authorizationId, cents, placedAt, status: hold.status } });
+    await d.store.updateVisit(v.id, {
+      state: "held",
+      hold: { orderId: hold.orderId, authorizationId: hold.authorizationId, cents, placedAt, status: hold.status },
+    });
     await d.store.money(v.id, "hold", cents, v.id, hold.authorizationId, hold.status);
     await d.store.event("hold.placed", v.id, "workflow", { cents, authorizationId: hold.authorizationId });
     return `held ${dollars(cents)}`;
@@ -51,7 +54,8 @@ export async function placeHold(d: TaskDeps, visitId: string): Promise<string> {
   }
 }
 
-const settled = (v: VisitRow) => ["paid_out", "cancelled", "voided", "late_cancel"].includes(v.state) && Boolean(v.payout?.finalAt || !v.settlement?.captureCents);
+const settled = (v: VisitRow) =>
+  ["paid_out", "cancelled", "voided", "late_cancel"].includes(v.state) && Boolean(v.payout?.finalAt || !v.settlement?.captureCents);
 
 /** First half of a settlement: capture or void per the outcome, then send the members' payout. Safe to repeat. */
 export async function settleMoney(d: TaskDeps, visitId: string): Promise<string> {
@@ -99,15 +103,35 @@ export async function settleMoney(d: TaskDeps, visitId: string): Promise<string>
     try {
       const p = await d.paypal.payout(sender, items, "Your pay from the cooperative");
       v = await d.store.updateVisit(v.id, {
-        payout: { batchId: p.batchId, senderBatchId: sender, status: p.status, sentAt: await d.store.now(), sentMs: Date.now(),
-          items: items.map((i, k) => ({ memberId: shares[k]![0], cents: i.cents, wallet: i.wallet, status: p.items[k]?.status, transactionId: p.items[k]?.transactionId })) },
+        payout: {
+          batchId: p.batchId,
+          senderBatchId: sender,
+          status: p.status,
+          sentAt: await d.store.now(),
+          sentMs: Date.now(),
+          items: items.map((i, k) => ({
+            memberId: shares[k]![0],
+            cents: i.cents,
+            wallet: i.wallet,
+            status: p.items[k]?.status,
+            transactionId: p.items[k]?.transactionId,
+          })),
+        },
       });
       for (const [memberId, cents] of shares) await d.store.money(v.id, "payout", cents, `${sender}-${memberId}`, p.batchId, p.status, { memberId });
       await d.store.event("payout.sent", v.id, "workflow", { batchId: p.batchId, items: shares });
     } catch (e) {
       if (!(e instanceof PayPalError && (e.issue.includes("DUPLICATE") || e.issue.includes("already exists")))) throw e;
       // sent by an earlier attempt whose record was lost: PayPal refused to pay twice
-      v = await d.store.updateVisit(v.id, { payout: { batchId: "", senderBatchId: sender, status: "SENT_EARLIER", sentAt: await d.store.now(), items: shares.map(([memberId, cents]) => ({ memberId, cents, wallet: "" })) } });
+      v = await d.store.updateVisit(v.id, {
+        payout: {
+          batchId: "",
+          senderBatchId: sender,
+          status: "SENT_EARLIER",
+          sentAt: await d.store.now(),
+          items: shares.map(([memberId, cents]) => ({ memberId, cents, wallet: "" })),
+        },
+      });
       await d.store.event("payout.duplicate_refused", v.id, "workflow", { sender });
     }
   }
@@ -125,8 +149,14 @@ export async function pollPayout(d: TaskDeps, visitId: string): Promise<boolean>
   const items = mergePayoutItems(v.id, v.payout.items, p.items);
   // transaction ids can trail the batch's SUCCESS by a few seconds
   const complete = final && (p.status !== "SUCCESS" || items.every((i) => i.transactionId) || waited >= wait);
-  v = await d.store.updateVisit(v.id, { payout: { ...v.payout, status: p.status, items, ...(complete ? { finalAt: await d.store.now(), finalMs: waited } : {}) } });
-  for (const i of items) await d.store.money(v.id, "payout", i.cents, `${v.payout!.senderBatchId}-${i.memberId}`, v.payout!.batchId, p.status, { memberId: i.memberId, transactionId: i.transactionId });
+  v = await d.store.updateVisit(v.id, {
+    payout: { ...v.payout, status: p.status, items, ...(complete ? { finalAt: await d.store.now(), finalMs: waited } : {}) },
+  });
+  for (const i of items)
+    await d.store.money(v.id, "payout", i.cents, `${v.payout!.senderBatchId}-${i.memberId}`, v.payout!.batchId, p.status, {
+      memberId: i.memberId,
+      transactionId: i.transactionId,
+    });
   if (complete) await d.store.event("payout.final", v.id, "workflow", { status: p.status });
   return complete || waited >= wait;
 }
@@ -136,8 +166,16 @@ export async function finishVisit(d: TaskDeps, visitId: string): Promise<string>
   const v = await d.store.visit(visitId);
   if (!v?.settlement) return "nothing to finish";
   const s = v.settlement;
-  const state = s.captureCents === 0 ? (v.outcome?.type === "member_absent" ? "voided" : "cancelled")
-    : v.outcome?.type === "cancel" ? "late_cancel" : v.payout ? "paid_out" : "captured";
+  const state =
+    s.captureCents === 0
+      ? v.outcome?.type === "member_absent"
+        ? "voided"
+        : "cancelled"
+      : v.outcome?.type === "cancel"
+        ? "late_cancel"
+        : v.payout
+          ? "paid_out"
+          : "captured";
   await d.store.updateVisit(v.id, { state });
   return `${state}: captured ${dollars(s.captureCents)}, released ${dollars(s.releaseCents)}`;
 }
@@ -164,5 +202,7 @@ export function mergePayoutItems(
 
 /** Visits whose hold is due: start minus (notice + lead) has passed, and the visit has not started. */
 export async function dueForHold(store: Store, now: number): Promise<VisitRow[]> {
-  return (await store.visits()).filter((v) => v.state === "scheduled" && v.memberIds.length > 0 && v.start - holdAtMinutesBefore(v.terms) <= now && v.start > now);
+  return (await store.visits()).filter(
+    (v) => v.state === "scheduled" && v.memberIds.length > 0 && v.start - holdAtMinutesBefore(v.terms) <= now && v.start > now,
+  );
 }

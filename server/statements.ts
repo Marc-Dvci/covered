@@ -61,11 +61,18 @@ export async function statement(store: Store, paypal: PayPal, memberId: string):
     const item = v.payout?.items.find((i) => i.memberId === memberId);
     if (!item || !v.payout) continue;
     const kind = v.outcome?.type === "cancel" ? "late_cancel" : v.outcome?.type === "lockout" ? "lockout" : "visit";
-    const worked = v.outcome?.type === "checkout" ? v.outcome.worked[memberId] ?? 0 : 0;
+    const worked = v.outcome?.type === "checkout" ? (v.outcome.worked[memberId] ?? 0) : 0;
     lines.push({
-      visitId: v.id, date: `${boardDate(v.start)} (${WEEK_DAYS[Math.floor(v.start / 1440)]})`, household: households.find((h) => h.id === v.householdId)?.name ?? "",
-      minutes: worked, cents: item.cents, kind, batchId: v.payout.batchId, transactionId: item.transactionId ?? null,
-      payoutStatus: item.status ?? v.payout.status, reconciled: "pending",
+      visitId: v.id,
+      date: `${boardDate(v.start)} (${WEEK_DAYS[Math.floor(v.start / 1440)]})`,
+      household: households.find((h) => h.id === v.householdId)?.name ?? "",
+      minutes: worked,
+      cents: item.cents,
+      kind,
+      batchId: v.payout.batchId,
+      transactionId: item.transactionId ?? null,
+      payoutStatus: item.status ?? v.payout.status,
+      reconciled: "pending",
     });
   }
   let searchedAt: string | null = null;
@@ -92,11 +99,14 @@ export async function statement(store: Store, paypal: PayPal, memberId: string):
     months.set(k, acc);
   }
   return {
-    memberId, memberName: m.name, lines,
+    memberId,
+    memberName: m.name,
+    lines,
     months: [...months.entries()].map(([month, x]) => ({ month, ...x, hours: Math.round(x.hours * 100) / 100 })),
     totalCents: lines.reduce((a, l) => a + l.cents, 0),
     reconciledCount: lines.filter((l) => l.reconciled === "matched").length,
-    searchedAt, searchError,
+    searchedAt,
+    searchError,
   };
 }
 
@@ -134,7 +144,13 @@ export function landlordView(s: Statement) {
     totalCents: s.totalCents,
     payouts: s.lines.length,
     reconciled: s.reconciledCount,
-    lines: s.lines.map((l) => ({ date: l.date, hours: Math.round((l.minutes / 60) * 100) / 100, cents: l.cents, transactionId: l.transactionId, reconciled: l.reconciled })),
+    lines: s.lines.map((l) => ({
+      date: l.date,
+      hours: Math.round((l.minutes / 60) * 100) / 100,
+      cents: l.cents,
+      transactionId: l.transactionId,
+      reconciled: l.reconciled,
+    })),
   };
 }
 
@@ -143,10 +159,18 @@ export async function coverLetter(ai: Gemini | null, s: Statement, visitor?: str
   const template = `${s.memberName} is a member-owner of a house-cleaning cooperative and is paid for each visit through PayPal. Paid in the period shown: ${dollars(s.totalCents)} across ${s.lines.length} payouts (${totals}). Each line carries its PayPal transaction id.`;
   if (!ai || !s.lines.length) return { text: template, source: "template" };
   try {
-    const r = await ai.json<{ text: string }>("cover-letter", "light",
+    const r = await ai.json<{ text: string }>(
+      "cover-letter",
+      "light",
       "Write a short, plain cover letter (3 sentences) a cleaner can show a landlord or lender, introducing their income statement. Use only the figures given. No household names.",
-      [{ text: `Name: ${s.memberName}\nWork: member-owner of a house-cleaning cooperative, paid per visit through PayPal\nTotal: ${dollars(s.totalCents)}\nPayouts: ${s.lines.length}\nBy month: ${totals}` }],
-      { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] }, visitor);
+      [
+        {
+          text: `Name: ${s.memberName}\nWork: member-owner of a house-cleaning cooperative, paid per visit through PayPal\nTotal: ${dollars(s.totalCents)}\nPayouts: ${s.lines.length}\nBy month: ${totals}`,
+        },
+      ],
+      { type: "OBJECT", properties: { text: { type: "STRING" } }, required: ["text"] },
+      visitor,
+    );
     const allowed = [dollars(s.totalCents), s.lines.length, ...s.months.flatMap((m) => [m.month, m.visits, m.hours, dollars(m.cents)])];
     if (numbersOk(r.text, allowed)) return { text: r.text, source: ai.last?.source ?? "live" };
   } catch (e) {

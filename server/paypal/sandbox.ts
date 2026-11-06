@@ -102,9 +102,7 @@ export class SandboxPayPal implements PayPal {
         },
       },
     } as unknown as SetupTokenRequest;
-    const r = await this.sdk("vault setup", () =>
-      this.vault.createSetupToken({ body, paypalRequestId: requestId("setup", ref) }),
-    );
+    const r = await this.sdk("vault setup", () => this.vault.createSetupToken({ body, paypalRequestId: requestId("setup", ref) }));
     const approve = r.links?.find((l) => l.rel === "approve")?.href;
     if (!r.id || !approve) throw new PayPalError("vault setup", 500, "NO_APPROVE_LINK");
     return { setupTokenId: r.id, approveUrl: approve };
@@ -276,8 +274,13 @@ export class SandboxPayPal implements PayPal {
     const h = (k: string) => headers[k] ?? "";
     if (!h("paypal-transmission-sig")) return false;
     const j = await this.rest("verify webhook", "POST", "/v1/notifications/verify-webhook-signature", {
-      auth_algo: h("paypal-auth-algo"), cert_url: h("paypal-cert-url"), transmission_id: h("paypal-transmission-id"),
-      transmission_sig: h("paypal-transmission-sig"), transmission_time: h("paypal-transmission-time"), webhook_id: webhookId, webhook_event: event,
+      auth_algo: h("paypal-auth-algo"),
+      cert_url: h("paypal-cert-url"),
+      transmission_id: h("paypal-transmission-id"),
+      transmission_sig: h("paypal-transmission-sig"),
+      transmission_time: h("paypal-transmission-time"),
+      webhook_id: webhookId,
+      webhook_event: event,
     });
     return j.verification_status === "SUCCESS";
   }

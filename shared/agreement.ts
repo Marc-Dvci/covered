@@ -30,8 +30,7 @@ export interface Agreement {
 }
 
 export type Field =
-  | "scope" | "location" | "schedule" | "rate" | "rate_floor" | "payment_schedule"
-  | "cancellation" | "expenses" | "classification" | "benefits" | "leave";
+  "scope" | "location" | "schedule" | "rate" | "rate_floor" | "payment_schedule" | "cancellation" | "expenses" | "classification" | "benefits" | "leave";
 
 export const ORDINANCE_FIELDS: { field: Field; label: string; question: string }[] = [
   { field: "scope", label: "Scope of work", question: "What should be cleaned on each visit?" },
@@ -57,8 +56,18 @@ export function missing(a: Agreement): Field[] {
   else if (a.rateCentsPerHour < SEATTLE_MIN_RATE_CENTS) out.push("rate_floor");
   if (!a.paymentSchedule?.trim()) out.push("payment_schedule");
   const c = a.cancellation;
-  if (c.noticeHours === null || c.lateCancelPct === null || c.lockoutPct === null
-    || c.noticeHours < 1 || c.noticeHours > 72 || c.lateCancelPct < 0 || c.lateCancelPct > 100 || c.lockoutPct < 0 || c.lockoutPct > 100) out.push("cancellation");
+  if (
+    c.noticeHours === null ||
+    c.lateCancelPct === null ||
+    c.lockoutPct === null ||
+    c.noticeHours < 1 ||
+    c.noticeHours > 72 ||
+    c.lateCancelPct < 0 ||
+    c.lateCancelPct > 100 ||
+    c.lockoutPct < 0 ||
+    c.lockoutPct > 100
+  )
+    out.push("cancellation");
   if (!a.expenses?.trim()) out.push("expenses");
   if (!a.classification?.trim()) out.push("classification");
   if (!a.benefits?.trim()) out.push("benefits");
@@ -79,14 +88,23 @@ export const COOP_STANDARD = {
 
 export function blank(householdName = "", language: Lang = "en"): Agreement {
   return {
-    householdName, contact: "", area: "", language, scope: [], location: "",
+    householdName,
+    contact: "",
+    area: "",
+    language,
+    scope: [],
+    location: "",
     schedule: { weekday: null, start: null, minutes: null, frequency: null },
     rateCentsPerHour: DEFAULT_TERMS.rateCentsPerHour,
     paymentSchedule: COOP_STANDARD.paymentSchedule,
     cancellation: { noticeHours: DEFAULT_TERMS.noticeHours, lateCancelPct: DEFAULT_TERMS.lateCancelPct, lockoutPct: DEFAULT_TERMS.lockoutPct },
     extraAllowanceMinutes: DEFAULT_TERMS.extraAllowanceMinutes,
-    expenses: COOP_STANDARD.expenses, classification: COOP_STANDARD.classification,
-    benefits: COOP_STANDARD.benefits, leave: COOP_STANDARD.leave,
-    needs: [], sameCleaner: false, memberTerms: null,
+    expenses: COOP_STANDARD.expenses,
+    classification: COOP_STANDARD.classification,
+    benefits: COOP_STANDARD.benefits,
+    leave: COOP_STANDARD.leave,
+    needs: [],
+    sameCleaner: false,
+    memberTerms: null,
   };
 }

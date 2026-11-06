@@ -168,6 +168,14 @@ describe("the drag guard for one day", () => {
     expect(Object.keys(g).sort()).toEqual(expected);
   });
 
+  it("a member busy elsewhere is told apart by the household's name, never an internal visit id", async () => {
+    const g = guards(await app.store.members(), await app.store.households(), await app.store.visits(), await activeAbsences(app.store), 3);
+    const reasons = g["v-thu-okafor"]!.teresa!.reasons;
+    expect(reasons.join("; ")).toContain("busy at the Hassans 09:00 to 11:00");
+    const every = Object.values(g).flatMap((byMember) => Object.values(byMember).flatMap((x) => x.reasons));
+    expect(every.filter((r) => /\bv-[a-z]/.test(r))).toEqual([]);
+  });
+
   it("each member's verdict is the one canMove gives for the same visit, with Sam out", async () => {
     await openDisruption(app.store, null, "sam", STORY.message);
     const g = guards(await app.store.members(), await app.store.households(), await app.store.visits(), await activeAbsences(app.store), 3);

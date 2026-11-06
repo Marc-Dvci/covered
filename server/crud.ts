@@ -10,7 +10,7 @@ import { WEEK_START_ISO } from "../shared/seed.ts";
 import { travelMinutes } from "../shared/travel.ts";
 import { holdText, type Absence } from "./actions.ts";
 import type { Disruption } from "./dispatch/agent.ts";
-import { solve, type Plan } from "./dispatch/solver.ts";
+import { readableReasons, solve, type Plan } from "./dispatch/solver.ts";
 import type { VisitRow } from "./store.ts";
 
 const GONE = new Set(["cancelled", "late_cancel", "voided"]);
@@ -177,7 +177,9 @@ export function guards(
     if (Math.floor(v.start / 1440) !== day || LOCKED.has(v.state)) continue;
     const others = visits.map((x) => (x.id === v.id ? { ...x, memberIds: [] } : x));
     const { candidates } = solve({ members, households, visits: others, absences, affected: [v.id], maxPlans: 1 });
-    out[v.id] = Object.fromEntries((candidates[v.id] ?? []).map((c) => [c.memberId, { ok: c.ok, reasons: c.reasons, consent: c.consent }]));
+    out[v.id] = Object.fromEntries(
+      (candidates[v.id] ?? []).map((c) => [c.memberId, { ok: c.ok, reasons: readableReasons(c.reasons, visits, households), consent: c.consent }]),
+    );
   }
   return out;
 }

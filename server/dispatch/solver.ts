@@ -58,6 +58,15 @@ export interface SolveResult {
 
 type Slot = { start: number; end: number; at: Household["at"]; id: string };
 
+/**
+ * The solver names other visits by id, and the agent reads those lines as they are. A person reads the household's
+ * name instead: this is what the board's tooltip and the server's refusal show.
+ */
+export function readableReasons(reasons: string[], visits: Pick<Visit, "id" | "householdId">[], households: Pick<Household, "id" | "name">[]): string[] {
+  const names = new Map(visits.map((v) => [v.id, households.find((h) => h.id === v.householdId)?.name.replace(/^The /, "the ")]));
+  return reasons.map((r) => r.replace(/\bv-[a-z0-9-]+/g, (id) => names.get(id) ?? "another visit"));
+}
+
 export function solve(input: SolveInput): SolveResult {
   const { members, households } = input;
   const hh = new Map(households.map((h) => [h.id, h]));

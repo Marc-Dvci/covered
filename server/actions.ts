@@ -2,7 +2,7 @@
 // Each action checks the visit's state, stores the outcome, and hands the money to a task.
 import { dollars, type Household, type Member } from "../shared/domain.ts";
 import { holdAtMinutesBefore, priceCents, settle, type Outcome } from "../shared/rules/settle.ts";
-import { solve } from "./dispatch/solver.ts";
+import { readableReasons, solve } from "./dispatch/solver.ts";
 import type { Runner } from "./runner.ts";
 import type { Store, VisitRow } from "./store.ts";
 
@@ -129,7 +129,7 @@ export async function canMove(
   const r = solve({ members, households: households as Household[], visits: moved, absences, affected: [id], maxPlans: 1 });
   const cand = r.candidates[id]!.find((x) => x.memberId === memberId);
   if (!cand) return { ok: false, reasons: ["unknown member"], consent: false, hold: holdText(v) };
-  const reasons = [...cand.reasons];
+  const reasons = readableReasons(cand.reasons, visits, households as Household[]);
   const newStart = start ?? v.start;
   if (start !== undefined && start !== v.start && v.hold) {
     const now = await c.store.now();

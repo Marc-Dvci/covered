@@ -1,5 +1,5 @@
-// The API Worker: D1 ledger, Workflows for the money steps, cron for the sweep. No public address of its own:
-// the Pages project in deploy/pages forwards /api/* to it through a service binding.
+// The API Worker: the ledger in a Durable Object, Workflows for the money steps, cron for the sweep. No public
+// address of its own: the Pages project in deploy/pages forwards /api/* to it through a service binding.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "covered-api",
@@ -11,9 +11,11 @@
   "observability": { "enabled": true },
   "triggers": { "crons": ["*/5 * * * *"] },
   "workflows": [{ "name": "covered-money", "binding": "TASKS", "class_name": "MoneyTask" }],
-  "d1_databases": [{ "binding": "DB", "database_name": "covered", "database_id": "REPLACED_AT_DEPLOY" }],
+  "durable_objects": { "bindings": [{ "name": "LEDGER", "class_name": "Ledger" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Ledger"] }],
   "vars": {
     "COVERED_DEMO": "1",
+    "COVERED_PUBLIC_URL": "https://covered-coop.pages.dev",
     "COVERED_AI_UNTIL": "2026-12-21",
     "COVERED_MODEL_MAIN": "gemini-3.6-flash",
     "COVERED_MODEL_LIGHT": "gemini-3.5-flash-lite",

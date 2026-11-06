@@ -88,32 +88,11 @@ label { display: grid; gap: 0.3rem; font-weight: 700; font-size: 0.95rem; }
 .days button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--wash); }
 .legend { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.25rem 0 0.75rem; }
 
-.tl { --label: 168px; position: relative; border-top: 1px solid var(--line); }
-.tl-hours { display: grid; margin-left: var(--label); position: relative; height: 1.6rem; }
-.tl-hours span { position: absolute; font-size: 0.78rem; color: var(--muted); transform: translateX(-50%); top: 0.3rem; }
-.tl-row { display: grid; grid-template-columns: var(--label) 1fr; border-bottom: 1px solid var(--line-2); min-height: 62px; }
-.tl-row.out .tl-name { color: var(--risk); }
-.tl-name { padding: 0.45rem 0.6rem 0.45rem 0; display: grid; align-content: center; gap: 0.05rem; }
-.tl-name b { font-size: 0.95rem; }
-.tl-name small { font-size: 0.76rem; }
-.tl-track { position: relative; background-image: linear-gradient(to right, var(--line-2) 1px, transparent 1px); background-size: calc(100% / 12) 100%; }
-.tl-now { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--risk); z-index: 3; pointer-events: none; }
-.tl-now::after { content: attr(data-label); position: absolute; top: -1.5rem; left: 4px; font-size: 0.75rem; font-weight: 700; color: var(--risk); white-space: nowrap; }
-.bar { position: absolute; top: 7px; bottom: 7px; border-radius: 5px; border: 1.5px solid currentColor; padding: 0.2rem 0.45rem; overflow: hidden; text-align: left; font-size: 0.78rem; line-height: 1.2; background: #fff; transition: left 0.6s ease, top 0.6s ease; z-index: 2; }
-.bar b { display: block; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar span { white-space: nowrap; }
-.bar.s-scheduled { color: var(--scheduled); background: #fff; }
-.bar.s-done { color: var(--void); background: #fff; border-color: var(--line); }
-.bar.s-held, .bar.s-holding { color: var(--held); background: var(--held-wash); }
-.bar.s-in_progress, .bar.s-settling { color: var(--progress); background: var(--progress-wash); }
-.bar.s-captured, .bar.s-paid_out { color: var(--paid); background: var(--paid-wash); }
-.bar.s-late_cancel { color: var(--fee); background: var(--fee-wash); }
-.bar.s-cancelled, .bar.s-voided { color: var(--void); background: var(--void-wash); text-decoration: line-through; }
-.bar.s-at_risk { color: var(--risk); background: var(--risk-wash); }
-.bar.orphan { border-style: dashed; color: var(--risk); background: repeating-linear-gradient(135deg, #fff 0 6px, var(--risk-wash) 6px 12px); }
-.bar.ghost { border-style: dashed; color: var(--ghost); background: rgba(232, 240, 253, 0.65); z-index: 1; }
-.bar.selected { box-shadow: 0 0 0 3px var(--ink); }
-.travel { position: absolute; top: 50%; height: 0; border-top: 2px dotted var(--muted); z-index: 1; }
+/* the demo's next step */
+.guide { display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem 0.8rem; padding: 0.35rem 0 0.35rem 0.75rem; margin-bottom: 0.7rem; border-left: 3px solid var(--held); }
+.guide-n { font-weight: 700; font-size: 0.82rem; color: var(--held); white-space: nowrap; }
+.guide-text { font-size: 0.95rem; }
+.guide-link { font-weight: 700; }
 
 /* side panel */
 .side-section { display: grid; gap: 0.7rem; padding-bottom: 1.1rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--line); }

@@ -1,12 +1,12 @@
-// One small SQL surface over SQLite: Cloudflare D1 in production, node:sqlite for the no-setup quickstart
-// and the tests, so the SQL that the tests run is the SQL that runs live. JSON columns are stored as text
-// and decoded on the way out; parameters are written $1, $2 like the rest of the code expects.
+// One small SQL surface over SQLite: a Durable Object's database in production, node:sqlite for the no-setup
+// quickstart and the tests, so the SQL that the tests run is the SQL that runs live. JSON columns are stored
+// as text and decoded on the way out; parameters are written $1, $2 like the rest of the code expects.
 
 export type Query = <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]>;
 
 export interface Db {
   query: Query;
-  /** Apply writes atomically. On D1 they are queued and sent as one batch, so `fn` cannot read their results. */
+  /** Apply writes atomically. They may be queued and sent as one batch, so `fn` cannot read their results. */
   tx(fn: (q: Query) => Promise<void>): Promise<void>;
   close(): Promise<void>;
 }
@@ -26,32 +26,6 @@ export function decodeRow<T>(row: Record<string, unknown>): T {
 
 export const numbered = (sql: string) => sql.replace(/\$(\d+)/g, "?$1");
 export const bindable = (params: unknown[] = []) => params.map((p) => (p === undefined ? null : typeof p === "boolean" ? Number(p) : p));
-
-/** The part of Cloudflare's D1 binding this code uses. */
-export interface D1Like {
-  prepare(sql: string): D1StatementLike;
-  batch(statements: D1StatementLike[]): Promise<unknown>;
-}
-export interface D1StatementLike {
-  bind(...values: unknown[]): D1StatementLike;
-  all(): Promise<{ results?: Record<string, unknown>[] }>;
-}
-
-export function d1Db(d1: D1Like): Db {
-  const statement = (sql: string, params?: unknown[]) => d1.prepare(numbered(sql)).bind(...bindable(params));
-  return {
-    query: async <T,>(sql: string, params?: unknown[]) => ((await statement(sql, params).all()).results ?? []).map((r) => decodeRow<T>(r)),
-    tx: async (fn) => {
-      const queued: D1StatementLike[] = [];
-      await fn(async (sql, params) => {
-        queued.push(statement(sql, params));
-        return [];
-      });
-      if (queued.length) await d1.batch(queued);
-    },
-    close: async () => {},
-  };
-}
 
 export const SCHEMA = `
 create table if not exists kv (key text primary key, value text not null);

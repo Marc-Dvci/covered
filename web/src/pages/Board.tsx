@@ -3,6 +3,7 @@ import { chipText } from "../../../shared/chip.ts";
 import { clock, dollars, LANG_NAMES, WEEK_DAYS } from "../../../shared/domain.ts";
 import { api, STATE_LABEL, usePoll, type Board, type Disruption, type EventRow, type PublicVisit } from "../api.ts";
 import { BoardScheduler, type BoardView } from "../components/BoardScheduler.tsx";
+import { DemoGuide } from "../components/DemoGuide.tsx";
 
 function dateOf(weekStart: string, t: number): string {
   const d = new Date(`${weekStart}T12:00:00Z`);
@@ -43,6 +44,7 @@ export function BoardPage() {
           <span className="spacer" style={{ flex: 1 }} />
           <DemoClock board={board} onChange={async () => { await reload(); }} setToast={setToast} />
         </div>
+        {board.mode.demo && <DemoGuide board={board} reload={reload} />}
         <div className="row" style={{ justifyContent: "space-between" }}>
           <div className="days" role="group" aria-label="Day">
             {WEEK_DAYS.slice(0, 6).map((d, i) => (
@@ -174,7 +176,7 @@ function Inbox({ board, active, reload, setToast }: { board: Board; active: Disr
         <>
           <div className="row" style={{ justifyContent: "space-between" }}>
             <h2>Proposal: {p.plan.covered} of {active.affected.length} covered</h2>
-            <small>{p.source === "template" ? "solver + templates" : `${p.source}${p.model ? `, ${p.model}` : ""}`}</small>
+            <small>{p.source === "template" ? "solver + templates" : p.source === "recorded" ? "solver + Gemini, recorded answer" : "solver + Gemini"}</small>
           </div>
           <div>
             {p.plan.assignments.map((a) => (
@@ -234,7 +236,7 @@ const EVENT_TEXT: Record<string, (e: EventRow, n: (id: string) => string) => str
   "disruption.opened": (e, n) => `${n(e.actor)} is out`,
   "disruption.proposed": (e) => `Agent proposed plan ${e.data.rank} (${e.data.source})`,
   "disruption.approved": () => "Coordinator approved",
-  "task.run": (e) => `Workflow ${e.data.task}: ${e.data.status}${Number(e.data.attempt) ? ` (attempt ${Number(e.data.attempt) + 1})` : ""}`,
+  "task.run": (e) => `Workflow step ${String(e.data.status) === "retrying" ? "failed, retrying" : String(e.data.status)}: ${String(e.data.detail)}`,
   "task.crashed": () => "Task crashed after capture (test)",
   "clock.set": () => "Demo clock moved",
   "agreement.signed": (e, n) => `${n(e.actor)} signed and saved PayPal`,
@@ -249,7 +251,8 @@ function Feed({ board }: { board: Board }) {
     const v = vid ? board.visits.find((x) => x.id === vid) : null;
     return v ? board.households.find((h) => h.id === v.householdId)?.name ?? "" : "";
   };
-  const rows = board.events.filter((e) => EVENT_TEXT[e.type]).slice(0, 18);
+  // a finished task is already told by its money event; only a retry or a failure adds something
+  const rows = board.events.filter((e) => EVENT_TEXT[e.type] && !(e.type === "task.run" && ["succeeded", "started"].includes(String(e.data.status)))).slice(0, 18);
   return (
     <section className="side-section" aria-label="Activity">
       <h2>Activity</h2>

@@ -30,7 +30,7 @@ export function StatementPage() {
         <div className="stat"><small>Payouts</small><b>{data.lines.length}</b></div>
         <div className="stat"><small>Matched in PayPal</small><b>{data.reconciledCount} / {data.lines.length}</b></div>
       </div>
-      {data.searchError && <p className="muted">Transaction Search did not answer: {data.searchError}. Lines show their payout ids until it does.</p>}
+      {data.searchError && <p className="muted">PayPal's Transaction Search has not answered yet, so lines show their payout's transaction id until it does.</p>}
       <p className="why">{data.letter.text}</p>
       <table>
         <thead><tr><th>Date</th><th>Household</th><th className="num">Hours</th><th>Kind</th><th className="num">Paid</th><th>PayPal transaction</th><th>Matched</th></tr></thead>

@@ -1,4 +1,4 @@
-// node:sqlite for the quickstart, the Docker image and the tests. Same SQL dialect as D1 in production.
+// node:sqlite for the quickstart, the Docker image and the tests. Same SQL dialect as the deployed ledger.
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";

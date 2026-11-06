@@ -1,19 +1,21 @@
-// The deployed service on Cloudflare: the API on a Worker, the ledger on D1, the money steps as Workflows,
-// and a cron trigger that starts the sweep. The Worker has no public address of its own: the public site is
-// a Pages project (web front end) that forwards /api/* to it through a service binding.
+// The deployed service on Cloudflare: the API on a Worker, the ledger in a Durable Object's SQLite database, the
+// money steps as Workflows, and a cron trigger that starts the sweep. The Worker has no public address of its
+// own: the public site is a Pages project (web front end) that forwards /api/* to it through a service binding.
 import "./shim.ts"; // first: see the note in that file
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
 import { Hono } from "hono";
 import { Gemini } from "../server/ai/gemini.ts";
 import { routes } from "../server/api.ts";
 import { config, makePayPal, sweep, seedIfEmpty, type App, type Env as Vars } from "../server/core.ts";
-import { d1Db } from "../server/db.ts";
 import { logRun, RETRY, type Runner } from "../server/runner.ts";
 import { Store } from "../server/store.ts";
 import { finishVisit, PAYOUT_WAIT_MS, placeHold, pollPayout, settleMoney, type TaskDeps, type TaskName } from "../server/tasks.ts";
+import { Ledger, ledgerDb, type LedgerStub } from "./ledger.ts";
+
+export { Ledger };
 
 export interface Env {
-  DB: D1Database;
+  LEDGER: DurableObjectNamespace<Ledger>;
   TASKS: Workflow<TaskParams>;
 }
 export interface TaskParams {
@@ -50,7 +52,7 @@ let built: { app: App; server: Hono } | null = null;
 async function build(env: Env): Promise<{ app: App; server: Hono }> {
   if (built) return built;
   const cfg = config(env as unknown as Vars);
-  const store = new Store(d1Db(env.DB));
+  const store = new Store(ledgerDb(() => env.LEDGER.get(env.LEDGER.idFromName("coop"), { locationHint: "enam" }) as unknown as LedgerStub));
   await store.migrate();
   const app: App = { cfg, store, paypal: makePayPal(cfg), runner: new WorkflowRunner(env, store) };
   await seedIfEmpty(app);

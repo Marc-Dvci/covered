@@ -54,6 +54,11 @@ export function StatementPage() {
       {data.searchError && (
         <p className="muted">PayPal's Transaction Search has not answered yet, so lines show their payout's transaction id until it does.</p>
       )}
+      {!data.searchError && data.reconciledCount < data.lines.length && (
+        <p className="muted">
+          On the sandbox, PayPal's Transaction Search lists a payout about 2 hours after it happens. Until then, its line reads as pending.
+        </p>
+      )}
       <p className="why">{data.letter.text}</p>
       <table>
         <thead>

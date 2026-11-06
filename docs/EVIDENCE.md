@@ -135,7 +135,7 @@ axe-core (WCAG 2.0 A/AA, 2.1 AA) runs on each screen, with the Bryntum board in 
 
 | What | Result | Command |
 |---|---|---|
-| Unit and integration tests, in random order, with no network and no keys | 356 passing, 0 skipped | `npm test` |
+| Unit and integration tests, in random order, with no network and no keys | 377 passing, 0 skipped | `npm test` |
 | Browser tests in Chromium | 11 passing | `npm run e2e` |
 | Decision core coverage: pay rules, agreement checklist, solver, money tasks, visit actions, board data, runner | 97.7% of lines, 92% of branches; CI floor 90% and 80% | `npm run test:coverage` |
 | The deployed shape in Cloudflare's own runtime (Worker, Durable Object, Workflows), with no account and no keys | holds placed and a visit settled | `npx tsx scripts/worker-smoke.ts` |

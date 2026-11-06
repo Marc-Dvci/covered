@@ -62,6 +62,11 @@ export function SharePage() {
           </b>
         </div>
       </div>
+      {data.reconciled < data.payouts && (
+        <p className="muted">
+          On the sandbox, PayPal's Transaction Search lists a payout about 2 hours after it happens, so newer payouts are not matched yet.
+        </p>
+      )}
       <table>
         <thead>
           <tr>

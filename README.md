@@ -2,13 +2,13 @@
 
 [![ci](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/ci.yml) [![codeql](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/codeql.yml) [![live demo](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml/badge.svg)](https://github.com/Marc-Dvci/covered/actions/workflows/live.yml) ![tests](https://img.shields.io/badge/tests-396%20passing-137a3f) ![decision core coverage](https://img.shields.io/badge/decision%20core%20coverage-97.7%25-137a3f) ![pay rules](https://img.shields.io/badge/pay%20rules-40%2F40-137a3f) ![held-out cover set](https://img.shields.io/badge/held--out%20cover%20set-20%2F20%2C%200%20rules%20broken-137a3f) ![axe](https://img.shields.io/badge/axe--core%20WCAG%202.1%20AA-0%20violations-137a3f) ![licence](https://img.shields.io/badge/licence-Apache--2.0-14213d)
 
-[![The film: a cleaner calls in sick at 07:10, and the money stays with the visit. Click to watch.](docs/film-thumbnail.jpg)](https://github.com/Marc-Dvci/covered#see-it-work)
+[![The film: a cleaner calls in sick at 07:10, and the money stays with the visit. Click to watch.](docs/film-thumbnail.jpg)](https://youtu.be/o25r8MY8CH8)
 
 **Covered runs a house-cleaning cooperative's week on one board: each household's PayPal holds the visit's pay 24 hours ahead, and whoever does the visit is paid through PayPal Payouts when they check out.**
 
 I audit payment systems for a living. In this trade, the cancellation fee and the week's pay are usually a promise; Covered makes both of them a PayPal object before anyone travels.
 
-[Try it](https://covered-coop.pages.dev/board) · [Film](https://github.com/Marc-Dvci/covered#see-it-work) · [For judges](#for-judges) · [See it work](#see-it-work) · [Run it](#run-it) · [Evidence](docs/EVIDENCE.md)
+[Try it](https://covered-coop.pages.dev/board) · [Film](https://youtu.be/o25r8MY8CH8) · [For judges](#for-judges) · [See it work](#see-it-work) · [Run it](#run-it) · [Evidence](docs/EVIDENCE.md)
 
 | | |
 |---|---|
@@ -30,7 +30,7 @@ I audit payment systems for a living. In this trade, the cancellation fee and th
 | Design | [See it work](#see-it-work): coordinator board, member and household phones in their own languages, sign-up by voice, 0 axe-core violations |
 | Potential impact | [Who it is for](#who-it-is-for), [The rule](#the-rule) |
 | Innovation | The hold belongs to the visit, so a cover keeps the money in place, and the notice window and the hold are the same 24 hours: [the guard](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/actions.ts#L116-L139), [the move](https://github.com/Marc-Dvci/covered/blob/v1.0.0/server/actions.ts#L148-L162) |
-| Presentation | [The film](https://github.com/Marc-Dvci/covered#see-it-work), [the live demo](https://covered-coop.pages.dev/board), [Run it](#run-it) with no keys |
+| Presentation | [The film](https://youtu.be/o25r8MY8CH8), [the live demo](https://covered-coop.pages.dev/board), [Run it](#run-it) with no keys |
 
 ## See it work
 
